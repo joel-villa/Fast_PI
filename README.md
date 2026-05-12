@@ -11,30 +11,33 @@ We dimensionally reduce
 ## To run main:
 python -m src.main
 
-## A Note on Cosine Distances
+## A Note on ssgetpy
 
-Cosine distances are from 0 to 2, where 0 is identical, 1 is orthogonal, and 
-2 is opposite
+The ssgetpy library will download matrices onto your machine, at the root in the .ssgetpy directory
 
 ## TODO
 
-### High Priority
-- Power iteration w/ JL reductions, Sparsified, and...
-    - Use subset matrices itteratively (akin to boosting) - random sampling
-- Behavior on various Sparse matrices
-- Try scikit learn library out
-- Compare eig preservation of scikit's gaussian vs. sparse
-- SVD or Power? that is the question
+- A proof that JL reductions approximately preserve eigenvectors.
 
-### Mid Priority
+- Does the sparse JL reduction result in dense matrices? What is the density of a JL reduction via the sparse matrix? It is sparse matrix sparse matrix multiplication, so this may not be the case, and a less drastic dimensionality reduction may be valid due to this.
 
-- Make Tests for preservation of Dot Products, Distance Vectors, etc
-- Find apt C, from this: d = (C ln n) / epsilon^2
-  
-### Low Priority
-- Inverse of Johnson Lindenstrauss: Moore-Penrose Psuedo-Inverse -> Singular Value Decomposition
-- Test the modified version of Thm 8.2.2 from https://users.cs.utah.edu/~jeffp/teaching/cs7931-S15/cs7931/8-sparsification.pdf, s.t. expected density is maintained (Connor if you want to mess arround with this, just lmk, I have it coded up already, just in a seperate repo)
-- Make JL take in just epsilon, d is determined by the following: d = (C \ln n) / \epsilon^2
+- Implementation of a JL reduction which takes into account the density of the original matrix (with the goal of preserving number of non-zeroes). As mentioned in Section 4.1, distributed arithmetic with dense matrices is more efficient than with sparse matrices with the same number of non-zeroes due to latency due to non-patterned messaging. 
+
+- A JL-enhanced SVD algorithm which uses a guess and check approach, re-reducing the matrix until one which preserves the top eigenvector is found (this can be verified by running some iterations with the original matrix), and continuing with the standard SVD after that JL-reduction has converged on a sufficiently accurate "initial guess" for the top eigenvector. 
+
+- Counting number of scalar multiplications in original SVD vs. a JL-enhanced SVD.
+
+- Proof on the lowerbound of dimensionality reduction in order to preserve top eigenvectors of a matrix: $d = \frac{C \log m}{\epsilon}$?
+
+- Timing convergence of original SVD vs. a JL-enhaced SVD.
+
+- A JL-enhanced SVD algorithm which takes averages of guesses for the top eigenvector. 
+
+- Does probability of preserving top eigenvectors depend on spectral gap? To what extent? 
+
+- How does spectral gap impact the ability of a JL reduction to preserve tpo eigenvectors. 
+
+- How does JL preserve top k eigenvectors? How does JL preserve top k eigenvectors when difference in singular values is relatively small?
   
 
 ## Things we Could Feasibly Hope to Prove
