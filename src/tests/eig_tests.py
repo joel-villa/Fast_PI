@@ -45,8 +45,10 @@ def scikit_eig_percent_reduce(A, ps, seed, type="jl_gaussian"):
     match type:
         case "jl_gaussian":
             reduct_funct = jl_gaussian
-        case _:
+        case "jl_sparse":
             reduct_funct = jl_sparse
+        case _:
+            raise TypeError(f"type must be 'jl_gaussian' or 'jl_sparse', not {type}")
 
     ys = np.zeros(np.shape(ps))
     xs = np.zeros(np.shape(ps))
