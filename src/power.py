@@ -6,7 +6,7 @@ from Sparsification_Research.src.SSGetter import SSGetter
 from Sparsification_Research.src.Plotter import Plotter
 
 import numpy as np
-from .tests.svd_tests import *
+from .tests.power import *
 from .util.eig_functs import *
 from .tests.svd_sparse import sparse_svd
 from .tests.subset_svd import percent_subset_svd
@@ -57,6 +57,7 @@ def main_swap():
 
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
+    mats = ["bcsstk19", "bcsstm07"]
     """These mats seem to imperically have this in common: small spectral gap,
       and large eigenvalues
       TODO: prove why this may be the case? 
@@ -65,16 +66,16 @@ def main_swap():
 
 
     types = ["jl_gaussian", "jl_sparse"]
-    ps = [97]
+    ps = [80]
     step_size = 8
 
-    plotter = Plotter(save_fig=True, show_fig=True)
+    plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
 
     for mat in mats:
         plotter.init_plot(title=f"SVD Convergence of {mat}", 
                           x_label="number of iterations",
                           y_label="residual", 
-                          save_name=f"{mat}_97_percent_reduced",
+                          save_name=f"{mat}_{ps[0]}_swap",
                           grid_on=True) 
 
         test(baseline_svd_convergence, plotter, mat, seed, num_avg, num_iter)
@@ -93,7 +94,8 @@ def main_swap():
 
         plotter.finish()
 
-if __name__ == '__main__':
+
+def main_no_swap():
     # mats    = ["494_bus"]
     seed    = 10
     num_avg = 1
@@ -102,6 +104,7 @@ if __name__ == '__main__':
 
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
+    mats = ["bcsstk19"]
     """These mats seem to imperically have this in common: small spectral gap,
       and large eigenvalues
       TODO: prove why this may be the case? 
@@ -110,26 +113,30 @@ if __name__ == '__main__':
 
 
     types = ["jl_gaussian", "jl_sparse"]
+    types = ["jl_gaussian"]
     p = 97
     step_size = 8
 
-    plotter = Plotter(save_fig=True, show_fig=True)
+    plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
 
     for mat in mats:
         plotter.init_plot(title=f"SVD Convergence of {mat}", 
                           x_label="number of iterations",
                           y_label="residual", 
-                          save_name=f"{mat}_97_p_reduced_no_swap",
+                          save_name=f"{mat}_subset_no_swap_{p}",
                           grid_on=True) 
 
         test(baseline_svd_convergence, plotter, mat, seed, num_avg, num_iter)
         
-        for type in types:
-            for i in range(5):
-                test(jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
+        # for type in types:
+        #     for i in range(7):
+        #         test(jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
             
-        for i in range(5):
+        for i in range(7):
             test(percent_subset_svd, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
 
         plotter.finish()
+
+if __name__ == '__main__':
+    main_swap()
 

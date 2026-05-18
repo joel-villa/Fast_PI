@@ -165,8 +165,8 @@ def run_scikit_eig_percent_reduce(plotter, mats, seed, num_avg, type="jl_gaussia
 if __name__ == '__main__':
     plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
     # mats    = ["494_bus"]
-    mats    = ["494_bus", "1138_bus", "bibd_11_5", "bibd_13_6","bcsstk08"]
-    # mats    = ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
+    # mats    = ["494_bus", "1138_bus", "bibd_11_5", "bibd_13_6","bcsstk08"]
+    mats    = ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
 
     seed    = 10
     num_avg = 1

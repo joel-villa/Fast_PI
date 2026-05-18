@@ -4,8 +4,8 @@ from Sparsification_Research.src.SGenerator import SGenerator
 import numpy as np
 
 from ..util.eig_functs import euclidean_dist
-from ..util.svd_util import v_from_u
-from ..util.svd_util import topsing
+from ..util.power import v_from_u
+from ..util.power import topsing
 
 def sparse_svd(A, u_0, u_star, num_iter, seed, x):
     sparsifier = MDSparsifier(seed=seed)

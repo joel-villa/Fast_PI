@@ -3,8 +3,8 @@ Some tests for dimensionality reduction where you use random subset of the
 columns to see if SVD converges faster
 """
 import numpy as np
-from ..util.svd_util import v_from_u
-from ..util.svd_util import topsing
+from ..util.power import v_from_u
+from ..util.power import topsing
 from ..util.eig_functs import euclidean_dist
 from ..util.scikit_jl import percent_reduce
 

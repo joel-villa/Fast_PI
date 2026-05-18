@@ -13,8 +13,8 @@ from ..util.eig_functs import euclidean_dist
 from ..util.scikit_jl import jl_gaussian
 from ..util.scikit_jl import jl_sparse
 from ..util.scikit_jl import percent_reduce
-from ..util.svd_util import topsing
-from ..util.svd_util import v_from_u
+from ..util.power import topsing
+from ..util.power import v_from_u
 
 def baseline_svd_convergence(A, u_0, u_star, num_iter, seed):
     """
