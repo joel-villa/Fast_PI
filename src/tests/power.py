@@ -1,5 +1,5 @@
 """
-For testing the convegence of a JL enhanced svd iteration method
+For testing the convegence of a JL enhanced power iteration method
 
 All methods in this file return xs, ys, and labels (for easy plotting)
 """
@@ -16,9 +16,9 @@ from ..util.scikit_jl import percent_reduce
 from ..util.power import topsing
 from ..util.power import v_from_u
 
-def baseline_svd_convergence(A, u_0, u_star, num_iter, seed):
+def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
     """
-    The baseline SVD convergence
+    The baseline power convergence
     """
 
     v =  v_from_u(A, u_0)
@@ -41,11 +41,11 @@ def baseline_svd_convergence(A, u_0, u_star, num_iter, seed):
         ys[i] = euc_dist
         xs[i] = i
     
-    return xs, ys, f"standard svd {A.shape}"
+    return xs, ys, f"standard power {A.shape}"
 
-def jl_reduced_svd_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gaussian"):
+def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gaussian"):
     """
-    Convergence of SVD on a JL-dimensionally reduced version of A
+    Convergence of Power Iteration on a JL-dimensionally reduced version of A
     """
 
     
@@ -79,21 +79,22 @@ def jl_reduced_svd_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gauss
         ys[i] = euc_dist
         xs[i] = i
 
-    return xs, ys, f"jl-reduced svd {reduced_A.shape} ({type})"
+    return xs, ys, f"jl-reduced power {reduced_A.shape} ({type})"
 
 def jl_percent_reduced(A, u_0, u_star, num_iter, seed, p, type):
     """
-    Convergence of SVD on a JL-dimensionally reduced version of A
+    Convergence of Power Iteration on a JL-dimensionally reduced version of A
     """
 
     d = percent_reduce(A.shape[1], p)
-    xs, ys, _ = jl_reduced_svd_convergence(A, u_0, u_star, num_iter, seed, d, type)
+    xs, ys, _ = jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type)
     
-    return xs, ys, f"{p}% jl-reduced svd ({type})"
+    return xs, ys, f"{p}% jl-reduced power ({type})"
 
-def multi_jl_svd(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian"):
+def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian"):
     """
-    Convergence of SVD on a JL-dimensionally reduced version of A
+    Swapping between multiple JL reductions, attempting to  "enhance" power 
+    iteration
     """
 
     xs = np.zeros(num_iter)
@@ -134,11 +135,12 @@ def multi_jl_svd(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
 
 def multi_jl_p_reduce(A, u_0, u_star, num_iter, seed, p, step_size, type):
     """
-    Convergence of SVD on a JL-dimensionally reduced version of A
+    Swapping between multiple JL reductions, attempting to  "enhance" power 
+    iteration (percentage based)
     """
 
     d = percent_reduce(A.shape[1], p)
-    xs, ys, _ = multi_jl_svd(A, u_0, u_star, num_iter, seed, d, step_size, type)
+    xs, ys, _ = multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type)
     
     return xs, ys, f"reduced {p}%, swapping every {step_size} ({type})"
 
