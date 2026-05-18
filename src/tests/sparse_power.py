@@ -7,7 +7,7 @@ from ..util.eig_functs import euclidean_dist
 from ..util.power import v_from_u
 from ..util.power import topsing
 
-def sparse_svd(A, u_0, u_star, num_iter, seed, x):
+def sparse_pow(A, u_0, u_star, num_iter, seed, x):
     sparsifier = MDSparsifier(seed=seed)
 
     s_generator = SGenerator(A.shape[0], A.nnz)

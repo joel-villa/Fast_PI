@@ -1,6 +1,6 @@
 """
 Some tests for dimensionality reduction where you use random subset of the 
-columns to see if SVD converges faster
+columns to see if power iteration converges faster
 """
 import numpy as np
 from ..util.power import v_from_u
@@ -37,18 +37,18 @@ def select_d_random_columns(A, d, seed):
 
     return B
 
-def subset_svd(A, u_0, u_star, num_iter, seed, d):
+def subset_pow(A, u_0, u_star, num_iter, seed, d):
     """
     A - the matrix (nxm)
     u_0 - an initial guess for the top left eigenvector of A
     u_star - the actual top left eigenvector of A
-    num_iter - the number of iterations of SVD to do
+    num_iter - the number of iterations of power to do
     seed - for repeatable tests
     d - reduction size: A_reduced is (nxd)
 
     RETURN: xs - a list of iterations [0, 1, 2, ..., num_iter - 1]
             ys - the list of residuals per iteration
-    Measure convergence of SVD with some random subset of the columns of A
+    Measure convergence of Power with some random subset of the columns of A
     """
 
     xs = np.zeros(num_iter)
@@ -74,39 +74,39 @@ def subset_svd(A, u_0, u_star, num_iter, seed, d):
 
     return xs, ys, f"random column subset: {A_reduced.shape}"
 
-def percent_subset_svd(A, u_0, u_star, num_iter, seed, p):
+def percent_subset_pow(A, u_0, u_star, num_iter, seed, p):
     """
     A - the matrix (nxm)
     u_0 - an initial guess for the top left eigenvector of A
     u_star - the actual top left eigenvector of A
-    num_iter - the number of iterations of SVD to do
+    num_iter - the number of iterations of power to do
     seed - for repeatable tests
     p - reduction percentage: A_reduced is (nx(1-p)*m)
 
     RETURN: xs - a list of iterations [0, 1, 2, ..., num_iter - 1]
             ys - the list of residuals per iteration
-    Measure convergence of SVD with some random subset of the columns of A
+    Measure convergence of power with some random subset of the columns of A
     """
 
     d = percent_reduce(A.shape[1], p)
 
-    xs, ys, label = subset_svd(A, u_0, u_star, num_iter, seed, d)
+    xs, ys, label = subset_pow(A, u_0, u_star, num_iter, seed, d)
 
     return xs, ys, f"{label}, ({p}%)"
 
-def subset_svd_swap(A, u_0, u_star, num_iter, seed, d, step_size):
+def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
     """
     A - the matrix (nxm)
     u_0 - an initial guess for the top left eigenvector of A
     u_star - the actual top left eigenvector of A
-    num_iter - the number of iterations of SVD to do
+    num_iter - the number of iterations of Power to do
     seed - for repeatable tests
     d - reduction size: A_reduced is (nxd)
     step_size - how often to regenerate A
 
     RETURN: xs - a list of iterations [0, 1, 2, ..., num_iter - 1]
             ys - the list of residuals per iteration
-    Measure convergence of SVD with some random subset of the columns of A
+    Measure convergence of Power with some random subset of the columns of A
     """
 
     xs = np.zeros(num_iter)
@@ -136,23 +136,23 @@ def subset_svd_swap(A, u_0, u_star, num_iter, seed, d, step_size):
 
     return xs, ys, f"column subset (swapping every {step_size}): {A_reduced.shape}"
 
-def percent_subset_svd_swap(A, u_0, u_star, num_iter, seed, p, step_size):
+def percent_subset_pow_swap(A, u_0, u_star, num_iter, seed, p, step_size):
     """
     A - the matrix (nxm)
     u_0 - an initial guess for the top left eigenvector of A
     u_star - the actual top left eigenvector of A
-    num_iter - the number of iterations of SVD to do
+    num_iter - the number of iterations of Power to do
     seed - for repeatable tests
     p - reduction percentage: A_reduced is (nx(1-p)*m)
     step_size - how often to regenerate A
 
     RETURN: xs - a list of iterations [0, 1, 2, ..., num_iter - 1]
             ys - the list of residuals per iteration
-    Measure convergence of SVD with some random subset of the columns of A
+    Measure convergence of Power with some random subset of the columns of A
     """
 
     d = percent_reduce(A.shape[1], p)
 
-    xs, ys, label = subset_svd_swap(A, u_0, u_star, num_iter, seed, d, step_size)
+    xs, ys, label = subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size)
 
     return xs, ys, f"{label}, ({p}%)"
