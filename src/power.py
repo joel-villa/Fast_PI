@@ -1,6 +1,6 @@
 """
 Has some runnable methods, which plot the convergence of a JL-enhanced power 
-iteration (SVD?) method
+iteration method
 """
 from Sparsification_Research.src.SSGetter import SSGetter
 from Sparsification_Research.src.Plotter import Plotter
@@ -8,9 +8,9 @@ from Sparsification_Research.src.Plotter import Plotter
 import numpy as np
 from .tests.power import *
 from .util.eig_functs import *
-from .tests.svd_sparse import sparse_svd
-from .tests.subset_svd import percent_subset_svd
-from .tests.subset_svd import percent_subset_svd_swap
+from .tests.sparse_power import sparse_pow
+from .tests.subset_power import percent_subset_pow
+from .tests.subset_power import percent_subset_pow_swap
 
 def test(funct, plotter, mat_name, seed, num_avg, num_iter, args={}):
     """
@@ -72,13 +72,13 @@ def main_swap():
     plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
 
     for mat in mats:
-        plotter.init_plot(title=f"SVD Convergence of {mat}", 
+        plotter.init_plot(title=f"Power Convergence of {mat}", 
                           x_label="number of iterations",
                           y_label="residual", 
                           save_name=f"{mat}_{ps[0]}_swap",
                           grid_on=True) 
 
-        test(baseline_svd_convergence, plotter, mat, seed, num_avg, num_iter)
+        test(baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
         
         for p in ps:
             for type in types:
@@ -86,11 +86,11 @@ def main_swap():
                 args2 = {"p": p, "step_size": step_size, "type" : type}
                 test(jl_percent_reduced, plotter, mat, seed, num_avg, num_iter, args1)
                 test(multi_jl_p_reduce, plotter, mat, seed, num_avg, num_iter, args2)
-            test(percent_subset_svd, plotter, mat, seed, num_avg, num_iter, {"p": p})
+            test(percent_subset_pow, plotter, mat, seed, num_avg, num_iter, {"p": p})
             if (mat == "impcol_d"):
-                # impcol_d gets "infs" with percent_subset_svd_swap, skipping it for now
+                # impcol_d gets "infs" with percent_subset_pow_swap, skipping it for now
                 continue 
-            test(percent_subset_svd_swap, plotter, mat, seed, num_avg, num_iter, {"p": p, "step_size" : step_size})
+            test(percent_subset_pow_swap, plotter, mat, seed, num_avg, num_iter, {"p": p, "step_size" : step_size})
 
         plotter.finish()
 
@@ -120,20 +120,20 @@ def main_no_swap():
     plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
 
     for mat in mats:
-        plotter.init_plot(title=f"SVD Convergence of {mat}", 
+        plotter.init_plot(title=f"Power Convergence of {mat}", 
                           x_label="number of iterations",
                           y_label="residual", 
                           save_name=f"{mat}_subset_no_swap_{p}",
                           grid_on=True) 
 
-        test(baseline_svd_convergence, plotter, mat, seed, num_avg, num_iter)
+        test(baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
         
         # for type in types:
         #     for i in range(7):
         #         test(jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
             
         for i in range(7):
-            test(percent_subset_svd, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
+            test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
 
         plotter.finish()
 
