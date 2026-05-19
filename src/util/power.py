@@ -45,7 +45,7 @@ def topsing(v0, A, maxiter=10):
     u = A @ v / s
     return u, s, v
 
-def count_mults(v0, A, maxiter=10):
+def count_mults(A, maxiter=10):
     """
     v0 - some vector with same dimension as A's top right eigenvectors
     A  - the matrix to do power iteration on
