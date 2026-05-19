@@ -2,8 +2,9 @@
 A file for some tests, which return xs and ys (for easy plotting)
 """
 from math import ceil 
-from ..util.eig_functs import *
-from ..util.scikit_jl import *
+from ..util import eig_functs as eig
+from ..util import scikit_jl as jl
+import numpy as np
 
 
 def jl_top_eig_pres(A, ps, seed):
@@ -22,8 +23,8 @@ def jl_top_eig_pres(A, ps, seed):
     xs = np.zeros(np.shape(ps))
 
     for i, p in enumerate(ps):
-        A_reduced = percent_reduce(A, p, seed=seed)
-        diff = diff_in_top_eigs(A, A_reduced)
+        A_reduced = jl.percent_reduce(A, p, seed=seed)
+        diff = eig.diff_in_top_eigs(A, A_reduced)
         ys[i] = diff
         xs[i] = A_reduced.shape[1]
 
@@ -44,9 +45,9 @@ def scikit_eig_percent_reduce(A, ps, seed, type="jl_gaussian"):
 
     match type:
         case "jl_gaussian":
-            reduct_funct = jl_gaussian
+            reduct_funct = jl.jl_gaussian
         case "jl_sparse":
-            reduct_funct = jl_sparse
+            reduct_funct = jl.jl_sparse
         case _:
             raise TypeError(f"type must be 'jl_gaussian' or 'jl_sparse', not {type}")
 
@@ -63,7 +64,7 @@ def scikit_eig_percent_reduce(A, ps, seed, type="jl_gaussian"):
         
         A_reduced = reduct_funct(A, d=d, eps=0.9, seed=seed)
 
-        diff = diff_in_top_eigs(A, A_reduced)
+        diff = eig.diff_in_top_eigs(A, A_reduced)
         ys[i] = diff
         xs[i] = A_reduced.shape[1]
     
@@ -86,8 +87,8 @@ def scikit_jl_top_eig_pres(A, epsilons, seed):
     xs = np.zeros(np.shape(epsilons))
 
     for i, eps in enumerate(epsilons):
-        A_reduced = jl_gaussian(A, d="auto", eps=eps, seed=seed)
-        diff = diff_in_top_eigs(A, A_reduced)
+        A_reduced = jl.jl_gaussian(A, d="auto", eps=eps, seed=seed)
+        diff = eig.diff_in_top_eigs(A, A_reduced)
         ys[i] = diff
         xs[i] = A_reduced.shape[1]
     
