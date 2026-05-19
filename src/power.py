@@ -117,7 +117,7 @@ def main_no_swap():
     p = 97
     step_size = 8
 
-    plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
+    plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat in mats:
         plotter.init_plot(title=f"Power Convergence of {mat}", 
@@ -128,15 +128,15 @@ def main_no_swap():
 
         test(baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
         
-        # for type in types:
-        #     for i in range(7):
-        #         test(jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
+        for type in types:
+            for i in range(7):
+                test(jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
             
-        for i in range(7):
-            test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
+        # for i in range(7):
+        #     test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
 
         plotter.finish()
 
 if __name__ == '__main__':
-    main_swap()
+    main_no_swap()
 
