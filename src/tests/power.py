@@ -38,14 +38,15 @@ def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
         ys[i] = euc_dist
         xs[i] = i
     
-    return xs, ys, f"standard power {A.shape}"
+    return xs, ys, f"standard power {A.shape}, ({pwr.count_mults(A, num_iter)} scalar mults)"
 
 def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gaussian"):
     """
     Convergence of Power Iteration on a JL-dimensionally reduced version of A
     """
 
-    
+    # tracking number of scalar mutls
+    scalar_mults = 0
 
     xs = np.zeros(num_iter)
     ys = np.zeros(num_iter)
@@ -57,6 +58,8 @@ def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gauss
             reduct_funct = jl.jl_sparse
 
     reduced_A = reduct_funct(A, d=d, seed=seed, eps=0.99)
+
+    scalar_mults += jl.reduction_cost(A, d=d)
 
     v =  pwr.v_from_u(reduced_A, u_0)
 
@@ -76,7 +79,10 @@ def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gauss
         ys[i] = euc_dist
         xs[i] = i
 
-    return xs, ys, f"jl-reduced power {reduced_A.shape} ({type})"
+    # Number of scalar mults for power
+    scalar_mults += pwr.count_mults(reduced_A, num_iter)
+
+    return xs, ys, f"jl-reduced power {reduced_A.shape} ({type}, {scalar_mults} scalar mults)"
 
 def jl_percent_reduced(A, u_0, u_star, num_iter, seed, p, type):
     """
@@ -84,9 +90,9 @@ def jl_percent_reduced(A, u_0, u_star, num_iter, seed, p, type):
     """
 
     d = jl.percent_reduce(A.shape[1], p)
-    xs, ys, _ = jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type)
+    xs, ys, lbl = jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type)
     
-    return xs, ys, f"{p}% jl-reduced power ({type})"
+    return xs, ys, f"{p}% {lbl}"
 
 def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian"):
     """
