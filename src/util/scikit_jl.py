@@ -2,6 +2,7 @@
 For interfacing with scikit learn's JL reduction
 """
 
+import numpy as np
 from sklearn import random_projection
 from math import ceil 
 
@@ -60,3 +61,22 @@ def jl_sparse(X, d, seed, eps=0.9):
     transformer = random_projection.SparseRandomProjection(n_components=d, eps=eps, random_state=seed)
     X_new = transformer.fit_transform(X)
     return X_new
+
+def reduction_cost(X, d):
+     """
+     X - original matrix
+     d - reduced dimension
+
+     Get the number of scalar mults required for the given dimensionality 
+     reduction
+
+     Projection matrix is (n x d) to get reduced matrix of (m x d)
+     """
+
+     # X is an (m x n) matrix
+     m, n = np.shape(X)
+
+     # (m x n) matrix times (n x d) matrix is m*n*d scalar mults
+     return m * n * d
+
+     
