@@ -168,6 +168,7 @@ def main_sparsification():
 
     # Expected percent of sparsification
     ps = [0.001, 0.01, 0.1, 1, 10]
+    xs = [1, 4, 16, 64]
 
 
     mats = ["494_bus", 
@@ -188,22 +189,37 @@ def main_sparsification():
                           save_name=f"{mat}_sparse_test",
                           grid_on=True) 
 
-        test(pwr.baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
+        test(funct=pwr.baseline_pow_convergence,
+            plotter=plotter, 
+            mat_name=mat, 
+            seed=seed, 
+            num_avg=num_avg, 
+            num_iter=num_iter,
+            )
 
-        for i in range(num_tests):
-            test(sub.percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
-
-        for i in range(num_tests):
+        for i, p in enumerate(ps):
+            test(funct=spwr.percent_sparse_pwr,
+                 plotter=plotter,
+                 mat_name=mat,
+                 seed=2 + i * 3,
+                 num_avg=num_avg,
+                 num_iter= num_iter, 
+                 kwargs= {"p": p},
+                 )
+            
+        for i, x in enumerate(xs):
             test(funct=spwr.expected_sparse_pwr,
                  plotter=plotter,
                  mat_name=mat,
                  seed=2 + i * 3,
                  num_avg=num_avg,
                  num_iter= num_iter, 
-                 kwargs= {"x": 1})
-
+                 kwargs= {"x": x},
+                 )
         plotter.finish()
 
 if __name__ == '__main__':
-    main_no_swap()
+    # main_no_swap()
+    # main_swap()
+    main_sparsification()
 
