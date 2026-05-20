@@ -9,11 +9,11 @@ import numpy as np
 from scipy.linalg import norm # 2-norm by default
 from .tests import power as pwr
 from .util import eig_functs as eigs
-from .tests.sparse_power import sparse_pow
+from .tests import sparse_power as spwr
 from .tests.subset_power import percent_subset_pow
 from .tests.subset_power import percent_subset_pow_swap
 
-def test(funct, plotter, mat_name, seed, num_avg, num_iter, args={}):
+def test(funct, plotter, mat_name, seed, num_avg, num_iter, kwargs={}):
     """
     Test the given function from tests.py 
     
@@ -35,13 +35,13 @@ def test(funct, plotter, mat_name, seed, num_avg, num_iter, args={}):
     u_star =  eigs.top_left(A)
     
     for i in range(num_avg):
-        seed_i = seed + i 
+        seed_i = seed + i * 3 
 
         rng = np.random.default_rng(seed=seed_i)
         u0 = rng.normal(0,1,np.shape(A)[0])
         u0 = u0 / norm(u0)
 
-        xs, ys_i, label = funct(A, u0, u_star, num_iter, seed=seed_i, **args)
+        xs, ys_i, label = funct(A, u0, u_star, num_iter, seed=seed_i, **kwargs)
         ys += ys_i
     
     ys = ys / num_avg
@@ -136,15 +136,15 @@ def main_no_swap():
             
         for i in range(num_tests):
             test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
-            
+
         for i in range(num_tests):
-            test(funct=sparse_pow,
+            test(funct=spwr.expected_sparse_pwr,
                  plotter=plotter,
                  mat_name=mat,
-                 seed=2 + 1,
+                 seed=2 + i * 3,
                  num_avg=num_avg,
                  num_iter= num_iter, 
-                 args= {"x": 1})
+                 kwargs= {"x": 1})
 
         plotter.finish()
 
