@@ -163,8 +163,6 @@ def main_sparsification():
     seed    = 10
     num_avg = 5
     num_iter = 64
-    step_size = 8
-    num_tests = 2
 
     # Expected percent of sparsification
     ps = [0.001, 0.01, 0.1, 1, 10]
@@ -196,7 +194,8 @@ def main_sparsification():
             num_avg=num_avg, 
             num_iter=num_iter,
             )
-
+        
+        # Percentage tests
         for i, p in enumerate(ps):
             test(funct=spwr.percent_sparse_pwr,
                  plotter=plotter,
@@ -206,7 +205,8 @@ def main_sparsification():
                  num_iter= num_iter, 
                  kwargs= {"p": p},
                  )
-            
+        
+        # Expected new zeros tests
         for i, x in enumerate(xs):
             test(funct=spwr.expected_sparse_pwr,
                  plotter=plotter,
