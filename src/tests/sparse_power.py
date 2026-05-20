@@ -1,4 +1,5 @@
 from Sparsification_Research.src.MDSparsifier import MDSparsifier
+from Sparsification_Research.src.Sparsifier import Sparsifier
 from Sparsification_Research.src.SGenerator import SGenerator
 
 import numpy as np
@@ -8,7 +9,7 @@ from ..util import power as pwr
 
 # TODO: tests w/ non-maintaining-diagonal-sparsifier
 
-def sparse_pwr(A, u_0, u_star, num_iter, seed, s):
+def sparse_pwr(A, u_0, u_star, num_iter, seed, s, type="MD"):
     """ Power iteration on a sparsified version of A
 
     Args: 
@@ -24,7 +25,14 @@ def sparse_pwr(A, u_0, u_star, num_iter, seed, s):
         ys: the residual per iteration
         lbl: the label associated with this function call (for easy plotting)
     """
-    sparsifier = MDSparsifier(seed=seed)
+
+    match type.upper():
+        case "MD":
+            sparsifier = MDSparsifier(seed=seed)
+        case "GENERIC":
+            sparsifier = Sparsifier(seed=seed)
+        case _:
+            raise TypeError(f"Invalid sparisifier type {type}")
 
     xs = np.zeros(num_iter)
     ys = np.zeros(num_iter)
@@ -54,7 +62,7 @@ def sparse_pwr(A, u_0, u_star, num_iter, seed, s):
     num_mults = pwr.count_mults(A=sparse_A, maxiter=num_iter - 1)
     return xs, ys, f"s = {s:0.6g}, sparsified; {num_mults:,} mults"
 
-def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x, tol):
+def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x, type, tol):
     """ Power iteration on a sparsified version of A, expected number of zeroes
     based
 
@@ -82,14 +90,14 @@ def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x, tol):
 
     if tol is None:
         # Non tolerance version
-        xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+        xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s, type)
     else:
         # Tolerance Version
         xs, ys, lbl = sparse_pwr_tol(A, u_0, u_star, num_iter, seed, s, tol)
 
     return xs, ys, f"x = {x}, {lbl}"
 
-def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p, tol):
+def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p, type, tol):
     """ Power iteration on a sparsified version of A, percentage based
 
     Args: 
@@ -107,11 +115,21 @@ def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p, tol):
         lbl: the label associated with this function call (for easy plotting)
     """
     s_generator = SGenerator(A.shape[0], A.nnz)
-
+    
+    match type.upper():
+        case "MD":
+            # s based off of off-diagonal non-zeroes
+            include_diags = False
+        case "GENERIC":
+            # s based off of nnzs
+            include_diags = True
+        case _:
+            raise TypeError(f"Invalid sparisifier type {type}")
+        
     # get s associated with an expected percent sparsification p
     expected_proportion = p / 100
     s = s_generator.proportion_sparse_s(p=expected_proportion, 
-                                        include_diags=False) 
+                                        include_diags=include_diags)
     
     xs = None
     ys = None
@@ -119,7 +137,7 @@ def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p, tol):
 
     if tol is None:
         # Non tolerance version
-        xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+        xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s, type)
     else:
         # Tolerance Version
         xs, ys, lbl = sparse_pwr_tol(A, u_0, u_star, num_iter, seed, s, tol)
