@@ -6,8 +6,9 @@ from Sparsification_Research.src.SSGetter import SSGetter
 from Sparsification_Research.src.Plotter import Plotter
 
 import numpy as np
-from .tests.power import *
-from .util.eig_functs import *
+from scipy.linalg import norm # 2-norm by default
+from .tests import power as pwr
+from .util import eig_functs as eigs
 from .tests.sparse_power import sparse_pow
 from .tests.subset_power import percent_subset_pow
 from .tests.subset_power import percent_subset_pow_swap
@@ -31,7 +32,7 @@ def test(funct, plotter, mat_name, seed, num_avg, num_iter, args={}):
     ys = np.zeros(num_iter)
     ys_i = np.zeros(num_iter)
 
-    u_star =  top_left(A)
+    u_star =  eigs.top_left(A)
     
     for i in range(num_avg):
         seed_i = seed + i 
@@ -78,14 +79,14 @@ def main_swap():
                           save_name=f"{mat}_{ps[0]}_swap",
                           grid_on=True) 
 
-        test(baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
+        test(pwr.baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
         
         for p in ps:
             for type in types:
                 args1 = {"p": p, "type" : type}
                 args2 = {"p": p, "step_size": step_size, "type" : type}
-                test(jl_percent_reduced, plotter, mat, seed, num_avg, num_iter, args1)
-                test(multi_jl_p_reduce, plotter, mat, seed, num_avg, num_iter, args2)
+                test(pwr.jl_percent_reduced, plotter, mat, seed, num_avg, num_iter, args1)
+                test(pwr.multi_jl_p_reduce, plotter, mat, seed, num_avg, num_iter, args2)
             test(percent_subset_pow, plotter, mat, seed, num_avg, num_iter, {"p": p})
             if (mat == "impcol_d"):
                 # impcol_d gets "infs" with percent_subset_pow_swap, skipping it for now
@@ -98,13 +99,16 @@ def main_swap():
 def main_no_swap():
     # mats    = ["494_bus"]
     seed    = 10
-    num_avg = 1
+    num_avg = 5
     num_iter = 64
+    p = 97
+    step_size = 8
+    num_tests = 2
 
 
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
-    mats = ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
-    mats = ["bcsstk19"]
+    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
+    # mats = ["bcsstk19"]
     """These mats seem to imperically have this in common: small spectral gap,
       and large eigenvalues
       TODO: prove why this may be the case? 
@@ -113,9 +117,7 @@ def main_no_swap():
 
 
     types = ["jl_gaussian", "jl_sparse"]
-    types = ["jl_gaussian"]
-    p = 97
-    step_size = 8
+    # types = ["jl_gaussian"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -126,17 +128,26 @@ def main_no_swap():
                           save_name=f"{mat}_subset_no_swap_{p}",
                           grid_on=True) 
 
-        test(baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
+        test(pwr.baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
         
         for type in types:
-            for i in range(7):
-                test(jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
+            for i in range(num_tests):
+                test(pwr.jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
             
-        # for i in range(7):
-        #     test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
+        for i in range(num_tests):
+            test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
+            
+        for i in range(num_tests):
+            test(funct=sparse_pow,
+                 plotter=plotter,
+                 mat_name=mat,
+                 seed=2 + 1,
+                 num_avg=num_avg,
+                 num_iter= num_iter, 
+                 args= {"x": 1})
 
         plotter.finish()
 
 if __name__ == '__main__':
-    main_swap()
+    main_no_swap()
 
