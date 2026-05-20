@@ -54,7 +54,7 @@ def sparse_pwr(A, u_0, u_star, num_iter, seed, s):
     num_mults = pwr.count_mults(A=sparse_A, maxiter=num_iter - 1)
     return xs, ys, f"s = {s:0.6g}, sparsified; {num_mults:,} mults"
 
-def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x):
+def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x, tol):
     """ Power iteration on a sparsified version of A, expected number of zeroes
     based
 
@@ -76,10 +76,20 @@ def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x):
 
     s = s_generator.get_min_s(x)
 
-    xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+    xs = None
+    ys = None
+    lbl = None
+
+    if tol is None:
+        # Non tolerance version
+        xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+    else:
+        # Tolerance Version
+        xs, ys, lbl = sparse_pwr_tol(A, u_0, u_star, num_iter, seed, s, tol)
+
     return xs, ys, f"x = {x}, {lbl}"
 
-def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p):
+def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p, tol):
     """ Power iteration on a sparsified version of A, percentage based
 
     Args: 
@@ -102,8 +112,17 @@ def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p):
     expected_proportion = p / 100
     s = s_generator.proportion_sparse_s(p=expected_proportion, 
                                         include_diags=False) 
+    
+    xs = None
+    ys = None
+    lbl = None
 
-    xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+    if tol is None:
+        # Non tolerance version
+        xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+    else:
+        # Tolerance Version
+        xs, ys, lbl = sparse_pwr_tol(A, u_0, u_star, num_iter, seed, s, tol)
 
     return xs, ys, f"{p}%, {lbl}"
 

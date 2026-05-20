@@ -31,6 +31,8 @@ def test(funct, plotter, mat_name, seed, num_avg, num_iter, kwargs={}):
     ys = np.zeros(num_iter)
     ys_i = np.zeros(num_iter)
 
+    label = ""
+
     u_star =  eigs.top_left(A)
     
     for i in range(num_avg):
@@ -43,7 +45,16 @@ def test(funct, plotter, mat_name, seed, num_avg, num_iter, kwargs={}):
         xs, ys_i, label = funct(A, u0, u_star, num_iter, seed=seed_i, **kwargs)
         ys += ys_i
     
-    ys = ys / num_avg
+    # ys = ys / num_avg
+
+    # """Start of code for sparse_pwr_tol() *** xs & ys are lists of variable 
+    # lengths -> averaging complicated and not implemented***"""
+    # rng = np.random.default_rng(seed=seed)
+    # u0 = rng.normal(0, 1, A.shape[0])
+    # u0 = u0 / norm(u0)
+
+    # xs, ys, label = funct(A, u0, u_star, num_iter, seed=seed, **kwargs)
+    # END of code for sparse_pwr_tol()
 
     plotter.add_to_plot(xs, ys, label=label)
     print("Finished test")
@@ -195,6 +206,9 @@ def main_sparsification():
             num_iter=num_iter,
             )
         
+
+        tol = None
+
         # Percentage tests
         for i, p in enumerate(ps):
             test(funct=spwr.percent_sparse_pwr,
@@ -203,7 +217,7 @@ def main_sparsification():
                  seed=2 + i * 3,
                  num_avg=num_avg,
                  num_iter= num_iter, 
-                 kwargs= {"p": p},
+                 kwargs= {"p": p, "tol": tol},
                  )
         
         # Expected new zeros tests
@@ -214,7 +228,7 @@ def main_sparsification():
                  seed=2 + i * 3,
                  num_avg=num_avg,
                  num_iter= num_iter, 
-                 kwargs= {"x": x},
+                 kwargs= {"x": x, "tol": tol},
                  )
         plotter.finish()
 
