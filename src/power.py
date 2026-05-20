@@ -172,11 +172,13 @@ def main_sparsification():
     For testing behavior of sparsification
     """
     seed    = 10
-    num_avg = 5
+    """NOTE: when doing sparse-technique, label will only show last 'new zeros', 
+    not an of all runs """
+    num_avg = 1
     num_iter = 64
 
     # Expected percent of sparsification
-    ps = [0.001, 0.01, 0.1, 1, 10]
+    ps = [0.01, 0.1, 1, 10]
     xs = [1, 4, 16, 64]
 
 
@@ -209,7 +211,7 @@ def main_sparsification():
 
         tol = None
 
-        # Percentage tests
+        # Percentage tests (maintain diagonal)
         for i, p in enumerate(ps):
             test(funct=spwr.percent_sparse_pwr,
                  plotter=plotter,
@@ -217,19 +219,30 @@ def main_sparsification():
                  seed=2 + i * 3,
                  num_avg=num_avg,
                  num_iter= num_iter, 
-                 kwargs= {"p": p, "tol": tol},
+                 kwargs= {"p": p, "type": "MD","tol": tol},
                  )
         
-        # Expected new zeros tests
-        for i, x in enumerate(xs):
-            test(funct=spwr.expected_sparse_pwr,
+        # Percentage tests (sparsify diagonal)
+        for i, p in enumerate(ps):
+            test(funct=spwr.percent_sparse_pwr,
                  plotter=plotter,
                  mat_name=mat,
                  seed=2 + i * 3,
                  num_avg=num_avg,
                  num_iter= num_iter, 
-                 kwargs= {"x": x, "tol": tol},
+                 kwargs= {"p": p, "type": "GENERIC","tol": tol},
                  )
+        
+        # Expected new zeros tests
+        # for i, x in enumerate(xs):
+        #     test(funct=spwr.expected_sparse_pwr,
+        #          plotter=plotter,
+        #          mat_name=mat,
+        #          seed=2 + i * 3,
+        #          num_avg=num_avg,
+        #          num_iter= num_iter, 
+        #          kwargs= {"x": x, "tol": tol},
+        #          )
         plotter.finish()
 
 if __name__ == '__main__':
