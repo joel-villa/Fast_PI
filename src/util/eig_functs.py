@@ -117,7 +117,7 @@ def euclidean_dist(x, y):
     # Original norm
     norm_original = norm(x)
 
-    if (norm_of_diff_pos > 2 or norm_of_diff_neg > 2 
+    if (norm_of_diff_pos > 2.00001 or norm_of_diff_neg > 2.00001
         or norm_original < 0.9999 or norm_original > 1.0001):
         raise ValueError(f"Eigenvector must be normalized, norm of diff:\
                          {norm_of_diff_pos}, {norm_of_diff_neg}\
