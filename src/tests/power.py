@@ -38,7 +38,7 @@ def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
         ys[i] = euc_dist
         xs[i] = i
     
-    return xs, ys, f"standard power {A.shape}, ({pwr.count_mults(A, num_iter)} scalar mults)"
+    return xs, ys, f"standard power {A.shape}; {pwr.count_mults(A, num_iter):,} mults"
 
 def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gaussian"):
     """
@@ -82,7 +82,7 @@ def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gauss
     # Number of scalar mults for power
     scalar_mults += pwr.count_mults(reduced_A, num_iter)
 
-    return xs, ys, f"jl-reduced power {reduced_A.shape} ({type}, {scalar_mults} scalar mults)"
+    return xs, ys, f"{type} {reduced_A.shape}; {scalar_mults:,} mults"
 
 def jl_percent_reduced(A, u_0, u_star, num_iter, seed, p, type):
     """
@@ -100,6 +100,9 @@ def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
     iteration
     """
 
+    # Track number of scalar mults
+    num_mults = 0 
+
     xs = np.zeros(num_iter)
     ys = np.zeros(num_iter)
 
@@ -111,6 +114,8 @@ def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
 
     reduced_A = reduct_funct(A, d=d, seed=seed, eps=0.99)
 
+    num_mults += jl.reduction_cost(X=A, d=d)
+
     v =  pwr.v_from_u(reduced_A, u_0)
 
     ys[0] = eig.euclidean_dist(u_0, u_star)
@@ -120,7 +125,8 @@ def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
         if (i % step_size == 0):
             # Randomly regenerate A
             reduced_A = reduct_funct(A, d=d, seed=seed*i, eps=0.99)
-            v = pwr.v_from_u(reduced_A, u)
+            v = pwr.v_from_u(reduced_A, u) #TODO: count this in number of scalar mults? 
+            num_mults += jl.reduction_cost(X=A, d=d)
 
         # NOTE: using scikit-learn -> top left eig (u) is of significance
 
@@ -134,7 +140,9 @@ def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
         ys[i] = euc_dist
         xs[i] = i
 
-    return xs, ys, f"reduced to {reduced_A.shape}, swapping every {step_size} ({type})"
+    num_mults += pwr.count_mults(A=reduced_A, maxiter=num_iter)
+
+    return xs, ys, f"{type} {reduced_A.shape} swapping every {step_size}; {num_mults:,} mults"
 
 def multi_jl_p_reduce(A, u_0, u_star, num_iter, seed, p, step_size, type):
     """
@@ -143,9 +151,9 @@ def multi_jl_p_reduce(A, u_0, u_star, num_iter, seed, p, step_size, type):
     """
 
     d = jl.percent_reduce(A.shape[1], p)
-    xs, ys, _ = multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type)
+    xs, ys, lbl = multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type)
     
-    return xs, ys, f"reduced {p}%, swapping every {step_size} ({type})"
+    return xs, ys, f"{p}% {lbl}"
 
 # def svds_convergence(A, v0, v_star, num_iter, seed):
 #     """
