@@ -4,8 +4,7 @@ from Sparsification_Research.src.SGenerator import SGenerator
 import numpy as np
 
 from ..util.eig_functs import euclidean_dist
-from ..util.power import v_from_u
-from ..util.power import topsing
+from ..util import power as pwr
 
 def sparse_pow(A, u_0, u_star, num_iter, seed, x):
     sparsifier = MDSparsifier(seed=seed)
@@ -21,7 +20,7 @@ def sparse_pow(A, u_0, u_star, num_iter, seed, x):
 
     sparsifier.sparsify(sparse_A, s)
 
-    v =  v_from_u(sparse_A, u_0)
+    v =  pwr.v_from_u(sparse_A, u_0)
 
     # Initial residual
     xs[0] = 0
@@ -29,13 +28,14 @@ def sparse_pow(A, u_0, u_star, num_iter, seed, x):
 
     
     for i in range(1, num_iter):
-        u, _, v = topsing(v0=v,
+        u, _, v = pwr.topsing(v0=v,
                           A=sparse_A, 
                           maxiter=1)
 
         # Track x and y
         xs[i] = i
-        ys[i] = euclidean_dist(u_0, u_star)
-        
-    print(ys)
-    return xs, ys, f"sparsified convergence, s = {s}"
+        ys[i] = euclidean_dist(u, u_star)
+    
+    # print(ys)
+    num_mults = pwr.count_mults(A=sparse_A, maxiter=num_iter)
+    return xs, ys, f"sparsified, x = {x}, s = {s}; {num_mults} mults"
