@@ -20,8 +20,6 @@ def select_d_random_columns(A, d, seed):
     cols = rng.choice(A_cols, size=d, replace=False)
 
     sorted_cols = np.sort(cols)
-    
-    # TODO: should we be using coo still? 
 
     # converting to Compressed Sparse Column format for list slicing
     A_csc = A.copy()
@@ -29,5 +27,7 @@ def select_d_random_columns(A, d, seed):
 
     # Array slicing
     B = A_csc[:, sorted_cols]
+    
+    # TODO: should this be converted back to coo? 
 
     return B
