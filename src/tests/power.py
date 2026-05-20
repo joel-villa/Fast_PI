@@ -38,7 +38,7 @@ def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
         ys[i] = euc_dist
         xs[i] = i
     
-    return xs, ys, f"standard power {A.shape}; {pwr.count_mults(A, num_iter):,} mults"
+    return xs, ys, f"standard power {A.shape}; {pwr.count_mults(A, num_iter - 1):,} mults"
 
 def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gaussian"):
     """
@@ -80,7 +80,7 @@ def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gauss
         xs[i] = i
 
     # Number of scalar mults for power
-    scalar_mults += pwr.count_mults(reduced_A, num_iter)
+    scalar_mults += pwr.count_mults(reduced_A, num_iter - 1)
 
     return xs, ys, f"{type} {reduced_A.shape}; {scalar_mults:,} mults"
 
@@ -140,7 +140,7 @@ def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
         ys[i] = euc_dist
         xs[i] = i
 
-    num_mults += pwr.count_mults(A=reduced_A, maxiter=num_iter)
+    num_mults += pwr.count_mults(A=reduced_A, maxiter=num_iter - 1)
 
     return xs, ys, f"{type} {reduced_A.shape} swapping every {step_size}; {num_mults:,} mults"
 
