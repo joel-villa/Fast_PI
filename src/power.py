@@ -138,5 +138,5 @@ def main_no_swap():
         plotter.finish()
 
 if __name__ == '__main__':
-    main_no_swap()
+    main_swap()
 

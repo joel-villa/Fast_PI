@@ -6,35 +6,7 @@ import numpy as np
 from ..util import power as pwr
 from ..util import eig_functs as eig
 from ..util import scikit_jl as jl
-
-def select_d_random_columns(A, d, seed):
-    """
-    A - a matrix (nxm)
-    d - the number of columns to get
-    seed - for predictable randomness
-
-    RETURN: B - where B is a (nxd) subset of A
-
-    Given a matrix A, get x of its columns randomly
-    """
-
-    A_cols = A.shape[1]
-
-    rng = np.random.default_rng(seed=seed)
-    cols = rng.choice(A_cols, size=d, replace=False)
-
-    sorted_cols = np.sort(cols)
-    
-    # TODO: should we be using coo still? 
-
-    # converting to csc for list slicing
-    A_csc = A.copy()
-    A_csc = A.tocsc()
-
-    # Array slicing
-    B = A_csc[:, sorted_cols]
-
-    return B
+from ..util.subset import select_d_random_columns
 
 def subset_pow(A, u_0, u_star, num_iter, seed, d):
     """
@@ -71,7 +43,7 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d):
         ys[i] = euc_dist
         xs[i] = i
 
-    return xs, ys, f"column subset {A_reduced.shape}; "
+    return xs, ys, f"column subset {A_reduced.shape}; {} mults"
 
 def percent_subset_pow(A, u_0, u_star, num_iter, seed, p):
     """
@@ -91,7 +63,7 @@ def percent_subset_pow(A, u_0, u_star, num_iter, seed, p):
 
     xs, ys, label = subset_pow(A, u_0, u_star, num_iter, seed, d)
 
-    return xs, ys, f"{label}, ({p}%)"
+    return xs, ys, f"{p}% {label}"
 
 def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
     """
