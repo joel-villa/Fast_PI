@@ -69,7 +69,7 @@ def main_swap():
     ps = [80]
     step_size = 8
 
-    plotter = Plotter(save_fig=True, show_fig=True, fig_size=(12, 6))
+    plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat in mats:
         plotter.init_plot(title=f"Power Convergence of {mat}", 
