@@ -50,6 +50,10 @@ def test(funct, plotter, mat_name, seed, num_avg, num_iter, kwargs={}):
     print("Finished test")
 
 def main_swap():
+    """
+    For testing swap behavior 
+    """
+
     # mats    = ["494_bus"]
     seed    = 10
     num_avg = 1
@@ -97,7 +101,12 @@ def main_swap():
 
 
 def main_no_swap():
-    # mats    = ["494_bus"]
+    """
+    For testing behavior of several approaches inluding:
+    - jl reduction
+    - column subsets
+    - sparsification
+    """
     seed    = 10
     num_avg = 5
     num_iter = 64
@@ -108,7 +117,7 @@ def main_no_swap():
 
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
-    # mats = ["bcsstk19"]
+
     """These mats seem to imperically have this in common: small spectral gap,
       and large eigenvalues
       TODO: prove why this may be the case? 
@@ -117,7 +126,6 @@ def main_no_swap():
 
 
     types = ["jl_gaussian", "jl_sparse"]
-    # types = ["jl_gaussian"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -147,6 +155,7 @@ def main_no_swap():
                  kwargs= {"x": 1})
 
         plotter.finish()
+
 
 if __name__ == '__main__':
     main_no_swap()
