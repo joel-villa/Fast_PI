@@ -6,15 +6,12 @@ import numpy as np
 from ..util.eig_functs import euclidean_dist
 from ..util import power as pwr
 
-def sparse_pow(A, u_0, u_star, num_iter, seed, x):
+def sparse_pwr(A, u_0, u_star, num_iter, seed, s):
     sparsifier = MDSparsifier(seed=seed)
-
-    s_generator = SGenerator(A.shape[0], A.nnz)
 
     xs = np.zeros(num_iter)
     ys = np.zeros(num_iter)
 
-    s = s_generator.get_min_s(x)
 
     sparse_A = A.copy()
 
@@ -37,5 +34,25 @@ def sparse_pow(A, u_0, u_star, num_iter, seed, x):
         ys[i] = euclidean_dist(u, u_star)
     
     # print(ys)
-    num_mults = pwr.count_mults(A=sparse_A, maxiter=num_iter)
-    return xs, ys, f"sparsified, x = {x}, s = {s}; {num_mults} mults"
+    num_mults = pwr.count_mults(A=sparse_A, maxiter=num_iter - 1)
+    return xs, ys, f"sparsified, x = {x}, s = {s}; {num_mults:,} mults"
+
+def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x):
+
+    s_generator = SGenerator(A.shape[0], A.nnz)
+
+    s = s_generator.get_min_s(x)
+
+    xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+    return xs, ys, f"x = {x} {lbl}"
+
+def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p):
+
+    
+    s_generator = SGenerator(A.shape[0], A.nnz)
+
+    s = s_generator.proportion_sparse_s(p)
+
+    xs, ys, lbl = sparse_pwr(A, u_0, u_star, num_iter, seed, s)
+
+    return xs, ys, f"{p}%, {lbl}"
