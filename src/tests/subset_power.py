@@ -42,8 +42,10 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d):
         euc_dist = eig.euclidean_dist(u, u_star)
         ys[i] = euc_dist
         xs[i] = i
+    
+    num_mults = pwr.count_mults(A=A_reduced, maxiter=num_iter - 1)
 
-    return xs, ys, f"column subset {A_reduced.shape}; {} mults"
+    return xs, ys, f"column subset {A_reduced.shape}; {num_mults:,} mults"
 
 def percent_subset_pow(A, u_0, u_star, num_iter, seed, p):
     """
@@ -96,6 +98,7 @@ def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
             # Randomly regenerate A
             reduced_A = select_d_random_columns(A, d=d, seed=seed*i)
             v = pwr.v_from_u(reduced_A, u)
+            # TODO: not currently counting number of mults in v_from_u() call
 
         u, _, v = pwr.topsing(v0=v,
                           A=A_reduced, 
@@ -105,7 +108,9 @@ def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
         ys[i] = euc_dist
         xs[i] = i
 
-    return xs, ys, f"column subset (swapping every {step_size}): {A_reduced.shape}"
+    num_mults = pwr.count_mults(A=A_reduced, maxiter=num_iter - 1)
+
+    return xs, ys, f"column subset {A_reduced.shape} swapping every {step_size}; {num_mults:,} mults"
 
 def percent_subset_pow_swap(A, u_0, u_star, num_iter, seed, p, step_size):
     """
