@@ -10,8 +10,7 @@ from scipy.linalg import norm # 2-norm by default
 from .tests import power as pwr
 from .util import eig_functs as eigs
 from .tests import sparse_power as spwr
-from .tests.subset_power import percent_subset_pow
-from .tests.subset_power import percent_subset_pow_swap
+from .tests import subset_power as sub
 
 def test(funct, plotter, mat_name, seed, num_avg, num_iter, kwargs={}):
     """
@@ -91,11 +90,11 @@ def main_swap():
                 args2 = {"p": p, "step_size": step_size, "type" : type}
                 test(pwr.jl_percent_reduced, plotter, mat, seed, num_avg, num_iter, args1)
                 test(pwr.multi_jl_p_reduce, plotter, mat, seed, num_avg, num_iter, args2)
-            test(percent_subset_pow, plotter, mat, seed, num_avg, num_iter, {"p": p})
+            test(sub.percent_subset_pow, plotter, mat, seed, num_avg, num_iter, {"p": p})
             if (mat == "impcol_d"):
                 # impcol_d gets "infs" with percent_subset_pow_swap, skipping it for now
                 continue 
-            test(percent_subset_pow_swap, plotter, mat, seed, num_avg, num_iter, {"p": p, "step_size" : step_size})
+            test(sub.percent_subset_pow_swap, plotter, mat, seed, num_avg, num_iter, {"p": p, "step_size" : step_size})
 
         plotter.finish()
 
@@ -143,7 +142,7 @@ def main_no_swap():
                 test(pwr.jl_percent_reduced, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p, "type" : type})
             
         for i in range(num_tests):
-            test(percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
+            test(sub.percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
 
         for i in range(num_tests):
             test(funct=spwr.expected_sparse_pwr,
@@ -156,6 +155,54 @@ def main_no_swap():
 
         plotter.finish()
 
+
+def main_sparsification():
+    """
+    For testing behavior of sparsification
+    """
+    seed    = 10
+    num_avg = 5
+    num_iter = 64
+    step_size = 8
+    num_tests = 2
+
+    # Expected percent of sparsification
+    ps = [0.001, 0.01, 0.1, 1, 10]
+
+
+    mats = ["494_bus", 
+            "bcsstk07", 
+            "bcsstk08", 
+            "bcsstk19", 
+            "bcsstm07", 
+            "impcol_d",
+            ]
+
+    plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
+
+
+    for mat in mats:
+        plotter.init_plot(title=f"Power Convergence of {mat}", 
+                          x_label="number of iterations",
+                          y_label="residual", 
+                          save_name=f"{mat}_sparse_test",
+                          grid_on=True) 
+
+        test(pwr.baseline_pow_convergence, plotter, mat, seed, num_avg, num_iter)
+
+        for i in range(num_tests):
+            test(sub.percent_subset_pow, plotter, mat, seed * i + i, num_avg, num_iter, {"p": p})
+
+        for i in range(num_tests):
+            test(funct=spwr.expected_sparse_pwr,
+                 plotter=plotter,
+                 mat_name=mat,
+                 seed=2 + i * 3,
+                 num_avg=num_avg,
+                 num_iter= num_iter, 
+                 kwargs= {"x": 1})
+
+        plotter.finish()
 
 if __name__ == '__main__':
     main_no_swap()
