@@ -3,10 +3,9 @@ Some tests for dimensionality reduction where you use random subset of the
 columns to see if power iteration converges faster
 """
 import numpy as np
-from ..util.power import v_from_u
-from ..util.power import topsing
-from ..util.eig_functs import euclidean_dist
-from ..util.scikit_jl import percent_reduce
+from ..util import power as pwr
+from ..util import eig_functs as eig
+from ..util import scikit_jl as jl
 
 def select_d_random_columns(A, d, seed):
     """
@@ -54,25 +53,25 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d):
     xs = np.zeros(num_iter)
     ys = np.zeros(num_iter)
 
-    ys[0] = euclidean_dist(u_0, u_star)
+    ys[0] = eig.euclidean_dist(u_0, u_star)
     xs[0] = 0
 
     A_reduced = select_d_random_columns(A, d, seed)
 
-    v =  v_from_u(A_reduced, u_0)
+    v =  pwr.v_from_u(A_reduced, u_0)
 
     for i in range(1, num_iter):
         # NOTE: using scikit-learn -> top left eig (u) is of significance
 
-        u, _, v = topsing(v0=v,
+        u, _, v = pwr.topsing(v0=v,
                           A=A_reduced, 
                           maxiter=1)
         
-        euc_dist = euclidean_dist(u, u_star)
+        euc_dist = eig.euclidean_dist(u, u_star)
         ys[i] = euc_dist
         xs[i] = i
 
-    return xs, ys, f"random column subset: {A_reduced.shape}"
+    return xs, ys, f"column subset {A_reduced.shape}; "
 
 def percent_subset_pow(A, u_0, u_star, num_iter, seed, p):
     """
@@ -88,7 +87,7 @@ def percent_subset_pow(A, u_0, u_star, num_iter, seed, p):
     Measure convergence of power with some random subset of the columns of A
     """
 
-    d = percent_reduce(A.shape[1], p)
+    d = jl.percent_reduce(A.shape[1], p)
 
     xs, ys, label = subset_pow(A, u_0, u_star, num_iter, seed, d)
 
@@ -112,25 +111,25 @@ def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
     xs = np.zeros(num_iter)
     ys = np.zeros(num_iter)
 
-    ys[0] = euclidean_dist(u_0, u_star)
+    ys[0] = eig.euclidean_dist(u_0, u_star)
     xs[0] = 0
 
     A_reduced = select_d_random_columns(A, d, seed)
 
-    v =  v_from_u(A_reduced, u_0)
+    v =  pwr.v_from_u(A_reduced, u_0)
 
     for i in range(1, num_iter):
         # NOTE: using scikit-learn -> top left eig (u) is of significance
         if (i % step_size == 0):
             # Randomly regenerate A
             reduced_A = select_d_random_columns(A, d=d, seed=seed*i)
-            v = v_from_u(reduced_A, u)
+            v = pwr.v_from_u(reduced_A, u)
 
-        u, _, v = topsing(v0=v,
+        u, _, v = pwr.topsing(v0=v,
                           A=A_reduced, 
                           maxiter=1)
         
-        euc_dist = euclidean_dist(u, u_star)
+        euc_dist = eig.euclidean_dist(u, u_star)
         ys[i] = euc_dist
         xs[i] = i
 
@@ -151,8 +150,8 @@ def percent_subset_pow_swap(A, u_0, u_star, num_iter, seed, p, step_size):
     Measure convergence of Power with some random subset of the columns of A
     """
 
-    d = percent_reduce(A.shape[1], p)
+    d = jl.percent_reduce(A.shape[1], p)
 
     xs, ys, label = subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size)
 
-    return xs, ys, f"{label}, ({p}%)"
+    return xs, ys, f"{p}% {label}"
