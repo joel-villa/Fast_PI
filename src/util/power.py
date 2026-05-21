@@ -1,9 +1,22 @@
 """
-For SVD functions
+For Power Iteration helper functions
 """
 
 import numpy as np
 from scipy.linalg import norm # 2-norm by default
+
+def s_from_u(A, u):
+    """Get the 'score' of the left vector of A
+
+    Args:
+        A: the matrix in question
+        u: the vector in question
+
+    Return:
+        singular value associated with the two
+    """
+    s = norm(A.T @ u)
+    return s
 
 def v_from_u(A, u):
     """
@@ -19,7 +32,8 @@ def v_from_u(A, u):
     #TODO: DEBUG and use this for consistent initialization 
     # (i.e. every iteration starts w/ same residue)
 
-    s = norm(A.T @ u)
+    s = s_from_u(A, u)
+    
     v = A.T @ u / s
     return v
     
@@ -37,8 +51,14 @@ def topsing(v0, A, maxiter=10):
     https://mmids-textbook.github.io/chap04_svd/04_power/roch-mmids-svd-power.html
     """
     x = v0.copy()
+
+    """
+    A is XP, where X is the original matrix
+    -> B is (XP)^T XP, ie B = P^T * X^T * X * P
+    """
     B = A.T @ A 
     for _ in range(maxiter):
+        #TODO: is x = A.T @ (A @ x) preferable? 
         x = B @ x
     v = x / norm(x)
     s = norm(A @ v)
@@ -53,21 +73,23 @@ def count_mults(A, maxiter=10):
 
     RETURN: total number of scalar mults
 
-    Calculate the number of matrix multiplications for a set number of i
-    terations of Power Iteration
+    Calculate the number of matrix multiplications for a set number of 
+    iterations of Power Iteration
     """
-    # The matrix to do power with
-    B = A.T @ A
+    m, n = A.shape
 
-    m, n = np.shape(B)
+    # Cost of A.T @ A
+    init_cost = m * n^2
 
-    # Number of scalar mults for a single iteration
-    scalar_mults = m * n
+    print(f"m: {m}, n: {n}")
+
+    # Number of scalar mults for a single iteration (B is nxn)
+    scalar_mults = n * n
 
     # Number of scalar mults of maxiter iterations
     scalar_mults *= maxiter
 
-    return scalar_mults
+    return scalar_mults + init_cost
 
     
 
