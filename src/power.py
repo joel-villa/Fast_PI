@@ -51,6 +51,10 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     # xs, ys, label = funct(A, u0, u_star, num_iter, seed=seed, **kwargs)
     # END of code for sparse_pwr_tol()
 
+    # Remove trailing zeros only ('b' for back)
+    xs = np.trim_zeros(xs, trim='b')
+    ys = np.trim_zeros(ys, trim='b')
+
     plotter.add_to_plot(xs, ys, label=label)
 
     return np.shape(xs)[0]
@@ -86,7 +90,7 @@ def main_swap():
     # mats    = ["494_bus"]
     seed    = 10
     num_avg = 1
-    num_iter = 64
+    max_iter = 64
 
 
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
@@ -119,14 +123,14 @@ def main_swap():
                           grid_on=True,
                           ) 
 
-        test(funct=pwr.baseline_pow_convergence, 
-             plotter=plotter, 
-             num_avg=num_avg, 
-             A=A,
-             num_iter=num_iter,
-             seed=seed,
-             kwargs=kwargs,
-             )
+        # Baseline test
+        num_iter = test(funct=pwr.baseline_pwr_tolerance_termination,
+                        plotter=plotter,
+                        num_avg=1,
+                        num_iter=max_iter,
+                        A=A, 
+                        seed=seed,
+                        kwargs=kwargs | {"tol": 1e-7})
         
         for p in ps:
             for type in types:
@@ -182,7 +186,7 @@ def main_no_swap():
     """
     seed    = 10
     num_avg = 5
-    num_iter = 64
+    max_iter = 64
     p = 97
     num_tests = 2
 
@@ -214,13 +218,14 @@ def main_no_swap():
                           save_name=f"{mat_name}_subset_no_swap_{p}",
                           grid_on=True) 
 
-        test(funct=pwr.baseline_pow_convergence,
-             plotter=plotter,
-             num_avg=num_avg,
-             A=A, 
-             num_iter=num_iter,
-             seed=seed,
-             kwargs=kwargs)
+        # Baseline test
+        num_iter = test(funct=pwr.baseline_pwr_tolerance_termination,
+                        plotter=plotter,
+                        num_avg=1,
+                        num_iter=max_iter,
+                        A=A, 
+                        seed=seed,
+                        kwargs=kwargs | {"tol": 1e-7})
         
         for type in types:
             for i in range(num_tests):
@@ -264,7 +269,7 @@ def main_terminate_on_converged():
     # num_avg = 1
     # max_iter = 128
     # p = 97
-    # num_tests = 1
+    # num_tests = 2
 
     # mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
 
@@ -285,14 +290,15 @@ def main_terminate_on_converged():
     #                       y_label="residual", 
     #                       save_name=f"{mat_name}_tolerance_convergence",
     #                       grid_on=True) 
-
-    #     test(funct=pwr.baseline_pwr_tolerance_termination,
-    #          plotter=plotter,
-    #          num_avg=num_avg,
-    #          num_iter=max_iter,
-    #          A=A, 
-    #          seed=seed,
-    #          kwargs=kwargs)
+        
+    #     # Baseline test
+    #     num_iter = test(funct=pwr.baseline_pwr_tolerance_termination,
+    #                     plotter=plotter,
+    #                     num_avg=1,
+    #                     num_iter=max_iter,
+    #                     A=A, 
+    #                     seed=seed,
+    #                     kwargs=kwargs | {"tol": 1e-7})
         
     #     for type in types:
     #         for i in range(num_tests):
@@ -325,8 +331,6 @@ def main_terminate_on_converged():
     #              )
 
     #     plotter.finish()
-    
-
 
 def main_sparsification():
     """
@@ -336,7 +340,7 @@ def main_sparsification():
     """NOTE: when doing sparse-technique, label will only show last 'new zeros', 
     not an of all runs """
     num_avg = 5
-    num_iter = 64
+    max_iter = 64
 
     # Expected percent of sparsification
     ps = [0.01, 0.1, 1, 10]
@@ -361,11 +365,14 @@ def main_sparsification():
                   "u_0": u_0,
                   }
 
-        plotter.init_plot(title=f"Power Convergence of {mat_name}", 
-                          x_label="number of iterations",
-                          y_label="residual", 
-                          save_name=f"{mat_name}_sparse_test",
-                          grid_on=True) 
+        # Baseline test
+        num_iter = test(funct=pwr.baseline_pwr_tolerance_termination,
+                        plotter=plotter,
+                        num_avg=1,
+                        num_iter=max_iter,
+                        A=A, 
+                        seed=seed,
+                        kwargs=kwargs | {"tol": 1e-7})
 
         test(funct=pwr.baseline_pow_convergence,
             plotter=plotter, 
@@ -414,7 +421,6 @@ def main_sparsification():
         plotter.finish()
 
 if __name__ == '__main__':
-    main_no_swap()
+    # main_no_swap()
     # main_swap()
-    # main_sparsification()
-
+    main_sparsification()
