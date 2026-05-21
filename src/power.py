@@ -13,16 +13,20 @@ from .tests import sparse_power as spwr
 from .tests import subset_power as sub
 
 def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
-    """
-    Test the given function from tests.py 
+    """Test the given function from tests.py 
     
-    funct   - a fucntion which takes a matrix, some x vals, and a seed, and 
-              returns xs and ys to be plotted
-    plotter - a Plotter() object
-    mat    - a matrix name
-    seed    - for randomized reproducability
-    num_avg - average of how many tests?
-    input   - input for funct
+    Args:
+        funct: a fucntion which takes a matrix, some x vals, and a seed, and 
+               returns xs and ys to be plotted
+        plotter: a Plotter() object
+        num_avg: average of how many tests?
+        A: a CSR sparse matrix
+        num_iter: how many iterations?
+        seed: for randomized reproducability
+        kwargs: input for funct
+    Return: 
+        The number of iterations ran (important for tests which terminate after
+        converged)
     """
     ys = np.zeros(num_iter)
     xs = np.zeros(num_iter)
@@ -48,6 +52,8 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     # END of code for sparse_pwr_tol()
 
     plotter.add_to_plot(xs, ys, label=label)
+
+    return np.shape(xs)[0]
 
 def init(mat_name, seed):
     """ Get intial information for tests
@@ -175,10 +181,9 @@ def main_no_swap():
     - sparsification
     """
     seed    = 10
-    num_avg = 1
+    num_avg = 5
     num_iter = 64
     p = 97
-    step_size = 8
     num_tests = 2
 
 
@@ -238,13 +243,13 @@ def main_no_swap():
                  kwargs=kwargs | {"p": p})
 
         for i in range(num_tests):
-            test(funct=spwr.expected_sparse_pwr,
+            test(funct=spwr.percent_sparse_pwr,
                  plotter=plotter,
                  num_avg=num_avg,
                  A=A,
                  num_iter= num_iter, 
                  seed=seed * i + i,
-                 kwargs=kwargs | {"x": 16, "type": "Generic", "tol": None},
+                 kwargs=kwargs | {"p": 4, "type": "Generic", "tol": None},
                  )
 
         plotter.finish()
@@ -255,6 +260,71 @@ def main_terminate_on_converged():
     For testing itterative approaches that terminate when power iteration is 
     within some epsilon of solution
     """
+    # seed    = 10
+    # num_avg = 1
+    # max_iter = 128
+    # p = 97
+    # num_tests = 1
+
+    # mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
+
+
+    # types = ["jl_gaussian", "jl_sparse"]
+
+    # plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
+
+    # for mat_name in mats:
+    #     A, u_star, u_0 = init(mat_name=mat_name, seed=seed)
+
+    #     kwargs = {"u_star": u_star,
+    #               "u_0": u_0,
+    #               }
+
+    #     plotter.init_plot(title=f"Power Convergence of {mat_name}", 
+    #                       x_label="number of iterations",
+    #                       y_label="residual", 
+    #                       save_name=f"{mat_name}_tolerance_convergence",
+    #                       grid_on=True) 
+
+    #     test(funct=pwr.baseline_pwr_tolerance_termination,
+    #          plotter=plotter,
+    #          num_avg=num_avg,
+    #          num_iter=max_iter,
+    #          A=A, 
+    #          seed=seed,
+    #          kwargs=kwargs)
+        
+    #     for type in types:
+    #         for i in range(num_tests):
+    #             test(funct=pwr.jl_percent_reduced, 
+    #                  plotter=plotter, 
+    #                  num_avg=num_avg, 
+    #                  A=A, 
+    #                  num_iter=num_iter,
+    #                  seed=seed * i + i, 
+    #                  kwargs=kwargs | {"p": p, "type" : type},
+    #                  )
+            
+    #     for i in range(num_tests):
+    #         test(funct=sub.percent_subset_pow, 
+    #              plotter=plotter, 
+    #              num_avg=num_avg,
+    #              A=A,
+    #              num_iter=num_iter,
+    #              seed=seed * i + i, 
+    #              kwargs=kwargs | {"p": p})
+
+    #     for i in range(num_tests):
+    #         test(funct=spwr.percent_sparse_pwr,
+    #              plotter=plotter,
+    #              num_avg=num_avg,
+    #              A=A,
+    #              num_iter= num_iter, 
+    #              seed=seed * i + i,
+    #              kwargs=kwargs | {"p": 4, "type": "Generic", "tol": None},
+    #              )
+
+    #     plotter.finish()
     
 
 
