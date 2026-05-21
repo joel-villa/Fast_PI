@@ -14,8 +14,19 @@ from ..util import scikit_jl as jl
 from ..util import power as pwr
 
 def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
-    """
-    The baseline power convergence
+    """ The baseline power convergence (terminates based on num_iter)
+
+    Args:
+        A: the matrix to do power iteration on
+        u_0: initial guess for top left eigenvector
+        u_star: actual top left eigenvector
+        num_iter: number of iterations to do power
+        seed: for repeatable randomness (doesn't work due to scikit's not 
+              supporting this functionality)
+    Return:
+        xs: an array [0, 1, 2, ..., num_iter - 1]
+        ys: an array of residual of each guess for u (top left eigencector)
+        lbl: the string representation of this test
     """
 
     v =  pwr.v_from_u(A, u_0)
@@ -33,6 +44,53 @@ def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
                           maxiter=1)
         
         # v = v.flatten() # make v 1D rather than 2D: (x,) rather than (x,1)
+
+        euc_dist = eig.euclidean_dist(u, u_star)
+        ys[i] = euc_dist
+        xs[i] = i
+    
+    return xs, ys, f"standard power {A.shape}; {pwr.count_mults(A, num_iter - 1):,} mults"
+
+def baseline_pwr_tolerance_termination(A, u_0, u_star, num_iter, seed, tol=1e-07):
+    """ The baseline power convergence (terminates based on tolerance)
+
+    Tolerance termination based on:
+        https://www.geeksforgeeks.org/python/power-method-determine-largest-eigenvalue-and-eigenvector-in-python/
+
+    Args:
+        A: the matrix to do power iteration on
+        u_0: initial guess for top left eigenvector
+        u_star: actual top left eigenvector
+        num_iter: max number of iterations to do power
+        seed: for repeatable randomness (doesn't work due to scikit's not 
+              supporting this functionality)
+        tol: How accurate should the top singular value be? 
+    Return:
+        xs: an array [0, 1, 2, ..., num_iter - 1]
+        ys: an array of residual of each guess for u (top left eigencector)
+        lbl: the string representation of this test
+    """
+
+    v =  pwr.v_from_u(A, u_0)
+
+    xs = np.zeros(num_iter)
+    ys = np.zeros(num_iter)
+
+    ys[0] = eig.euclidean_dist(u_0, u_star)
+    xs[0] = 0
+
+    # top singular value is None for first iteration
+    s_prev = None
+
+    for i in range(1, num_iter):
+        # NOTE: using scikit-learn -> top left eig (u) is of significance
+        u, s_curr, v = pwr.topsing(v0=v,
+                          A=A, 
+                          maxiter=1)
+        
+        if s_prev is not None and abs(s_curr - s_prev) < tol:
+            # Converged
+            break
 
         euc_dist = eig.euclidean_dist(u, u_star)
         ys[i] = euc_dist
