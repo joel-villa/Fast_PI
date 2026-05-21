@@ -95,6 +95,8 @@ def baseline_pwr_tolerance_termination(A, u_0, u_star, num_iter, seed, tol=1e-07
         euc_dist = eig.euclidean_dist(u, u_star)
         ys[i] = euc_dist
         xs[i] = i
+
+        s_prev = s_curr
     
     return xs, ys, f"standard power {A.shape}; {pwr.count_mults(A, num_iter - 1):,} mults"
 
