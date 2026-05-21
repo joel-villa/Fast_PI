@@ -52,14 +52,8 @@ def topsing(v0, A, maxiter=10):
     """
     x = v0.copy()
 
-    """
-    A is XP, where X is the original matrix
-    -> B is (XP)^T XP, ie B = P^T * X^T * X * P
-    """
-    B = A.T @ A 
     for _ in range(maxiter):
-        #TODO: is x = A.T @ (A @ x) preferable? 
-        x = B @ x
+        x = A.T @ (A @ x)
     v = x / norm(x)
     s = norm(A @ v)
     u = A @ v / s
@@ -78,18 +72,21 @@ def count_mults(A, maxiter=10):
     """
     m, n = A.shape
 
-    # Cost of A.T @ A
-    init_cost = m * n^2
-
     print(f"m: {m}, n: {n}")
 
+    # Cost of A @ x 
+    cost_Ax = m * n
+
+    # Cost of A.T @ (A @ x): A.T is nxm and A @ x is mx1
+    cost_ATAx = cost_Ax
+
     # Number of scalar mults for a single iteration (B is nxn)
-    scalar_mults = n * n
+    scalar_mults = cost_Ax + cost_ATAx
 
     # Number of scalar mults of maxiter iterations
     scalar_mults *= maxiter
 
-    return scalar_mults + init_cost
+    return scalar_mults
 
     
 
