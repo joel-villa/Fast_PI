@@ -8,6 +8,9 @@ from ..util import eig_functs as eig
 from ..util import scikit_jl as jl
 from ..util.subset import select_d_random_columns
 
+#TODO: less naive random sampling: based on one-norm? 
+#TODO: something similar to Chan's (randomly pick larger and larger sample-sizes)
+
 def subset_pow(A, u_0, u_star, num_iter, seed, d):
     """
     A - the matrix (nxm)
