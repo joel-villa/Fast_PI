@@ -185,9 +185,9 @@ def main_no_swap():
     - sparsification
     """
     seed    = 10
-    num_avg = 5
+    num_avg = 1
     max_iter = 64
-    p = 97
+    p = 70
     num_tests = 2
 
 
@@ -291,6 +291,12 @@ def main_sparsification():
         kwargs = {"u_star": u_star,
                   "u_0": u_0,
                   }
+        
+        plotter.init_plot(title=f"Power Convergence of {mat_name}", 
+                          x_label="number of iterations",
+                          y_label="residual", 
+                          save_name=f"{mat_name}_sparsification",
+                          grid_on=True) 
 
         # Baseline test
         num_iter = test(funct=pwr.baseline_pwr_tolerance_termination,
@@ -300,17 +306,7 @@ def main_sparsification():
                         A=A, 
                         seed=seed,
                         kwargs=kwargs | {"tol": 1e-7})
-
-        test(funct=pwr.baseline_pow_convergence,
-            plotter=plotter, 
-            A=A, 
-            seed=seed, 
-            num_avg=num_avg, 
-            num_iter=num_iter,
-            kwargs=kwargs,
-            )
         
-
         tol = None
 
         # Percentage tests (maintain diagonal)
@@ -348,6 +344,6 @@ def main_sparsification():
         plotter.finish()
 
 if __name__ == '__main__':
-    # main_no_swap()
+    main_no_swap()
     # main_swap()
-    main_sparsification()
+    # main_sparsification()
