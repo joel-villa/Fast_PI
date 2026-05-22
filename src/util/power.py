@@ -74,13 +74,13 @@ def count_mults(A, maxiter=10):
 
     print(f"m: {m}, n: {n}")
 
-    # Cost of A @ x 
-    cost_Ax = m * n
+    # Cost of A @ x: A is (mxn), x is (nx1)
+    cost_Ax = m * n * 1
 
     # Cost of A.T @ (A @ x): A.T is nxm and A @ x is mx1
-    cost_ATAx = cost_Ax
+    cost_ATAx = n * m * 1
 
-    # Number of scalar mults for a single iteration (B is nxn)
+    # Number of scalar mults for a single iteration
     scalar_mults = cost_Ax + cost_ATAx
 
     # Number of scalar mults of maxiter iterations
