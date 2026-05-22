@@ -13,7 +13,6 @@ import numpy as np
 from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
 
-from .test_util.eig_functs import top_left
 from src.tests import score as tst
 
 def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):

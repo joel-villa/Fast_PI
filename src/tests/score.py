@@ -5,8 +5,8 @@ difference in top singular value on the y-axis
 
 import numpy as np
 
-from ..test_util import power as pwr
-from ..test_util import score as scr
+from ..util import power as pwr
+from ..util import score as scr
 
 
 def baseline(A, u_0, s_star, max_iter, tol, seed):

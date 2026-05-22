@@ -10,7 +10,7 @@ import numpy as np
 from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
 
-from .test_util.eig_functs import top_left
+from .util.eig_functs import top_left
 from .tests import power as pwr
 from .tests import sparse_power as spwr
 from .tests import subset_power as sub
