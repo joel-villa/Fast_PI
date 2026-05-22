@@ -51,6 +51,6 @@ def jl_simple(A, d, seed, eps=0.9):
 
     _, n = A.shape
 
-    A_new = A @ jl_matrix(n=n, d=d, seed=seed)
+    A_reduced = A @ jl_matrix(n=n, d=d, seed=seed)
 
-    return A_new
+    return A_reduced
