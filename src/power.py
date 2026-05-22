@@ -60,29 +60,6 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
 
     return np.shape(xs)[0]
 
-# def init(mat_name, seed):
-#     """ Get intial information for tests
-
-#     Args: 
-#         mat_name: the name of the matrix in the SuiteSparse Matrix Collection
-#         seed: for generating initial guess for top left eigenvector
-
-#     Return:
-#         A: the matrix in CSR format
-#         u_star: the matrix's top left eigenvector
-#     """
-#     ss_getter = SSGetter(in_csr=False)
-#     A = ss_getter.get(mat_name)
-#     u_star =  eigs.top_left(A)
-
-#     rng = np.random.default_rng(seed=seed)
-#     u0 = rng.normal(0, 1, A.shape[0])
-#     u0 = u0 / norm(u0)
-
-#     print(f"Testing {mat_name}")
-
-#     return A, u_star, u0
-
 def main_swap():
     """
     For testing swap behavior 
