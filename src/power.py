@@ -42,15 +42,6 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     
     ys = ys / num_avg
 
-    # """Start of code for sparse_pwr_tol() *** xs & ys are lists of variable 
-    # lengths -> averaging complicated and not implemented***"""
-    # rng = np.random.default_rng(seed=seed)
-    # u0 = rng.normal(0, 1, A.shape[0])
-    # u0 = u0 / norm(u0)
-
-    # xs, ys, label = funct(A, u0, u_star, num_iter, seed=seed, **kwargs)
-    # END of code for sparse_pwr_tol()
-
     # Remove trailing zeros only ('b' for back)
     xs = np.trim_zeros(xs, trim='b')
     ys = np.trim_zeros(ys, trim='b')
