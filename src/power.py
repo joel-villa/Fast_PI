@@ -3,9 +3,9 @@ Has some runnable methods, which plot the convergence of a JL-enhanced power
 iteration method
 """
 from Sparsification_Research.src.Plotter import Plotter
+from Sparsification_Research.src.SSGetter import SSGetter
 
 from scipy.linalg import norm # 2-norm by default
-from .plot_util.plot import init
 
 import numpy as np
 from .tests import power as pwr
@@ -49,6 +49,35 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     plotter.add_to_plot(xs, ys, label=label)
 
     return np.shape(xs)[0]
+
+def init(mat_name, seed):
+    """ Get intial information for tests
+
+    Args: 
+        mat_name: the name of the matrix in the SuiteSparse Matrix Collection
+        seed: for generating initial guess for top left eigenvector
+
+    Return:
+        A: the matrix in CSR format
+        kwargs: a dictionary containing the initial guess for u, as wall as the 
+                solution u
+    """
+    ss_getter = SSGetter(in_csr=False)
+    A = ss_getter.get(mat_name)
+        
+    u_star =  eigs.top_left(A)
+
+    rng = np.random.default_rng(seed=seed)
+    u0 = rng.normal(0, 1, A.shape[0])
+    u0 = u0 / norm(u0)
+
+    print(f"Testing {mat_name}")
+
+    kwargs = {"u_star": u_star,
+              "u_0": u0,
+              }
+
+    return A, kwargs
 
 def main_swap():
     """
