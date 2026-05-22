@@ -7,7 +7,7 @@ https://www.cs.unm.edu/~saia/classes/506-s26/lec/HighDim+JLProjection.pdf
 import math
 import numpy as np
 
-import scikit_jl as util
+import src.util.scikit_jl as util
 
 def jl_entry_vals(d):
     """ Get a tuple of those possible values that can be put in the JL matrix
