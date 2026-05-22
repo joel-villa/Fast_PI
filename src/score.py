@@ -118,7 +118,7 @@ if __name__ == '__main__':
         # Baseline test
         num_iter = test(funct=tst.baseline,
                         plotter=plotter,
-                        num_avg=num_avg,
+                        num_avg=1,
                         num_iter=max_iter,
                         A=A, 
                         seed=seed,
