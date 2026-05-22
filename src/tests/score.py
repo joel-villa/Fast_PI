@@ -11,11 +11,11 @@ from ..util import jl_implementation as jl
 from ..util import scikit_jl as jlsk
 
 
-def baseline(A, u_0, s_star, max_iter, tol, seed, init_mults=0):
+def baseline(A, u_0, s_star, max_iter, tol, seed, init_mults=0, A_tilde=None):
     """ The baseline power work-load (number of scalar mults)
 
     Args:
-        A: the matrix to do power iteration on
+        A: the original matrix
         u_0: initial guess for top left eigenvector
         s_star: actual top singular value
         max_iter: maximum number of iterations to do power iteration
@@ -23,14 +23,20 @@ def baseline(A, u_0, s_star, max_iter, tol, seed, init_mults=0):
         seed: for repeatable randomness (scikit does not have repeatable 
               randomness)
         init_mults: the initial number of scalar mults
+        A_tilde: some augmented version of A (more sparse, less dimensions, etc)
+
     Return:
         xs: an array of amount of scalar mults done
         ys: an array of error of each guess ()
         lbl: the string representation of this test
     """
 
+    if A_tilde is None:
+        # Baseline case, no augmentation
+        A_tilde = A
+
     s_curr =  pwr.s_from_u(A, u_0)
-    v =  pwr.v_from_u(A, u_0)
+    v =  pwr.v_from_u(A_tilde, u_0)
 
     xs = np.zeros(max_iter)
     ys = np.zeros(max_iter)
@@ -43,10 +49,13 @@ def baseline(A, u_0, s_star, max_iter, tol, seed, init_mults=0):
 
     for i in range(1, max_iter):
         # NOTE: using scikit-learn -> top left eig (u) is of significance
-        u, s_curr, v = pwr.topsing(v0=v,
-                                   A=A, 
+        u, _, v = pwr.topsing(v0=v,
+                                   A=A_tilde, 
                                    maxiter=1,
                                    )
+        
+        # Get score of current approximation of top left eigenvector
+        s_curr =  pwr.s_from_u(A, u)
         
         # ERROR RATE: abs(top eigenvalue - approximate eigenvalue) / top eigenvalue
         error_rate = scr.error(s_approx=s_curr, s_star=s_star)
@@ -102,7 +111,8 @@ def jl_dimension(A, u_0, s_star, max_iter, tol, seed, d, eps, type):
     
     init_mults = jlsk.reduction_cost(X=A, d=d)
 
-    xs, ys, _ = baseline(A=A_reduced,
+    xs, ys, _ = baseline(A=A,
+                         A_tilde=A_reduced,
                          u_0=u_0,
                          s_star=s_star,
                          max_iter=max_iter,
@@ -132,7 +142,7 @@ def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
         lbl: the string representation of this test
     """
     _, n = A.shape
-    
+
     d = jlsk.percent_reduce(n=n, p=p)
 
     xs, ys, lbl = jl_dimension(A=A,
