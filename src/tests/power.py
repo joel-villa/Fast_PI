@@ -9,9 +9,9 @@ from scipy.linalg import norm # 2-norm by default
 
 import numpy as np
 
-from ..test_util import eig_functs as eig
-from ..test_util import scikit_jl as jl
-from ..test_util import power as pwr
+from ..util import eig_functs as eig
+from ..util import scikit_jl as jl
+from ..util import power as pwr
 
 def baseline_pow_convergence(A, u_0, u_star, num_iter, seed):
     """ The baseline power convergence (terminates based on num_iter)
