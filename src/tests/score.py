@@ -13,7 +13,7 @@ from ..util import jl_implementation as jl
 from ..util import scikit_jl as jlsk
 
 
-def baseline(A, u_0, s_star, max_iter, tol, seed, init_mults=0, A_tilde=None):
+def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
     """ The baseline power work-load (number of scalar mults)
 
     Args:
@@ -119,7 +119,6 @@ def jl_dimension(A, u_0, s_star, max_iter, tol, seed, d, eps, type):
                          s_star=s_star,
                          max_iter=max_iter,
                          tol=tol,
-                         seed=seed,
                          init_mults=init_mults)
 
     return xs, ys, f"jl {type}, {A_reduced.shape}"
@@ -160,7 +159,7 @@ def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
 
     return xs, ys, f"{p}% {lbl}"
 
-def row_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
+def row_sample(A, u_0, s_star, max_iter, tol, seed, d):
     """ Test of random row-sampling 
 
     Args:
@@ -172,30 +171,13 @@ def row_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
         seed: for repeatable randomness (doesn't work due to scikit's not 
               supporting this functionality)
         d: reduced dimension
-        eps: for jl-reduction
-        type: string representation of reduction type
     Return:
-        xs: an array [0, 1, 2, ..., max_iter - 1]
-        ys: an array of residual of each guess for u (top left eigencector)
+        xs: an array of amount of scalar mults done
+        ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
         lbl: the string representation of this test
     """
 
-    jl_funct = None
-
-    match type.lower():
-        # Get reduction function
-        case "simple":
-            jl_funct = jl.jl_simple
-        case "gaussian":
-            jl_funct = jlsk.jl_gaussian
-        case "sparse":
-            jl_funct = jlsk.jl_sparse
-        case _:
-            raise TypeError(f"Invalid reduction type: {type}")
-
-    A_reduced = jl_funct(X=A, d=d, seed=seed, eps=eps)
-    
-    init_mults = jlsk.reduction_cost(X=A, d=d)
+    A_reduced = select_d_random_columns(A, d, seed)
 
     xs, ys, _ = baseline(A=A,
                          A_tilde=A_reduced,
@@ -203,7 +185,40 @@ def row_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
                          s_star=s_star,
                          max_iter=max_iter,
                          tol=tol,
-                         seed=seed,
-                         init_mults=init_mults)
+                         init_mults=0)
 
-    return xs, ys, f"jl {type}, {A_reduced.shape}"
+    return xs, ys, f"row sample, {A_reduced.shape}"
+
+def row_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
+    """ Test of random row sampling based on percent of reduction
+
+    Args:
+        A: the matrix to do power iteration on
+        u_0: initial guess for top left eigenvector
+        s_star: actual top singular value
+        max_iter: maximum number of iterations to do power iteration
+        tol: how much tolerance (for stopping condition of power iteration)
+        seed: for repeatable randomness (doesn't work due to scikit's not 
+              supporting this functionality)
+        p: reduction percentage
+        eps: for jl-reduction
+        type: string representation of reduction type
+    Return:
+        xs: an array of amount of scalar mults done
+        ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
+        lbl: the string representation of this test
+    """
+    _, n = A.shape
+
+    d = jlsk.percent_reduce(n=n, p=p)
+
+    xs, ys, lbl = row_sample(A=A,
+                             u_0=u_0,
+                             s_star=s_star,
+                             max_iter=max_iter,
+                             tol=tol,
+                             seed=seed,
+                             d=d,
+                             )
+
+    return xs, ys, f"{p}% {lbl}"
