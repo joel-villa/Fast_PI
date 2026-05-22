@@ -9,7 +9,6 @@ from .plot_util.plot import init
 
 import numpy as np
 from .tests import power as pwr
-from .test_util import eig_functs as eigs
 from .tests import sparse_power as spwr
 from .tests import subset_power as sub
 
