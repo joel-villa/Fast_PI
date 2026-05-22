@@ -63,7 +63,7 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
 
     return np.shape(xs)[0]
 
-def init(mat_name, seed):
+def init(mat_name, seed, tol):
     """ Get intial information for tests
 
     Args: 
@@ -90,6 +90,7 @@ def init(mat_name, seed):
 
     kwargs = {"s_star": s_star,
               "u_0": u0,
+              "tol": tol,
               }
 
     return A, kwargs
@@ -98,6 +99,7 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 64
     num_avg = 5
+    tol = 1e-7
     
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
@@ -105,7 +107,7 @@ if __name__ == '__main__':
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
-        A, kwargs = init(mat_name=mat_name, seed=seed)
+        A, kwargs = init(mat_name=mat_name, seed=seed, tol=tol)
 
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
                           x_label="work (approximate number of scalar multiplications)",
@@ -120,6 +122,7 @@ if __name__ == '__main__':
                         num_iter=max_iter,
                         A=A, 
                         seed=seed,
-                        kwargs=kwargs | {"tol": 1e-7})
+                        kwargs=kwargs,
+                        )
 
         plotter.finish()
