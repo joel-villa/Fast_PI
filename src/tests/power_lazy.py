@@ -85,7 +85,7 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
         # Save current score as previous
         s_prev = s_curr
 
-    return xs, ys, f"baseline {A.shape}"
+    return xs, ys, f"jl simple (lazy) ({A.shape[0]}, {d})"
 
 def lazy_percent(A, u_0, s_star, max_iter, tol, seed, p, eps):
     """ Percent reduction test
@@ -110,7 +110,7 @@ def lazy_percent(A, u_0, s_star, max_iter, tol, seed, p, eps):
 
     d = jlsk.percent_reduce(n=n, p=p)
 
-    xs, ys, _ = lazy(A=A,
+    xs, ys, lbl = lazy(A=A,
                      u_0=u_0,
                      s_star=s_star,
                      max_iter=max_iter,
@@ -119,4 +119,4 @@ def lazy_percent(A, u_0, s_star, max_iter, tol, seed, p, eps):
                      d=d,
                      eps=eps)
 
-    return xs, ys, f"baseline {A.shape}"
+    return xs, ys, f"{p}% {lbl}"
