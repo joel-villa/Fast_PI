@@ -2,11 +2,12 @@
 Has some runnable methods, which plot the convergence of a JL-enhanced power 
 iteration method
 """
-from Sparsification_Research.src.SSGetter import SSGetter
 from Sparsification_Research.src.Plotter import Plotter
 
-import numpy as np
 from scipy.linalg import norm # 2-norm by default
+from .plot_util.plot import init
+
+import numpy as np
 from .tests import power as pwr
 from .test_util import eig_functs as eigs
 from .tests import sparse_power as spwr
@@ -59,28 +60,28 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
 
     return np.shape(xs)[0]
 
-def init(mat_name, seed):
-    """ Get intial information for tests
+# def init(mat_name, seed):
+#     """ Get intial information for tests
 
-    Args: 
-        mat_name: the name of the matrix in the SuiteSparse Matrix Collection
-        seed: for generating initial guess for top left eigenvector
+#     Args: 
+#         mat_name: the name of the matrix in the SuiteSparse Matrix Collection
+#         seed: for generating initial guess for top left eigenvector
 
-    Return:
-        A: the matrix in CSR format
-        u_star: the matrix's top left eigenvector
-    """
-    ss_getter = SSGetter(in_csr=False)
-    A = ss_getter.get(mat_name)
-    u_star =  eigs.top_left(A)
+#     Return:
+#         A: the matrix in CSR format
+#         u_star: the matrix's top left eigenvector
+#     """
+#     ss_getter = SSGetter(in_csr=False)
+#     A = ss_getter.get(mat_name)
+#     u_star =  eigs.top_left(A)
 
-    rng = np.random.default_rng(seed=seed)
-    u0 = rng.normal(0, 1, A.shape[0])
-    u0 = u0 / norm(u0)
+#     rng = np.random.default_rng(seed=seed)
+#     u0 = rng.normal(0, 1, A.shape[0])
+#     u0 = u0 / norm(u0)
 
-    print(f"Testing {mat_name}")
+#     print(f"Testing {mat_name}")
 
-    return A, u_star, u0
+#     return A, u_star, u0
 
 def main_swap():
     """
@@ -110,11 +111,7 @@ def main_swap():
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
-        A, u_star, u0 = init(mat_name=mat_name, seed=seed)
-
-        kwargs = {"u_star": u_star,
-                  "u_0": u0,
-                  }
+        A, kwargs = init(mat_name=mat_name, seed=seed)
 
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
                           x_label="number of iterations",
@@ -206,11 +203,7 @@ def main_no_swap():
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
-        A, u_star, u_0 = init(mat_name=mat_name, seed=seed)
-
-        kwargs = {"u_star": u_star,
-                  "u_0": u_0,
-                  }
+        A, kwargs = init(mat_name=mat_name, seed=seed)
 
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
                           x_label="number of iterations",
@@ -286,11 +279,7 @@ def main_sparsification():
 
 
     for mat_name in mats:
-        A, u_star, u_0 = init(mat_name=mat_name, seed=seed)
-
-        kwargs = {"u_star": u_star,
-                  "u_0": u_0,
-                  }
+        A, kwargs = init(mat_name=mat_name, seed=seed)
         
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
                           x_label="number of iterations",
