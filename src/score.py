@@ -43,6 +43,10 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
 
     plotter.add_to_plot(xs, ys, label=label)
 
+    # Remove trailing zeros only ('b' for back)
+    xs = np.trim_zeros(xs, trim='b')
+    ys = np.trim_zeros(ys, trim='b')
+
     return np.shape(xs)[0]
 
 

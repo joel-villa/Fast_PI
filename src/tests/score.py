@@ -58,9 +58,5 @@ def baseline(A, u_0, s_star, max_iter, tol, seed):
 
         # Save current score as previous
         s_prev = s_curr
-    
-    # Remove trailing zeros only ('b' for back)
-    xs = np.trim_zeros(xs, trim='b')
-    ys = np.trim_zeros(ys, trim='b')
 
     return xs, ys, f"standard power {A.shape}" #TODO: Test this baddie
