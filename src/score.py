@@ -15,7 +15,7 @@ from Sparsification_Research.src.SSGetter import SSGetter
 
 from src.tests import score as tst
 
-def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
+def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     """Test the given function from src/tests
     
     Args:
@@ -40,9 +40,12 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     trim_size_prev = None
     
     for i in range(num_avg):
-        seed_i = seed + i * 3 
+        #TODO: averaging doesn't work :(
+        if "seed" in kwargs:
+            # If seed in kwargs, update it for variable tests to average
+            kwargs["seed"] = kwargs["seed"] * (i + 1) + i * 3
 
-        xs, ys_i, label = funct(A=A, max_iter=num_iter, seed=seed_i, **kwargs)
+        xs, ys_i, label = funct(A=A, max_iter=num_iter, **kwargs)
         ys += ys_i
 
         trim_size = np.trim_zeros(xs).shape[0]
@@ -98,7 +101,7 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 64
     num_avg = 5
-    ps = (70, 90, 97)
+    ps = (50, 70, 90, 97)
     types = ("simple", "gaussian", "sparse")
     tol = 1e-7
     epsilon = 0.98
@@ -120,7 +123,7 @@ if __name__ == '__main__':
         kwargs = {"plotter": plotter,
                   "num_iter": max_iter,
                   "A": A,
-                  "seed": seed}
+                  }
         
         # Baseline test
         test(funct=tst.baseline,
@@ -132,7 +135,7 @@ if __name__ == '__main__':
         
         # JL-reduction tests
         kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
-        funct_args = funct_args | {"eps": epsilon}
+        funct_args = funct_args | {"eps": epsilon, "seed": seed}
         for p in ps:
             for type in types:
                 p_args = funct_args | {"type": type, "p": p}
