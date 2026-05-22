@@ -54,6 +54,8 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     
     ys = ys / num_avg
 
+    # print(f"{label}: xs[0] = {xs[0]}, ys[0] = {ys[0]}")
+
     # Remove trailing zeros only ('b' for back)
     xs = np.trim_zeros(xs, trim='b')
     ys = np.trim_zeros(ys, trim='b')
@@ -86,6 +88,7 @@ def init(mat_name, seed, tol):
     print(f"Testing {mat_name}")
 
     kwargs = {"s_star": s_star,
+              "s_0": s0,
               "u_0": u0,
               "tol": tol,
               }
@@ -131,8 +134,8 @@ if __name__ == '__main__':
         # JL-reduction tests
         kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
         funct_args = funct_args | {"eps": epsilon}
-        for type in types:
-            for p in ps:
+        for p in ps:
+            for type in types:
                 p_args = funct_args | {"type": type, "p": p}
                 test(funct=tst.jl_percent,
                      kwargs=p_args,
