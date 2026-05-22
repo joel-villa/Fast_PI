@@ -34,23 +34,23 @@ def jl_matrix(n, d, seed):
     rng = np.random.default_rng(seed)
     return rng.choice(jl_entry_vals(d), size=(n, d))
 
-def jl_simple(X, d, seed, eps=0.9):
-    """
-    X - original matrix (nxm)
-    d - desired dimension
-    seed - for repeatable randomness
-    eps - allowable error
+def jl_simple(A, d, seed, eps=0.9):
+    """Reduce dimensions of A, via simple jl projection
 
-    RETURN: reduced X (nxd), i.e. less columns
+    Args:
+        A: original matrix (nxm)
+        d: desired dimension
+        seed: for repeatable randomness
+        eps: allowable error
 
-    Reduce dimensions of X, via scikit learn's gaussian method
+    RETURN: reduced A (nxd), i.e. less columns
     """
     
-    util.check_valid_dimensions(X)
-    util.check_safe(X, d, eps)
+    util.check_valid_dimensions(A)
+    util.check_safe(A, d, eps)
 
-    _, n = X.shape
+    _, n = A.shape
 
-    X_new = X @ jl_matrix(n=n, d=d, seed=seed)
-    
-    return X_new
+    A_new = A @ jl_matrix(n=n, d=d, seed=seed)
+
+    return A_new
