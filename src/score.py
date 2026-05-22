@@ -101,7 +101,7 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 64
     num_avg = 5
-    ps = (50, 70, 90, 97)
+    ps = (50, 97)
     types = ("simple", "gaussian", "sparse")
     tol = 1e-7
     epsilon = 0.98
