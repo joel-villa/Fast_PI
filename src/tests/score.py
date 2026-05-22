@@ -54,7 +54,7 @@ def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
         u, _, v = pwr.topsing(v0=v,
                                    A=A_tilde, 
                                    maxiter=1,
-                                   )
+                                   ) #TODO: maybe use this s for convergence? 
         
         # Get score of current approximation of top left eigenvector
         s_curr =  pwr.s_from_u(A, u)
