@@ -32,7 +32,8 @@ def baseline(A, u_0, s_star, max_iter, tol, seed):
     xs = np.zeros(max_iter)
     ys = np.zeros(max_iter)
 
-    ys[0] = scr.error(s_approx=s_curr, s_star=s_star)
+    error_rate = scr.error(s_approx=s_curr, s_star=s_star)
+    ys[0] = error_rate
     xs[0] = 0
 
     s_prev = s_curr
