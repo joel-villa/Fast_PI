@@ -7,9 +7,11 @@ import numpy as np
 
 from ..util import power as pwr
 from ..util import score as scr
+from ..util import jl_implementation as jl
+from ..util import scikit_jl as jlsk
 
 
-def baseline(A, u_0, s_star, max_iter, tol, seed):
+def baseline(A, u_0, s_star, max_iter, tol, seed, init_mults=0):
     """ The baseline power work-load (number of scalar mults)
 
     Args:
@@ -18,11 +20,12 @@ def baseline(A, u_0, s_star, max_iter, tol, seed):
         s_star: actual top singular value
         max_iter: maximum number of iterations to do power iteration
         tol: how much tolerance (for stopping condition of power iteration)
-        seed: for repeatable randomness (doesn't work due to scikit's not 
-              supporting this functionality)
+        seed: for repeatable randomness (scikit does not have repeatable 
+              randomness)
+        init_mults: the initial number of scalar mults
     Return:
-        xs: an array [0, 1, 2, ..., max_iter - 1]
-        ys: an array of residual of each guess for u (top left eigencector)
+        xs: an array of amount of scalar mults done
+        ys: an array of error of each guess ()
         lbl: the string representation of this test
     """
 
@@ -34,7 +37,7 @@ def baseline(A, u_0, s_star, max_iter, tol, seed):
 
     error_rate = scr.error(s_approx=s_curr, s_star=s_star)
     ys[0] = error_rate
-    xs[0] = 0
+    xs[0] = init_mults
 
     s_prev = s_curr
 
@@ -60,4 +63,87 @@ def baseline(A, u_0, s_star, max_iter, tol, seed):
         # Save current score as previous
         s_prev = s_curr
 
-    return xs, ys, f"standard power {A.shape}" #TODO: Test this baddie
+    return xs, ys, f"baseline {A.shape}"
+
+def jl_dimension(A, u_0, s_star, max_iter, tol, seed, d, eps, type):
+    """ Test of jl implementations
+
+    Args:
+        A: the matrix to do power iteration on
+        u_0: initial guess for top left eigenvector
+        s_star: actual top singular value
+        max_iter: maximum number of iterations to do power iteration
+        tol: how much tolerance (for stopping condition of power iteration)
+        seed: for repeatable randomness (doesn't work due to scikit's not 
+              supporting this functionality)
+        d: reduced dimension
+        eps: for jl-reduction
+        type: string representation of reduction type
+    Return:
+        xs: an array [0, 1, 2, ..., max_iter - 1]
+        ys: an array of residual of each guess for u (top left eigencector)
+        lbl: the string representation of this test
+    """
+
+    jl_funct = None
+
+    match type.lower():
+        # Get reduction function
+        case "simple":
+            jl_funct = jl.jl_simple
+        case "gaussian":
+            jl_funct = jlsk.jl_gaussian
+        case "sparse":
+            jl_funct = jlsk.jl_sparse
+        case _:
+            raise TypeError(f"Invalid reduction type: {type}")
+
+    A_reduced = jl_funct(X=A, d=d, seed=seed, eps=eps)
+    
+    init_mults = jlsk.reduction_cost(X=A, d=d)
+
+    xs, ys, _ = baseline(A=A_reduced,
+                         u_0=u_0,
+                         s_star=s_star,
+                         max_iter=max_iter,
+                         tol=tol,
+                         seed=seed,
+                         init_mults=init_mults)
+
+    return xs, ys, f"jl {type}, {A_reduced.shape}"
+
+def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
+    """ Test of jl implementations with percent reductions
+
+    Args:
+        A: the matrix to do power iteration on
+        u_0: initial guess for top left eigenvector
+        s_star: actual top singular value
+        max_iter: maximum number of iterations to do power iteration
+        tol: how much tolerance (for stopping condition of power iteration)
+        seed: for repeatable randomness (doesn't work due to scikit's not 
+              supporting this functionality)
+        p: reduction percentage
+        eps: for jl-reduction
+        type: string representation of reduction type
+    Return:
+        xs: an array [0, 1, 2, ..., max_iter - 1]
+        ys: an array of residual of each guess for u (top left eigencector)
+        lbl: the string representation of this test
+    """
+    _, n = A.shape
+    
+    d = jlsk.percent_reduce(n=n, p=p)
+
+    xs, ys, lbl = jl_dimension(A=A,
+                             u_0=u_0,
+                             s_star=s_star,
+                             max_iter=max_iter,
+                             tol=tol,
+                             seed=seed,
+                             d=d,
+                             eps=eps,
+                             type=type,
+                             )
+
+    return xs, ys, f"{p}% {lbl}"
