@@ -2,12 +2,15 @@
 Has some runnable methods, which plot the convergence of a JL-enhanced power 
 iteration method
 """
-from Sparsification_Research.src.Plotter import Plotter
-from Sparsification_Research.src.SSGetter import SSGetter
 
 from scipy.linalg import norm # 2-norm by default
 
 import numpy as np
+
+from Sparsification_Research.src.Plotter import Plotter
+from Sparsification_Research.src.SSGetter import SSGetter
+
+from .test_util.eig_functs import top_left
 from .tests import power as pwr
 from .tests import sparse_power as spwr
 from .tests import subset_power as sub
@@ -65,7 +68,7 @@ def init(mat_name, seed):
     ss_getter = SSGetter(in_csr=False)
     A = ss_getter.get(mat_name)
         
-    u_star =  eigs.top_left(A)
+    u_star =  top_left(A)
 
     rng = np.random.default_rng(seed=seed)
     u0 = rng.normal(0, 1, A.shape[0])
