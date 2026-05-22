@@ -14,3 +14,15 @@ def error(s_approx, s_star):
         relative error of s_approx
     """
     return abs(s_star - s_approx) / abs(s_star)
+
+def converged(s_curr, s_prev, tol):
+    """ Has the power iteration converged? 
+
+    Args:
+        s_curr: score of current iteration's approximation
+        s_prev: score of previous iteration's  approximation
+
+    Return:
+        True if converged, False otw
+    """
+    return (abs(s_curr - s_prev) / abs(s_curr)) < tol
