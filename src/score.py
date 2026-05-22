@@ -132,15 +132,23 @@ if __name__ == '__main__':
              **kwargs,
              )
         
-        
-        # JL-reduction tests
         kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
-        funct_args = funct_args | {"eps": epsilon, "seed": seed}
+        funct_args = funct_args | {"seed": seed}
+
+        # JL-reduction tests
+        jl_args = funct_args | {"eps": epsilon}
         for p in ps:
             for type in types:
-                p_args = funct_args | {"type": type, "p": p}
+                p_args = jl_args | {"type": type, "p": p}
                 test(funct=tst.jl_percent,
                      kwargs=p_args,
                      **kwargs)
+                
+        # Row Sampling
+        for p in ps: 
+            p_args = funct_args | {"p": p}
+            test(funct=tst.row_sample_p,
+                 kwargs=p_args,
+                 **kwargs)
 
         plotter.finish(xscale="log")
