@@ -4,11 +4,16 @@ top-eigenvector approximation, with some score
 
 Where work is number of scalar mults and "score" is closeness of singular value
 """
-from Sparsification_Research.src.Plotter import Plotter
-from .plot_util.plot import init
+
+from scipy.linalg import norm # 2-norm by default
+from scipy.sparse.linalg import svds
 
 import numpy as np
 
+from Sparsification_Research.src.Plotter import Plotter
+from Sparsification_Research.src.SSGetter import SSGetter
+
+from .test_util.eig_functs import top_left
 from src.tests import score as tst
 
 def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
@@ -49,37 +54,53 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
 
     return np.shape(xs)[0]
 
+def init(mat_name, seed):
+    """ Get intial information for tests
 
+    Args: 
+        mat_name: the name of the matrix in the SuiteSparse Matrix Collection
+        seed: for generating initial guess for top left eigenvector
+
+    Return:
+        A: the matrix in CSR format
+        kwargs: a dictionary containing the initial guess for u, as wall as the 
+                solution u
+    """
+    ss_getter = SSGetter(in_csr=False)
+    A = ss_getter.get(mat_name)
+        
+    _, s_star, _ =  svds(A, k=1)
+
+    s_star = s_star[0]
+
+    rng = np.random.default_rng(seed=seed)
+    u0 = rng.normal(0, 1, A.shape[0])
+    u0 = u0 / norm(u0)
+
+    print(f"Testing {mat_name}")
+
+    kwargs = {"s_star": s_star,
+              "u_0": u0,
+              }
+
+    return A, kwargs
 
 if __name__ == '__main__':
     seed = 10
     max_iter = 64
-    p = 70
-    num_tests = 1
-
+    
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
-
-    """These mats seem to imperically have this in common: small spectral gap,
-      and large eigenvalues
-      TODO: prove why this may be the case? 
-      TODO: an itterative approach which will use theses matrix approximations 
-            to converge faster"""
-
-
-    types = ["jl_gaussian", "jl_sparse"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
         A, kwargs = init(mat_name=mat_name, seed=seed)
 
-        
-
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
-                          x_label="number of iterations",
-                          y_label="residual", 
-                          save_name=f"{mat_name}_subset_no_swap_{p}",
+                          x_label="work (approximate number of scalar multiplications)",
+                          y_label=r"Error Rate ($\frac{|\lambda^* - lambda|}{|lambda^*}$)", 
+                          save_name=f"{mat_name}_error_v_work",
                           grid_on=True) 
 
         # Baseline test
