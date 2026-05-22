@@ -9,19 +9,19 @@ from ..test_util import power as pwr
 from ..test_util import score as scr
 
 
-def baseline(A, u_0, s_star, num_iter, tol, seed):
+def baseline(A, u_0, s_star, max_iter, tol, seed):
     """ The baseline power work-load (number of scalar mults)
 
     Args:
         A: the matrix to do power iteration on
         u_0: initial guess for top left eigenvector
         s_star: actual top singular value
-        num_iter: number of iterations to do power
-        tol: how much tolerance? 
+        max_iter: maximum number of iterations to do power iteration
+        tol: how much tolerance (for stopping condition of power iteration)
         seed: for repeatable randomness (doesn't work due to scikit's not 
               supporting this functionality)
     Return:
-        xs: an array [0, 1, 2, ..., num_iter - 1]
+        xs: an array [0, 1, 2, ..., max_iter - 1]
         ys: an array of residual of each guess for u (top left eigencector)
         lbl: the string representation of this test
     """
@@ -29,15 +29,15 @@ def baseline(A, u_0, s_star, num_iter, tol, seed):
     s_curr =  pwr.s_from_u(A, u_0)
     v =  pwr.v_from_u(A, u_0)
 
-    xs = np.zeros(num_iter)
-    ys = np.zeros(num_iter)
+    xs = np.zeros(max_iter)
+    ys = np.zeros(max_iter)
 
     ys[0] = scr.error(s_approx=s_curr, s_star=s_star)
     xs[0] = 0
 
     s_prev = s_curr
 
-    for i in range(1, num_iter):
+    for i in range(1, max_iter):
         # NOTE: using scikit-learn -> top left eig (u) is of significance
         u, s_curr, v = pwr.topsing(v0=v,
                                    A=A, 
@@ -59,4 +59,8 @@ def baseline(A, u_0, s_star, num_iter, tol, seed):
         # Save current score as previous
         s_prev = s_curr
     
+    # Remove trailing zeros only ('b' for back)
+    xs = np.trim_zeros(xs, trim='b')
+    ys = np.trim_zeros(ys, trim='b')
+
     return xs, ys, f"standard power {A.shape}" #TODO: Test this baddie
