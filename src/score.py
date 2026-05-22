@@ -60,8 +60,6 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
 
     plotter.add_to_plot(xs, ys, label=label)
 
-    return np.shape(xs)[0]
-
 def init(mat_name, seed, tol):
     """ Get intial information for tests
 
@@ -98,7 +96,10 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 64
     num_avg = 5
+    ps = (70, 90, 97)
+    types = ("simple", "gaussian", "sparse")
     tol = 1e-7
+    epsilon = 0.98
     
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
@@ -106,22 +107,35 @@ if __name__ == '__main__':
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
-        A, kwargs = init(mat_name=mat_name, seed=seed, tol=tol)
+        A, funct_args = init(mat_name=mat_name, seed=seed, tol=tol)
 
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
                           x_label="work (approximate number of scalar multiplications)",
                           y_label=r"Error Rate $\left(\frac{|\lambda^* - \lambda|}{|\lambda^*|}\right)$", 
                           save_name=f"{mat_name}_error_v_work",
                           grid_on=True) 
-
+        
+        kwargs = {"plotter": plotter,
+                  "num_iter": max_iter,
+                  "A": A,
+                  "seed": seed}
+        
         # Baseline test
-        num_iter = test(funct=tst.baseline,
-                        plotter=plotter,
-                        num_avg=1,
-                        num_iter=max_iter,
-                        A=A, 
-                        seed=seed,
-                        kwargs=kwargs,
-                        )
+        test(funct=tst.baseline,
+             num_avg=1,
+             kwargs=funct_args,
+             **kwargs,
+             )
+        
+        
+        # JL-reduction tests
+        kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
+        funct_args = funct_args | {"eps": epsilon}
+        for type in types:
+            for p in ps:
+                p_args = funct_args | {"type": type, "p": p}
+                test(funct=tst.jl_percent,
+                     kwargs=p_args,
+                     **kwargs)
 
-        plotter.finish()
+        plotter.finish(xscale="log")
