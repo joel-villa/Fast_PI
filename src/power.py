@@ -8,7 +8,7 @@ from Sparsification_Research.src.Plotter import Plotter
 import numpy as np
 from scipy.linalg import norm # 2-norm by default
 from .tests import power as pwr
-from .util import eig_functs as eigs
+from .test_util import eig_functs as eigs
 from .tests import sparse_power as spwr
 from .tests import subset_power as sub
 
