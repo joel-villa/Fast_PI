@@ -72,8 +72,6 @@ def count_mults(A, maxiter=10):
     """
     m, n = A.shape
 
-    print(f"m: {m}, n: {n}")
-
     # Cost of A @ x: A is (mxn), x is (nx1)
     cost_Ax = m * n * 1
 
