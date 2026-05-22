@@ -88,6 +88,63 @@ def count_mults(A, maxiter=10):
 
     
 
+def power_lazy(v0, A, P, maxiter=10):
+    """ A version of JL-enhanced power iteration, which avoids mat-mat 
+    multiplication, instead doing only matrix vector mults
+
+    Args: 
+        v0: an initial guess for the top right eigenvector (m-dimensional)
+        A: A matrix (nxm) s.t. n is less than or equal to m (for relative 
+           efficiency)
+        P: Projection matrix
+        maxiter: how many iterations of Power? 
+
+    RETURN: u - top left eigenvector approximation (n-dimensional)
+            s - singular value (akin to eigenvalue)
+            v - top right eigenvector approximation (m-dimensional)
+
+    Adapted from section "4.4.2. Computing the top singular vector", found here:
+    https://mmids-textbook.github.io/chap04_svd/04_power/roch-mmids-svd-power.html
+    """
+    x = v0.copy()
+
+    for _ in range(maxiter):
+        x = P.T @ (A.T @ (A @ (P @ x))) # x is dx1
+    v = x / norm(x)
+    s = norm(A @ (P @ v))
+    u = A @ (P @ v) / s
+    return u, s, v
+
+def count_mults_lazy(A, P, maxiter=10):
+    """
+    v0 - some vector with same dimension as A's top right eigenvectors
+    A  - the matrix to do power iteration on
+    maxiter - number of iterations of Power Iteration
+
+    RETURN: total number of scalar mults
+
+    Calculate the number of matrix multiplications for a set number of 
+    iterations of Power Iteration
+    """
+    m, n = A.shape
+    n, d = P.shape
+
+    cost_Px = n * d * 1
+
+    cost_APx = m * n * 1
+
+    cost_ATAPx = n * m * 1
+
+    cost_PTATAPx = d * n * 1
+
+    # Number of scalar mults for a single iteration
+    single_iter_cost = cost_Px + cost_APx + cost_ATAPx + cost_PTATAPx
+
+    # Number of scalar mults of maxiter iterations
+    scalar_mults = maxiter * single_iter_cost
+
+    return scalar_mults
+
 
 # def topsing(v0, A, maxiter=10, tolerance=1e-07):
 #     """
