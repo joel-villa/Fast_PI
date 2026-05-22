@@ -5,11 +5,11 @@ difference in top singular value on the y-axis
 
 import numpy as np
 
-from ..util import power as pwr
-from ..util import score as scr
+from ..test_util import power as pwr
+from ..test_util import score as scr
 
 
-def baseline_pwr_s_based(A, u_0, s_star, num_iter, tol, seed):
+def baseline(A, u_0, s_star, num_iter, tol, seed):
     """ The baseline power work-load (number of scalar mults)
 
     Args:
@@ -52,7 +52,7 @@ def baseline_pwr_s_based(A, u_0, s_star, num_iter, tol, seed):
         # Track amount of work done
         xs[i] = xs[i-1] + pwr.count_mults(A=A, maxiter=1)
         
-        if ((abs(s_curr - s_prev) / abs(s_curr)) < tol):
+        if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=tol)):
             # Converged
             break
 
