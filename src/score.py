@@ -88,7 +88,6 @@ def init(mat_name, seed, tol):
     print(f"Testing {mat_name}")
 
     kwargs = {"s_star": s_star,
-              "s_0": s0,
               "u_0": u0,
               "tol": tol,
               }
