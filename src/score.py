@@ -14,6 +14,7 @@ from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
 
 from src.tests import score as tst
+from src.tests.power_lazy import lazy_percent
 
 def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     """Test the given function from src/tests
@@ -143,6 +144,13 @@ if __name__ == '__main__':
                 test(funct=tst.jl_percent,
                      kwargs=p_args,
                      **kwargs)
+                
+        # JL lazy
+        for p in ps:
+            p_args = jl_args | {"p": p}
+            test(funct=lazy_percent,
+                kwargs=p_args,
+                **kwargs)
                 
         # Row Sampling
         for p in ps: 
