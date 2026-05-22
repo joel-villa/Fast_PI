@@ -37,20 +37,29 @@ def test(funct, plotter, num_avg, A, num_iter, seed, kwargs={}):
     ys_i = np.zeros(num_iter)
 
     label = ""
+
+    trim_size_prev = None
     
     for i in range(num_avg):
         seed_i = seed + i * 3 
 
         xs, ys_i, label = funct(A=A, max_iter=num_iter, seed=seed_i, **kwargs)
         ys += ys_i
+
+        trim_size = np.trim_zeros(xs).shape[0]
+
+        if (trim_size_prev is not None) and (trim_size_prev != trim_size):
+            print("WARNING: getting variable length convergence")
+        
+        trim_size_prev = trim_size
     
     ys = ys / num_avg
-
-    plotter.add_to_plot(xs, ys, label=label)
 
     # Remove trailing zeros only ('b' for back)
     xs = np.trim_zeros(xs, trim='b')
     ys = np.trim_zeros(ys, trim='b')
+
+    plotter.add_to_plot(xs, ys, label=label)
 
     return np.shape(xs)[0]
 
@@ -88,6 +97,7 @@ def init(mat_name, seed):
 if __name__ == '__main__':
     seed = 10
     max_iter = 64
+    num_avg = 5
     
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
@@ -99,14 +109,14 @@ if __name__ == '__main__':
 
         plotter.init_plot(title=f"Power Convergence of {mat_name}", 
                           x_label="work (approximate number of scalar multiplications)",
-                          y_label=r"Error Rate ($\frac{|\lambda^* - lambda|}{|lambda^*}$)", 
+                          y_label=r"Error Rate $\left(\frac{|\lambda^* - \lambda|}{|\lambda^*|}\right)$", 
                           save_name=f"{mat_name}_error_v_work",
                           grid_on=True) 
 
         # Baseline test
         num_iter = test(funct=tst.baseline,
                         plotter=plotter,
-                        num_avg=1,
+                        num_avg=num_avg,
                         num_iter=max_iter,
                         A=A, 
                         seed=seed,
