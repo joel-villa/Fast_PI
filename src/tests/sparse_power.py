@@ -4,8 +4,8 @@ from Sparsification_Research.src.SGenerator import SGenerator
 
 import numpy as np
 
-from ..util.eig_functs import euclidean_dist
-from ..util import power as pwr
+from ..test_util.eig_functs import euclidean_dist
+from ..test_util import power as pwr
 
 # TODO: tests w/ non-maintaining-diagonal-sparsifier
 

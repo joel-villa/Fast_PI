@@ -2,8 +2,8 @@
 A file for some tests, which return xs and ys (for easy plotting)
 """
 from math import ceil 
-from ..util import eig_functs as eig
-from ..util import scikit_jl as jl
+from ..test_util import eig_functs as eig
+from ..test_util import scikit_jl as jl
 import numpy as np
 
 

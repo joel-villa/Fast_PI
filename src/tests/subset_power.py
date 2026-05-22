@@ -3,10 +3,10 @@ Some tests for dimensionality reduction where you use random subset of the
 columns to see if power iteration converges faster
 """
 import numpy as np
-from ..util import power as pwr
-from ..util import eig_functs as eig
-from ..util import scikit_jl as jl
-from ..util.subset import select_d_random_columns
+from ..test_util import power as pwr
+from ..test_util import eig_functs as eig
+from ..test_util import scikit_jl as jl
+from ..test_util.subset import select_d_random_columns
 
 #TODO: less naive random sampling: based on one-norm? 
 #TODO: something similar to Chan's (randomly pick larger and larger sample-sizes)
