@@ -5,6 +5,8 @@ top-eigenvector approximation, with some score
 Where work is number of scalar mults and "score" is closeness of singular value
 """
 
+from wsgiref import types
+
 from scipy.linalg import norm # 2-norm by default
 from scipy.sparse.linalg import svds
 
@@ -145,7 +147,7 @@ def jl_lazy(funct_args, ps, kwargs):
             kwargs=p_args,
             **kwargs)
         
-def col_sample(ps, funct_args, kwargs):
+def col_sample(ps, funct_args, kwargs, types):
     """Test column sampling enhancement to power iteration
 
     Args: 
@@ -153,11 +155,10 @@ def col_sample(ps, funct_args, kwargs):
         funct_args: dictionary of arguments for the function col_p_sample() 
                     (except for p and type)
         kwargs: a dictionary of arguments for the test function
+        types: a list of string representations of the types of column sampling
 
     Return: None
     """
-    types = ("simple", "1-norm")
-
     for p in ps: 
         for type in types:
             p_args = funct_args | {"p": p, "type": type}
@@ -187,6 +188,33 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
+def col_sample_inc(funct_args, kwargs, types):
+    """Test column sampling enhancement to power iteration
+
+    Args: 
+        funct_args: dictionary of arguments for the function col_p_sample() 
+                    (except for p and type)
+        kwargs: a dictionary of arguments for the test function
+        types: a list of string representations of the types of column sampling
+
+    Return: None
+    """
+    init_p = 99
+    step = 5
+    inc_funct = lambda p: p + 5
+
+    funct_args = funct_args | {
+        "p0": init_p, 
+        "step": step, 
+        "inc_funct": inc_funct
+    }
+
+    for type in types:
+        p_args = funct_args | {"type": type}
+        test(funct=smpl.col_sample_inc_p,
+             kwargs=p_args,
+             **kwargs)
+
 if __name__ == '__main__':
     seed = 10
     max_iter = 64
@@ -194,6 +222,7 @@ if __name__ == '__main__':
     ps = (25, 50, 97)
     tol = 1e-7
     epsilon = 0.98
+    sample_types = ("simple", "1-norm")
     
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
@@ -233,9 +262,20 @@ if __name__ == '__main__':
         # jl_reduction(funct_args=jl_args, kwargs=kwargs)
         # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
 
-        col_sample(ps=ps, funct_args=funct_args, kwargs=kwargs)
+        col_sample(
+            ps=ps, 
+            funct_args=funct_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         sparsification(funct_args=funct_args, kwargs=kwargs)
+
+        col_sample_inc(
+            funct_args=funct_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         plotter.finish(
             # xscale="log"
