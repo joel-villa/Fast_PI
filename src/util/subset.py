@@ -4,14 +4,14 @@ Contains a method for selecting d columns from a matrix
 import numpy as np
 
 def select_d_random_columns(A, d, seed):
-    """
-    A - a matrix (nxm)
-    d - the number of columns to get
-    seed - for predictable randomness
+    """Given a matrix A, get d of its columns randomly
+
+    Args: 
+        A: a matrix (nxm)
+        d: the number of columns to get
+        seed: for predictable randomness
 
     RETURN: B - where B is a (nxd) subset of A
-
-    Given a matrix A, get x of its columns randomly
     """
 
     A_cols = A.shape[1]
