@@ -110,7 +110,7 @@ if __name__ == '__main__':
     max_iter = 64
     num_avg = 5
     jl_ps = (80, 97)
-    ps = (50, 97)
+    ps = (25, 50, 97)
     types = ("simple", "gaussian", "sparse")
     tol = 1e-7
     epsilon = 0.98
@@ -146,12 +146,12 @@ if __name__ == '__main__':
 
         # JL-reduction tests
         jl_args = funct_args | {"eps": epsilon}
-        for p in jl_ps:
-            for type in types:
-                p_args = jl_args | {"type": type, "p": p}
-                test(funct=tst.jl_percent,
-                     kwargs=p_args,
-                     **kwargs)
+        # for p in jl_ps:
+        #     for type in types:
+        #         p_args = jl_args | {"type": type, "p": p}
+        #         test(funct=tst.jl_percent,
+        #              kwargs=p_args,
+        #              **kwargs)
                 
         # JL lazy
         for p in ps:
