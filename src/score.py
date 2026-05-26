@@ -168,6 +168,15 @@ if __name__ == '__main__':
                  **kwargs)
             
         # Sparsification
+        for p in (2, 16):
+            for type in ("MD", "Generic"):
+                p_args = funct_args | {"p": p, "type": type}
+                test(
+                    funct=tst.percent_sparse,
+                    kwargs=p_args,
+                    **kwargs,
+                )
+
 
         plotter.finish(
             # xscale="log"
