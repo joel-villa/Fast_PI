@@ -105,18 +105,54 @@ def init(mat_name, seed, tol):
 
     return A, kwargs
 
+def jl_reduction(funct_args, kwargs):
+    """Test the naive JL enhancement to power iteration
+    
+    Args:
+        funct_args: a dictionary of arguments for the function jl_percent()
+                    (except for type, and p)
+        kwargs: a dictionary of arguments for the test function
+    
+    Return: None
+    """
+    ps = (80, 97)
+    types = ("simple", "gaussian", "sparse")
+
+    for p in ps:
+        for type in types:
+            p_args = funct_args | {"type": type, "p": p}
+            test(funct=tst.jl_percent,
+                 kwargs=p_args,
+                 **kwargs)
+
+def jl_lazy(funct_args, ps, kwargs):
+    """Test the JL enhancement to power iteration, with lazy multiplication
+    
+    Args:
+        funct_args: dictionary of arguments for the function lazy_percent() 
+                    (except for p)
+        ps: the percent reduction ammounts
+        kwargs: a dictionary of arguments for the test function
+        
+    Return: None
+    """
+    for p in ps:
+        p_args = funct_args | {"p": p}
+        test(funct=lazy_percent,
+            kwargs=p_args,
+            **kwargs)
+
 if __name__ == '__main__':
     seed = 10
     max_iter = 64
     num_avg = 5
-    jl_ps = (80, 97)
     ps = (25, 50, 97)
-    types = ("simple", "gaussian", "sparse")
     tol = 1e-7
     epsilon = 0.98
     
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
-    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
+    # mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
+    mats = ["bcspwr06"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -141,24 +177,18 @@ if __name__ == '__main__':
              **kwargs,
              )
         
+        # The following tests have some randomness, so we average them over num_avg runs
         kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
+
+        # Add seed to funct_args for tests which require randomness
         funct_args = funct_args | {"seed": seed}
 
-        # JL-reduction tests
+        # Args for JL reduction tests
         jl_args = funct_args | {"eps": epsilon}
-        # for p in jl_ps:
-        #     for type in types:
-        #         p_args = jl_args | {"type": type, "p": p}
-        #         test(funct=tst.jl_percent,
-        #              kwargs=p_args,
-        #              **kwargs)
-                
-        # JL lazy
-        for p in ps:
-            p_args = jl_args | {"p": p}
-            test(funct=lazy_percent,
-                kwargs=p_args,
-                **kwargs)
+
+        # jl_reduction(funct_args=jl_args, kwargs=kwargs)
+        # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
+
                 
         # Row Sampling
         for p in ps: 
