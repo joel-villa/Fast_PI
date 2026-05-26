@@ -70,17 +70,17 @@ def count_mults(v0, A, maxiter=10):
 
     RETURN: total number of scalar mults
     """
-    n0, one = v0.shape
+    n0 = v0.shape[0]
     m, n = A.shape
 
-    if (n0 != n) or (one != 1):
+    if (n0 != n):
         raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}")
 
     # Cost of A @ x: A is (mxn), x is (nx1)
-    cost_Ax = m * n * one
+    cost_Ax = m * n * 1
 
     # Cost of A.T @ (A @ x): A.T is nxm and A @ x is mx1
-    cost_ATAx = n * m * one
+    cost_ATAx = n * m * 1
 
     # Number of scalar mults for a single iteration
     scalar_mults = cost_Ax + cost_ATAx
@@ -131,11 +131,11 @@ def count_mults_lazy(v0, A, P, maxiter=10):
 
     RETURN: total number of scalar mults
     """
-    d0, one = v0.shape
+    d0 = v0.shape[0]
     m, n0 = A.shape
     n, d = P.shape
 
-    if (n0 != n) or (d0 != d) or (one != 1):
+    if (n0 != n) or (d0 != d):
         raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}, P {P.shape}")
 
     cost_Px = n * d * 1
