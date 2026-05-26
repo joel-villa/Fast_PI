@@ -248,11 +248,17 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     
     match type.upper():
         case "MD":
+            sparsifier = MDSparsifier(seed=seed)
+
             # s based off of off-diagonal non-zeroes
             include_diags = False
+            
         case "GENERIC":
+            sparsifier = Sparsifier(seed=seed)
+
             # s based off of nnzs
             include_diags = True
+            
         case _:
             raise TypeError(f"Invalid sparisifier type {type}")
         
@@ -261,13 +267,6 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     s = s_generator.proportion_sparse_s(p=expected_proportion, 
                                         include_diags=include_diags)
     
-    match type.upper():
-        case "MD":
-            sparsifier = MDSparsifier(seed=seed)
-        case _:
-            sparsifier = Sparsifier(seed=seed)
-
-
     sparse_A = A.copy()
 
     new_zeros = A.nnz - sparse_A.nnz
