@@ -199,9 +199,9 @@ def col_sample_dec(funct_args, kwargs, types):
 
     Return: None
     """
-    init_p = 99
-    step = 5
-    dec_funct = lambda p: p - 5
+    init_p = 98
+    step = 2
+    dec_funct = lambda p: p // 2
 
     funct_args = funct_args | {
         "p0": init_p, 
@@ -218,7 +218,7 @@ def col_sample_dec(funct_args, kwargs, types):
 if __name__ == '__main__':
     seed = 10
     max_iter = 64
-    num_avg = 5
+    num_avg = 1
     ps = (25, 50, 97)
     tol = 1e-7
     epsilon = 0.98
@@ -269,7 +269,7 @@ if __name__ == '__main__':
             types=sample_types
         )
 
-        sparsification(funct_args=funct_args, kwargs=kwargs)
+        # sparsification(funct_args=funct_args, kwargs=kwargs)
 
         col_sample_dec(
             funct_args=funct_args, 
