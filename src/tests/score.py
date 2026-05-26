@@ -225,7 +225,7 @@ def row_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
                              d=d,
                              )
 
-    return xs, ys, f"{p}% {lbl}"
+    return xs, ys, f"{100 - p}% {lbl}"
 
 def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     """ Power iteration on a sparsified version of A, percentage based
@@ -282,4 +282,4 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     
     new_zeros = A.nnz - sparse_A.nnz
 
-    return xs, ys, f"{p}% sparsified {A.shape} ({new_zeros} new zeros)"
+    return xs, ys, f"{p}% {type} sparsified {A.shape} ({new_zeros} new zeros)"
