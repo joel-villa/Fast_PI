@@ -12,23 +12,6 @@ from ..util import power as pwr
 from ..util import score as scr
 from ..util import scikit_jl as jl
 
-def get_reduce_funct(type):
-    """ Get the reduction function based on the type of reduction
-    
-    Args:
-        type: the type of reduction to do (string representation)
-
-    Return: the reduction function"""
-    match type.lower():
-        case "simple":
-            # simple random sampling of columns
-            return sub.select_d_random_columns
-        case "1-norm":
-            # random sampling of columns, with weight based on 1-norm of column
-            return  sub.one_norm_select
-        case _:
-            raise TypeError(f"Invalid sampling type: {type}")
-
 def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
     """ Test of random col-sampling 
 
@@ -49,7 +32,7 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
 
     A_reduced = None
 
-    reduce = get_reduce_funct(type)
+    reduce = sub.get_reduce_funct(type)
     A_reduced = reduce(A=A, d=d, seed=seed)
 
     xs, ys, _ = baseline(A=A,
@@ -96,23 +79,6 @@ def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
 
     return xs, ys, f"{100 - p}% {lbl}"
 
-def reduce_A(A, p, seed, type):
-    """ Reduce A based on percent reduction and reduction function
-    
-    Args:
-        A: the matrix to reduce
-        p: reduction percentage
-        seed: for repeatable randomness
-        type: the type of reduction to do (string representation)
-    
-    Return: the reduced A
-    """
-    _, n = A.shape
-
-    d = jl.percent_reduce(n=n, p=p)
-    reduce = get_reduce_funct(type)
-    return reduce(A, d, seed)
-
 def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_funct):
     """ Test of random col sampling with an increasing percentage of reduction
 
@@ -139,7 +105,7 @@ def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_fu
     # Reduce A initially
     p = p0
     
-    A_tilde = reduce_A(A, p, seed, type)
+    A_tilde = sub.reduce_A(A, p, seed, type)
 
     s_curr =  pwr.s_from_u(A, u_0)
     v =  pwr.v_from_u(A_tilde, u_0)
@@ -159,7 +125,7 @@ def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_fu
             p = inc_funct(p)
 
             # Reduce A again with new reduction percentage
-            A_tilde = reduce_A(A, p, seed, type)
+            A_tilde = sub.reduce_A(A, p, seed, type)
         
         # NOTE: using scikit-learn -> top left eig (u) is of significance
         u, _, v = pwr.topsing(

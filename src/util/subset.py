@@ -3,6 +3,8 @@ Contains a method for selecting d columns from a matrix
 """
 import numpy as np
 
+from .scikit_jl import percent_reduce
+
 def get_subset(A, cols):
     """Given a matrix A, get the columns specified by cols
     
@@ -62,3 +64,37 @@ def one_norm_select(A, d, seed):
     cols = rng.choice(A_cols, size=d, replace=False, p=weights/np.sum(weights))
 
     return get_subset(A=A, cols=cols)
+
+def get_reduce_funct(type):
+    """ Get the reduction function based on the type of reduction
+    
+    Args:
+        type: the type of reduction to do (string representation)
+
+    Return: the reduction function"""
+    match type.lower():
+        case "simple":
+            # simple random sampling of columns
+            return select_d_random_columns
+        case "1-norm":
+            # random sampling of columns, with weight based on 1-norm of column
+            return  one_norm_select
+        case _:
+            raise TypeError(f"Invalid sampling type: {type}")
+        
+def reduce_A(A, p, seed, type):
+    """ Reduce A based on percent reduction and reduction function
+    
+    Args:
+        A: the matrix to reduce
+        p: reduction percentage
+        seed: for repeatable randomness
+        type: the type of reduction to do (string representation)
+    
+    Return: the reduced A
+    """
+    _, n = A.shape
+
+    d = percent_reduce(n=n, p=p)
+    reduce = get_reduce_funct(type)
+    return reduce(A, d, seed)
