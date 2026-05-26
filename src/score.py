@@ -141,6 +141,26 @@ def jl_lazy(funct_args, ps, kwargs):
         test(funct=lazy_percent,
             kwargs=p_args,
             **kwargs)
+        
+def col_sample(ps, funct_args, kwargs):
+    """Test column sampling enhancement to power iteration
+
+    Args: 
+        ps: the percent reduction ammounts
+        funct_args: dictionary of arguments for the function col_p_sample() 
+                    (except for p and type)
+        kwargs: a dictionary of arguments for the test function
+
+    Return: None
+    """
+    types = ("simple", "1-norm")
+
+    for p in ps: 
+        for type in types:
+            p_args = funct_args | {"p": p, "type": type}
+            test(funct=tst.col_sample_p,
+                 kwargs=p_args,
+                 **kwargs)
 
 if __name__ == '__main__':
     seed = 10
@@ -179,7 +199,6 @@ if __name__ == '__main__':
         
         # The following tests have some randomness, so we average them over num_avg runs
         kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
-
         # Add seed to funct_args for tests which require randomness
         funct_args = funct_args | {"seed": seed}
 
@@ -189,14 +208,7 @@ if __name__ == '__main__':
         # jl_reduction(funct_args=jl_args, kwargs=kwargs)
         # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
 
-                
-        # Row Sampling
-        for p in ps: 
-            for type in ("simple", "1-norm"):
-                p_args = funct_args | {"p": p, "type": type}
-                test(funct=tst.col_sample_p,
-                     kwargs=p_args,
-                     **kwargs)
+        col_sample(ps=ps, funct_args=funct_args, kwargs=kwargs)
             
         # Sparsification
         for p in (2, 16):
