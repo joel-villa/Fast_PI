@@ -201,14 +201,16 @@ def col_sample_dec(funct_args, kwargs, types):
     Return: None
     """
     init_p = 98
-    step = 2
-    dec_funct = lambda p: p - 5 #TODO: debug this
+    dec_funct = lambda p: p - 5 
+    #dec_funct = lambda p: p // 1.25 TODO: test different hyperparams w/ only single matrix maybe: bcsstk08
+
+    swap_tol = 0.01
 
     funct_args = funct_args | {
         "p0": init_p, 
         # "step": step, 
         "dec_funct": dec_funct,
-        "swap_tol": 0.1, # override tol for this test (diff-behavior)
+        "swap_tol": swap_tol,
     }
 
     for type in types:
@@ -222,7 +224,7 @@ if __name__ == '__main__':
     max_iter = 64
     num_avg = 1
     ps = (25, 50, 97)
-    tol = 1e-7
+    tol = 1e-5
     epsilon = 0.98
     sample_types = ("simple", "1-norm")
     
