@@ -7,11 +7,13 @@ from sklearn import random_projection
 from math import ceil 
 
 def percent_reduce(n, p):
-     """
-     n - an integer (orignal dimension)
-     p - the percent to reduce n by
+     """Get n reduced by p percent
 
-     Reduce dimension n by p percent
+     Args: 
+        n: an integer (orignal dimension)
+        p: the percent to reduce n by
+
+    Return: n - p * n / 100
      """
      if p > 100 or p <= 0:
             raise ValueError(f"Invalid reduction percentage: {p}")
