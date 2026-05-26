@@ -188,7 +188,7 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def col_sample_inc(funct_args, kwargs, types):
+def col_sample_dec(funct_args, kwargs, types):
     """Test column sampling enhancement to power iteration
 
     Args: 
@@ -201,17 +201,17 @@ def col_sample_inc(funct_args, kwargs, types):
     """
     init_p = 99
     step = 5
-    inc_funct = lambda p: p + 5
+    dec_funct = lambda p: p - 5
 
     funct_args = funct_args | {
         "p0": init_p, 
         "step": step, 
-        "inc_funct": inc_funct
+        "dec_funct": dec_funct
     }
 
     for type in types:
         p_args = funct_args | {"type": type}
-        test(funct=smpl.col_sample_inc_p,
+        test(funct=smpl.col_sample_dec_p,
              kwargs=p_args,
              **kwargs)
 
@@ -271,7 +271,7 @@ if __name__ == '__main__':
 
         sparsification(funct_args=funct_args, kwargs=kwargs)
 
-        col_sample_inc(
+        col_sample_dec(
             funct_args=funct_args, 
             kwargs=kwargs, 
             types=sample_types
