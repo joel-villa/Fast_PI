@@ -13,7 +13,9 @@ def percent_reduce(n, p):
 
      Reduce dimension n by p percent
      """
-
+     if p > 100 or p <= 0:
+            raise ValueError(f"Invalid reduction percentage: {p}")
+     
      reduce_ammount = ceil(n * p * 0.01)
      d = n - reduce_ammount
      
