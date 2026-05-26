@@ -65,6 +65,7 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     ys = np.trim_zeros(ys, trim='b')
 
     if (ys.shape[0] < xs.shape[0]):
+        # print(f"ys: [{ys[:3]}, ..., {ys[-3:]}], xs: [{xs[:3]}, ..., {xs[-3:]}]")
         raise ValueError("ys has fewer non-zero entries than xs, cannot plot")
     
     ys = ys[:xs.shape[0]]
@@ -201,12 +202,13 @@ def col_sample_dec(funct_args, kwargs, types):
     """
     init_p = 98
     step = 2
-    dec_funct = lambda p: p // 2
+    dec_funct = lambda p: p - 5 #TODO: debug this
 
     funct_args = funct_args | {
         "p0": init_p, 
-        "step": step, 
-        "dec_funct": dec_funct
+        # "step": step, 
+        "dec_funct": dec_funct,
+        "swap_tol": 0.1, # override tol for this test (diff-behavior)
     }
 
     for type in types:
