@@ -215,35 +215,3 @@ def multi_jl_p_reduce(A, u_0, u_star, num_iter, seed, p, step_size, type):
     xs, ys, lbl = multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type)
     
     return xs, ys, f"{p}% {lbl}"
-
-# def svds_convergence(A, v0, v_star, num_iter, seed):
-#     """
-#     The baseline SVD convergence
-#     NOTE: svds() from scipy.sparse.linalg is not an itterative method
-#     """
-#     v = v0.copy()
-
-#     xs = np.zeros(num_iter)
-#     ys = np.zeros(num_iter)
-
-#     for i in range(num_iter):
-#         # NOTE: using scikit-learn -> top left eig is of significance
-#         v, _, _ = svds(A, 
-#                        k=1,        # top eigenvector
-#                        which='LM', # top eigenvector
-#                        v0=v, #TODO
-#                        maxiter=1, 
-#                        random_state=seed) #TODO should this be more random (ie: add i to seed)
-        
-#         v = v.flatten() # make v 1D rather than 2D: (x,) rather than (x,1)
-
-#         euc_dist = euclidean_dist(v, v_star)
-#         ys[i] = euc_dist
-#         xs[i] = i
-
-#     # print(f"xs: {xs}")
-#     # print(f"ys: {ys}")
-    
-#     return xs, ys, f"standard svd"
-    
-    
