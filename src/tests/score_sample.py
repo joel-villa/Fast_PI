@@ -132,7 +132,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, dec_fu
                 A_tilde = A
             else: 
                 # Reduce A again with new reduction percentage
-                A_tilde = sub.reduce_A(A, p, seed, type) 
+                A_tilde = sub.reduce_A(A, p, seed * i + (i * 2), type) 
                 
             v =  pwr.v_from_u(A_tilde, u) #TODO: count this in work
         
@@ -161,4 +161,4 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, dec_fu
         # Save current score as previous
         s_prev = s_curr
 
-    return xs, ys, f"{100 - p}%, increasing every {step} iterations"
+    return xs, ys, f"{p0}% to {p}%, increasing every {step} iterations ({type})"
