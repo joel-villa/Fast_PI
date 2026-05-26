@@ -167,5 +167,5 @@ if __name__ == '__main__':
                  **kwargs)
 
         plotter.finish(
-            xscale="log"
+            # xscale="log"
             )
