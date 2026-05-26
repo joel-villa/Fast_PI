@@ -124,15 +124,19 @@ def count_mults_lazy(v0, A, P, maxiter=10):
     iterations of Power Iteration
     
     Args: 
-        v0: some vector with same dimension as A's top right eigenvectors
-        A: the orignal matrix
-        P: the projection matrix
+        v0: some vector with same dimension as A's top right eigenvectors (dx1)
+        A: the orignal matrix (mxn)
+        P: the projection matrix (nxd)
         maxiter: number of iterations of Power Iteration
 
     RETURN: total number of scalar mults
     """
-    m, n = A.shape
+    d0, one = v0.shape
+    m, n0 = A.shape
     n, d = P.shape
+
+    if (n0 != n) or (d0 != d) or (one != 1):
+        raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}, P {P.shape}")
 
     cost_Px = n * d * 1
 

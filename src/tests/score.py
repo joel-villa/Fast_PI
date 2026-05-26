@@ -52,9 +52,9 @@ def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
     for i in range(1, max_iter):
         # NOTE: using scikit-learn -> top left eig (u) is of significance
         u, _, v = pwr.topsing(v0=v,
-                                   A=A_tilde, 
-                                   maxiter=1,
-                                   ) #TODO: maybe use this s for convergence? 
+                              A=A_tilde, 
+                              maxiter=1,
+                              ) #TODO: maybe use this s for convergence? 
         
         # Get score of current approximation of top left eigenvector
         s_curr =  pwr.s_from_u(A, u)
