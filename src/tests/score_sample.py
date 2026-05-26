@@ -124,8 +124,12 @@ def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_fu
             # Increase reduction percentage
             p = inc_funct(p)
 
-            # Reduce A again with new reduction percentage
-            A_tilde = sub.reduce_A(A, p, seed, type)
+            if p >= 100:
+                # Use unreduced A
+                A_tilde = A
+            else: 
+                # Reduce A again with new reduction percentage
+                A_tilde = sub.reduce_A(A, p, seed, type)
         
         # NOTE: using scikit-learn -> top left eig (u) is of significance
         u, _, v = pwr.topsing(
