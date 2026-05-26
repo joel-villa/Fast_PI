@@ -258,7 +258,7 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
 
             # s based off of nnzs
             include_diags = True
-            
+
         case _:
             raise TypeError(f"Invalid sparisifier type {type}")
         
@@ -269,9 +269,8 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     
     sparse_A = A.copy()
 
-    new_zeros = A.nnz - sparse_A.nnz
-
     sparsifier.sparsify(sparse_A, s)
+
     xs, ys, lbl = baseline(
         A=A,
         u_0=u_0, 
@@ -280,5 +279,7 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
         tol=tol,
         init_mults=0,
         A_tilde=sparse_A)
+    
+    new_zeros = A.nnz - sparse_A.nnz
 
     return xs, ys, f"{p}% sparsified {A.shape} ({new_zeros} new zeros)"
