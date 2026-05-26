@@ -76,7 +76,7 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
         ys[i] = error_rate
 
         # Track amount of work done
-        xs[i] = xs[i-1] + pwr.count_mults_lazy(A=A, P=projection_mat, maxiter=1)
+        xs[i] = xs[i-1] + pwr.count_mults_lazy(v0=v, A=A, P=projection_mat, maxiter=1)
         
         if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=tol)):
             # Converged

@@ -59,24 +59,28 @@ def topsing(v0, A, maxiter=10):
     u = A @ v / s
     return u, s, v
 
-def count_mults(A, maxiter=10):
-    """
-    v0 - some vector with same dimension as A's top right eigenvectors
-    A  - the matrix to do power iteration on
-    maxiter - number of iterations of Power Iteration
+def count_mults(v0, A, maxiter=10):
+    """Calculate the number of matrix multiplications for a set number of 
+    iterations of Power Iteration
+
+    Args:
+        v0: some vector with same dimension as A's top right eigenvectors
+        A: the matrix to do power iteration on
+        maxiter: number of iterations of Power Iteration
 
     RETURN: total number of scalar mults
-
-    Calculate the number of matrix multiplications for a set number of 
-    iterations of Power Iteration
     """
+    n0, one = v0.shape
     m, n = A.shape
 
+    if (n0 != n) or (one != 1):
+        raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}")
+
     # Cost of A @ x: A is (mxn), x is (nx1)
-    cost_Ax = m * n * 1
+    cost_Ax = m * n * one
 
     # Cost of A.T @ (A @ x): A.T is nxm and A @ x is mx1
-    cost_ATAx = n * m * 1
+    cost_ATAx = n * m * one
 
     # Number of scalar mults for a single iteration
     scalar_mults = cost_Ax + cost_ATAx
@@ -115,16 +119,17 @@ def power_lazy(v0, A, P, maxiter=10):
     u = A @ (P @ v) / s
     return u, s, v
 
-def count_mults_lazy(A, P, maxiter=10):
-    """
-    v0 - some vector with same dimension as A's top right eigenvectors
-    A  - the matrix to do power iteration on
-    maxiter - number of iterations of Power Iteration
+def count_mults_lazy(v0, A, P, maxiter=10):
+    """Calculate the number of matrix multiplications for a set number of 
+    iterations of Power Iteration
+    
+    Args: 
+        v0: some vector with same dimension as A's top right eigenvectors
+        A: the orignal matrix
+        P: the projection matrix
+        maxiter: number of iterations of Power Iteration
 
     RETURN: total number of scalar mults
-
-    Calculate the number of matrix multiplications for a set number of 
-    iterations of Power Iteration
     """
     m, n = A.shape
     n, d = P.shape

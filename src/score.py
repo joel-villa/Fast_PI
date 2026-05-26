@@ -64,6 +64,13 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     xs = np.trim_zeros(xs, trim='b')
     ys = np.trim_zeros(ys, trim='b')
 
+    #UNCOMMENT FOLLOWING LINE FOR ITTERATIVE VIEW
+    # xs = np.arange(xs.shape[0])
+
+    """For plotting initial values (since using log-scale-x, need to add 
+    perturbation to see x=0 values)"""
+    xs = xs + 1e-2
+
     plotter.add_to_plot(xs, ys, label=label)
 
 def init(mat_name, seed, tol):
@@ -159,4 +166,6 @@ if __name__ == '__main__':
                  kwargs=p_args,
                  **kwargs)
 
-        plotter.finish(xscale="log")
+        plotter.finish(
+            xscale="log"
+            )

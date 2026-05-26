@@ -65,7 +65,7 @@ def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
         ys[i] = error_rate
 
         # Track amount of work done
-        xs[i] = xs[i-1] + pwr.count_mults(A=A, maxiter=1)
+        xs[i] = xs[i-1] + pwr.count_mults(v0=v, A=A_tilde, maxiter=1)
         
         if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=tol)):
             # Converged
