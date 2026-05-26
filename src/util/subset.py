@@ -11,13 +11,44 @@ def select_d_random_columns(A, d, seed):
         d: the number of columns to get
         seed: for predictable randomness
 
-    RETURN: B - where B is a (nxd) subset of A
+    RETURN: B - an (nxd) column subset of A
     """
 
     A_cols = A.shape[1]
 
     rng = np.random.default_rng(seed=seed)
     cols = rng.choice(A_cols, size=d, replace=False)
+
+    sorted_cols = np.sort(cols)
+
+    # converting to Compressed Sparse Column format for list slicing
+    A_csc = A.copy()
+    A_csc = A.tocsc()
+
+    # Array slicing
+    B = A_csc[:, sorted_cols]
+    
+    # TODO: should this be converted back to coo? 
+
+    return B
+
+def one_norm_select(A, d, seed):
+    """Given a matrix A, get d of its columns randomly (putting more weight on 
+    columns with higher 1-norm)
+
+    Args: 
+        A: a matrix (nxm)
+        d: the number of columns to get
+        seed: for predictable randomness
+
+    RETURN: An (nxd) column subset of A
+    """
+
+    A_cols = A.shape[1]
+    weights = np.asarray(np.sum(np.abs(A), axis=0)).ravel()# 1-norm of each column
+
+    rng = np.random.default_rng(seed=seed)
+    cols = rng.choice(A_cols, size=d, replace=False, p=weights/np.sum(weights))
 
     sorted_cols = np.sort(cols)
 
