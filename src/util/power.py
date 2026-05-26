@@ -29,9 +29,6 @@ def v_from_u(A, u):
     NOTE: 
     A * v = s * u -> A^T * u = s * v
     """
-    #TODO: DEBUG and use this for consistent initialization 
-    # (i.e. every iteration starts w/ same residue)
-
     s = s_from_u(A, u)
     
     v = A.T @ u / s

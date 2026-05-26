@@ -6,7 +6,7 @@ https://users.cs.utah.edu/~jeffp/teaching/cs7931-S15/cs7931/8-sparsification.pdf
 from Sparsification_Reasearch.src.Sparsifier import Sparsifier
 from scipy.sparse import coo_array
 
-class MDSparsifier(Sparsifier):
+class DenseSparsifier(Sparsifier):
     """
     Mantain Diagonal Sparsifier, i.e. sparsify as usual, except garuntee 
     diagonal is kept and scaled
