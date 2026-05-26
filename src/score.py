@@ -116,7 +116,7 @@ if __name__ == '__main__':
     epsilon = 0.98
     
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
-    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
+    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
