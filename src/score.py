@@ -13,6 +13,7 @@ from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
 
 from src.tests import score as tst
+from src.tests import score_sample as smpl
 from src.tests.power_lazy import lazy_percent
 
 def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
@@ -160,7 +161,7 @@ def col_sample(ps, funct_args, kwargs):
     for p in ps: 
         for type in types:
             p_args = funct_args | {"p": p, "type": type}
-            test(funct=tst.col_sample_p,
+            test(funct=smpl.col_sample_p,
                  kwargs=p_args,
                  **kwargs)
             
