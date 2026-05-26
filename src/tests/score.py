@@ -5,8 +5,7 @@ difference in top singular value on the y-axis
 
 import numpy as np
 
-from ..util.subset import select_d_random_columns
-
+from ..util import subset as sub
 from ..util import power as pwr
 from ..util import score as scr
 from ..util import jl_implementation as jl
@@ -163,7 +162,7 @@ def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
 
     return xs, ys, f"{p}% {lbl}"
 
-def col_sample(A, u_0, s_star, max_iter, tol, seed, d):
+def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
     """ Test of random col-sampling 
 
     Args:
@@ -175,13 +174,24 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d):
         seed: for repeatable randomness (doesn't work due to scikit's not 
               supporting this functionality)
         d: reduced dimension
+        type: string representation of sampling type
     Return:
         xs: an array of amount of scalar mults done
         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
         lbl: the string representation of this test
     """
 
-    A_reduced = select_d_random_columns(A, d, seed)
+    A_reduced = None
+
+    match type.lower():
+        case "simple":
+            # simple random sampling of columns
+            A_reduced = sub.select_d_random_columns(A, d, seed)
+        case "1-norm":
+            # random sampling of columns, with weight based on 1-norm of column
+            A_reduced = sub.one_norm_select(A, d, seed)
+        case _:
+            raise TypeError(f"Invalid sampling type: {type}")
 
     xs, ys, _ = baseline(A=A,
                          A_tilde=A_reduced,
@@ -191,9 +201,9 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d):
                          tol=tol,
                          init_mults=0)
 
-    return xs, ys, f"col sample, {A_reduced.shape}"
+    return xs, ys, f"col sample ({type}), {A_reduced.shape}"
 
-def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
+def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
     """ Test of random col sampling based on percent of reduction
 
     Args:
@@ -223,6 +233,7 @@ def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
                              tol=tol,
                              seed=seed,
                              d=d,
+                             type=type,
                              )
 
     return xs, ys, f"{100 - p}% {lbl}"
