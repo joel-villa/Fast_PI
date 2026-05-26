@@ -12,6 +12,10 @@ from ..util import score as scr
 from ..util import jl_implementation as jl
 from ..util import scikit_jl as jlsk
 
+from Sparsification_Research.src.MDSparsifier import MDSparsifier
+from Sparsification_Research.src.Sparsifier import Sparsifier
+from Sparsification_Research.src.SGenerator import SGenerator
+
 
 def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
     """ The baseline power work-load (number of scalar mults)
@@ -222,3 +226,60 @@ def row_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
                              )
 
     return xs, ys, f"{p}% {lbl}"
+
+def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
+    """ Power iteration on a sparsified version of A, percentage based
+
+    Args: 
+        A: the original matrix
+        u_0: initial guess for top left eigenvector of A
+        s_star: actual top eigenvalue
+        max_iter: maximum number of iterations of power to do
+        seed: for duplicatable randomness
+        p: expected proportion of new zeroes in the sparsified A (not counting
+           diagonal entries)
+
+    Returns:
+        xs: an array of amount of scalar mults done
+        ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
+        lbl: the string representation of this test
+    """
+    s_generator = SGenerator(A.shape[0], A.nnz)
+    
+    match type.upper():
+        case "MD":
+            # s based off of off-diagonal non-zeroes
+            include_diags = False
+        case "GENERIC":
+            # s based off of nnzs
+            include_diags = True
+        case _:
+            raise TypeError(f"Invalid sparisifier type {type}")
+        
+    # get s associated with an expected percent sparsification p
+    expected_proportion = p / 100
+    s = s_generator.proportion_sparse_s(p=expected_proportion, 
+                                        include_diags=include_diags)
+    
+    match type.upper():
+        case "MD":
+            sparsifier = MDSparsifier(seed=seed)
+        case _:
+            sparsifier = Sparsifier(seed=seed)
+
+
+    sparse_A = A.copy()
+
+    new_zeros = A.nnz - sparse_A.nnz
+
+    sparsifier.sparsify(sparse_A, s)
+    xs, ys, lbl = baseline(
+        A=A,
+        u_0=u_0, 
+        s_star=s_star,
+        max_iter=max_iter,
+        tol=tol,
+        init_mults=0,
+        A_tilde=sparse_A)
+
+    return xs, ys, f"{p}% sparsified {A.shape} ({new_zeros} new zeros)"
