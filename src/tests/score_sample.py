@@ -79,8 +79,8 @@ def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
 
     return xs, ys, f"{100 - p}% {lbl}"
 
-def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_funct):
-    """ Test of random col sampling with an increasing percentage of reduction
+def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, dec_funct):
+    """ Test of random col sampling with an decreasing percentage of reduction
 
     Args:
         A: the matrix to do power iteration on
@@ -93,8 +93,8 @@ def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_fu
         p0: initial reduction percentage
         eps: for jl-reduction
         type: string representation of reduction type
-        step: how often to increase percentage of reduction 
-        inc_funct: function to increase the reduction percentage
+        step: how often to decrease percentage of reduction 
+        dec_funct: function to decrease the reduction percentage
     Return:
         xs: an array of amount of scalar mults done
         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
@@ -119,17 +119,22 @@ def col_sample_inc_p(A, u_0, s_star, max_iter, tol, seed, p0, type, step, inc_fu
 
     s_prev = s_curr
 
+    # Set initial u to zero vector
+    u = np.zeros_like(u_0)
+
     for i in range(1, max_iter):
         if (i % step == 0):
-            # Increase reduction percentage
-            p = inc_funct(p)
+            # decrease reduction percentage
+            p = dec_funct(p)
 
             if p >= 100:
                 # Use unreduced A
                 A_tilde = A
             else: 
                 # Reduce A again with new reduction percentage
-                A_tilde = sub.reduce_A(A, p, seed, type)
+                A_tilde = sub.reduce_A(A, p, seed, type) 
+                
+            v =  pwr.v_from_u(A_tilde, u) #TODO: count this in work
         
         # NOTE: using scikit-learn -> top left eig (u) is of significance
         u, _, v = pwr.topsing(
