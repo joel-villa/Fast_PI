@@ -163,7 +163,7 @@ if __name__ == '__main__':
         # Row Sampling
         for p in ps: 
             p_args = funct_args | {"p": p}
-            test(funct=tst.row_sample_p,
+            test(funct=tst.col_sample_p,
                  kwargs=p_args,
                  **kwargs)
             

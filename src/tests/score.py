@@ -163,8 +163,8 @@ def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
 
     return xs, ys, f"{p}% {lbl}"
 
-def row_sample(A, u_0, s_star, max_iter, tol, seed, d):
-    """ Test of random row-sampling 
+def col_sample(A, u_0, s_star, max_iter, tol, seed, d):
+    """ Test of random col-sampling 
 
     Args:
         A: the matrix to do power iteration on
@@ -191,10 +191,10 @@ def row_sample(A, u_0, s_star, max_iter, tol, seed, d):
                          tol=tol,
                          init_mults=0)
 
-    return xs, ys, f"row sample, {A_reduced.shape}"
+    return xs, ys, f"col sample, {A_reduced.shape}"
 
-def row_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
-    """ Test of random row sampling based on percent of reduction
+def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
+    """ Test of random col sampling based on percent of reduction
 
     Args:
         A: the matrix to do power iteration on
@@ -216,7 +216,7 @@ def row_sample_p(A, u_0, s_star, max_iter, tol, seed, p):
 
     d = jlsk.percent_reduce(n=n, p=p)
 
-    xs, ys, lbl = row_sample(A=A,
+    xs, ys, lbl = col_sample(A=A,
                              u_0=u_0,
                              s_star=s_star,
                              max_iter=max_iter,
