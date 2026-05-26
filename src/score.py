@@ -16,60 +16,6 @@ from Sparsification_Research.src.SSGetter import SSGetter
 from src.tests import score as tst
 from src.tests.power_lazy import lazy_percent
 
-# def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
-#     """Test the given function from src/tests
-    
-#     Args:
-#         funct: a fucntion which takes a matrix, some x vals, and a seed, and 
-#                returns xs and ys to be plotted
-#         plotter: a Plotter() object
-#         num_avg: average of how many tests?
-#         A: a CSR sparse matrix
-#         num_iter: how many iterations?
-#         seed: for randomized reproducability
-#         kwargs: input for funct
-#     Return: 
-#         The number of iterations ran (important for tests which terminate after
-#         converged)
-#     """
-#     ys = np.zeros(num_iter)
-#     xs = np.zeros(num_iter)
-#     ys_i = np.zeros((num_avg, num_iter))
-
-#     label = ""
-
-#     trim_size_prev = None
-    
-#     for i in range(num_avg):
-#         #TODO: averaging doesn't work :(
-#         if "seed" in kwargs:
-#             # If seed in kwargs, update it for variable tests to average
-#             kwargs["seed"] = kwargs["seed"] * (i + 1) + i * 3
-
-#         xs, ys_i[i], label = funct(A=A, max_iter=num_iter, **kwargs)
-
-#         trim_size = np.trim_zeros(xs).shape[0]
-
-#         if (trim_size_prev is not None) and (trim_size_prev != trim_size):
-#             print("WARNING: getting variable length convergence")
-        
-#         trim_size_prev = trim_size
-    
-#     ys = ys / num_avg
-
-#     # Remove trailing zeros only ('b' for back)
-#     xs = np.trim_zeros(xs, trim='b')
-#     ys = np.trim_zeros(ys, trim='b')
-
-#     #UNCOMMENT FOLLOWING LINE FOR ITTERATIVE VIEW
-#     # xs = np.arange(xs.shape[0])
-
-#     """For plotting initial values (since using log-scale-x, need to add 
-#     perturbation to see x=0 values)"""
-#     xs = xs + 1e-2
-
-#     plotter.add_to_plot(xs, ys, label=label)
-
 def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     """Test the given function from src/tests
     
@@ -88,7 +34,7 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     """
     ys = np.zeros(num_iter)
     xs = np.zeros(num_iter)
-    ys_i = np.zeros(num_iter)
+    ys_i = np.full((num_avg, num_iter), fill_value=np.nan) # for averaging
 
     label = ""
 
@@ -100,8 +46,7 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
             # If seed in kwargs, update it for variable tests to average
             kwargs["seed"] = kwargs["seed"] * (i + 1) + i * 3
 
-        xs, ys_i, label = funct(A=A, max_iter=num_iter, **kwargs)
-        ys += ys_i
+        xs, ys_i[i], label = funct(A=A, max_iter=num_iter, **kwargs)
 
         trim_size = np.trim_zeros(xs).shape[0]
 
@@ -110,9 +55,8 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
         
         trim_size_prev = trim_size
     
-    ys = ys / num_avg
-
-    # print(f"{label}: xs[0] = {xs[0]}, ys[0] = {ys[0]}")
+    # Calculate average
+    ys = np.nanmean(ys_i, axis=0)
 
     # Remove trailing zeros only ('b' for back)
     xs = np.trim_zeros(xs, trim='b')
@@ -126,6 +70,63 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     xs = xs + 1e-2
 
     plotter.add_to_plot(xs, ys, label=label)
+
+# def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
+#     """Test the given function from src/tests
+    
+#     Args:
+#         funct: a fucntion which takes a matrix, some x vals, and a seed, and 
+#                returns xs and ys to be plotted
+#         plotter: a Plotter() object
+#         num_avg: average of how many tests?
+#         A: a CSR sparse matrix
+#         num_iter: how many iterations?
+#         seed: for randomized reproducability
+#         kwargs: input for funct
+#     Return: 
+#         The number of iterations ran (important for tests which terminate after
+#         converged)
+#     """
+#     ys = np.zeros(num_iter)
+#     xs = np.zeros(num_iter)
+#     ys_i = np.zeros(num_iter)
+
+#     label = ""
+
+#     trim_size_prev = None
+    
+#     for i in range(num_avg):
+#         #TODO: averaging doesn't work :(
+#         if "seed" in kwargs:
+#             # If seed in kwargs, update it for variable tests to average
+#             kwargs["seed"] = kwargs["seed"] * (i + 1) + i * 3
+
+#         xs, ys_i, label = funct(A=A, max_iter=num_iter, **kwargs)
+#         ys += ys_i
+
+#         trim_size = np.trim_zeros(xs).shape[0]
+
+#         if (trim_size_prev is not None) and (trim_size_prev != trim_size):
+#             print("WARNING: getting variable length convergence")
+        
+#         trim_size_prev = trim_size
+    
+#     ys = ys / num_avg
+
+#     # print(f"{label}: xs[0] = {xs[0]}, ys[0] = {ys[0]}")
+
+#     # Remove trailing zeros only ('b' for back)
+#     xs = np.trim_zeros(xs, trim='b')
+#     ys = np.trim_zeros(ys, trim='b')
+
+#     #UNCOMMENT FOLLOWING LINE FOR ITTERATIVE VIEW
+#     # xs = np.arange(xs.shape[0])
+
+#     """For plotting initial values (since using log-scale-x, need to add 
+#     perturbation to see x=0 values)"""
+#     xs = xs + 1e-2
+
+#     plotter.add_to_plot(xs, ys, label=label)
 
 def init(mat_name, seed, tol):
     """ Get intial information for tests
