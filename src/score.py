@@ -9,7 +9,6 @@ from scipy.linalg import norm # 2-norm by default
 from scipy.sparse.linalg import svds
 
 import numpy as np
-
 from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
 
@@ -34,11 +33,12 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     """
     ys = np.zeros(num_iter)
     xs = np.zeros(num_iter)
-    ys_i = np.full((num_avg, num_iter), fill_value=np.nan) # for averaging
+    ys_i = np.zeros((num_avg, num_iter)) # for averaging
 
     label = ""
 
-    trim_size_prev = None
+    max_iter = 0
+    min_iter = num_iter
     
     for i in range(num_avg):
         #TODO: averaging doesn't work :(
@@ -46,28 +46,33 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
             # If seed in kwargs, update it for variable tests to average
             kwargs["seed"] = kwargs["seed"] * (i + 1) + i * 3
 
-        xs, ys_i[i], label = funct(A=A, max_iter=num_iter, **kwargs)
+        xs_temp, ys_i[i], label = funct(A=A, max_iter=num_iter, **kwargs)
 
-        trim_size = np.trim_zeros(xs).shape[0]
+        trim_size = np.trim_zeros(xs_temp).shape[0]
 
-        if (trim_size_prev is not None) and (trim_size_prev != trim_size):
-            print("WARNING: getting variable length convergence")
-        
-        trim_size_prev = trim_size
-    
+        if (min_iter > trim_size):
+            # Smaller x value, store this one for consistent averaging
+            xs = xs_temp
+            min_iter = trim_size
+
     # Calculate average
-    ys = np.nanmean(ys_i, axis=0)
+    ys = np.mean(ys_i, axis=0)
 
     # Remove trailing zeros only ('b' for back)
     xs = np.trim_zeros(xs, trim='b')
     ys = np.trim_zeros(ys, trim='b')
+
+    if (ys.shape[0] < xs.shape[0]):
+        raise ValueError("ys has fewer non-zero entries than xs, cannot plot")
+    
+    ys = ys[:xs.shape[0]]
 
     #UNCOMMENT FOLLOWING LINE FOR ITTERATIVE VIEW
     # xs = np.arange(xs.shape[0])
 
     """For plotting initial values (since using log-scale-x, need to add 
     perturbation to see x=0 values)"""
-    xs = xs + 1e-2
+    # xs = xs + 1e-2
 
     plotter.add_to_plot(xs, ys, label=label)
 
@@ -275,7 +280,7 @@ if __name__ == '__main__':
              )
         
         # The following tests have some randomness, so we average them over num_avg runs
-        kwargs = kwargs | {"num_avg" : 1} #TODO: make num_avg != 1 work
+        kwargs = kwargs | {"num_avg" : num_avg} #TODO: make num_avg != 1 work
         # Add seed to funct_args for tests which require randomness
         funct_args = funct_args | {"seed": seed}
 
