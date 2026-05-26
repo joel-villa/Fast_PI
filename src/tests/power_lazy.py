@@ -51,8 +51,6 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
                                   d=d,
                                   seed=seed)
     
-    print(f"A.shape: {A.shape}")
-    print(f"P.shape: {projection_mat.shape}")
     
     # jlsk.check_valid_dimensions(A)
     # jlsk.check_safe(A, d, eps)
