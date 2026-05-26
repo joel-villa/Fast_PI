@@ -109,6 +109,7 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 64
     num_avg = 5
+    jl_ps = (80, 97)
     ps = (50, 97)
     types = ("simple", "gaussian", "sparse")
     tol = 1e-7
@@ -145,7 +146,7 @@ if __name__ == '__main__':
 
         # JL-reduction tests
         jl_args = funct_args | {"eps": epsilon}
-        for p in ps:
+        for p in jl_ps:
             for type in types:
                 p_args = jl_args | {"type": type, "p": p}
                 test(funct=tst.jl_percent,
@@ -165,6 +166,8 @@ if __name__ == '__main__':
             test(funct=tst.row_sample_p,
                  kwargs=p_args,
                  **kwargs)
+            
+        # Sparsification
 
         plotter.finish(
             # xscale="log"
