@@ -112,17 +112,17 @@ def init(mat_name, seed, tol):
 
     return A, kwargs
 
-def jl_reduction(funct_args, kwargs):
+def jl_reduction(funct_args, kwargs, ps):
     """Test the naive JL enhancement to power iteration
     
     Args:
         funct_args: a dictionary of arguments for the function jl_percent()
                     (except for type, and p)
         kwargs: a dictionary of arguments for the test function
+        ps: the percent reduction ammounts
     
     Return: None
     """
-    ps = (97, None)
     types = ("simple", "gaussian", "sparse")
 
     for p in ps:
@@ -143,8 +143,6 @@ def jl_lazy(funct_args, ps, kwargs):
         
     Return: None
     """
-    ps = (*ps, None)
-
     for p in ps:
         p_args = funct_args | {"p": p}
         test(funct=lazy_percent,
@@ -245,6 +243,7 @@ if __name__ == '__main__':
     max_iter = 128
     num_avg = 1
     ps = (25, 50, 97)
+    jl_ps = (97, None)
     tol = 1e-5
     epsilon = 0.5
     # epsilon = 0.24
@@ -283,17 +282,17 @@ if __name__ == '__main__':
         funct_args = funct_args | {"seed": seed}
 
         # Args for JL reduction tests
-        # jl_args = funct_args | {"eps": epsilon}
+        jl_args = funct_args | {"eps": epsilon}
 
-        # jl_reduction(funct_args=jl_args, kwargs=kwargs)
-        # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
+        # jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
+        jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
-        # col_sample(
-        #     ps=ps, 
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs, 
-        #     types=sample_types
-        # )
+        col_sample(
+            ps=ps, 
+            funct_args=funct_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         sparsification(funct_args=funct_args, kwargs=kwargs)
         
