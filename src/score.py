@@ -238,10 +238,23 @@ def col_sample_dec(funct_args, kwargs): #TODO: type input
                      kwargs=test_args,
                      **kwargs)
 
+def sparse_jl_combo(funct_args, kwargs):
+    funct_args = funct_args | {
+        "p_sparse": 3,
+        "type_sparse": "Generic",
+        "p_jl": 97,
+        "type_jl": "Simple",
+    }
+    test(
+                funct=tst.sparse_jl_combo,
+                kwargs=funct_args,
+                **kwargs,
+            )
+
 if __name__ == '__main__':
     seed = 10
     max_iter = 128
-    num_avg = 1
+    num_avg = 5
     ps = (25, 50, 97)
     jl_ps = (97, None)
     tol = 1e-5
@@ -285,16 +298,18 @@ if __name__ == '__main__':
         jl_args = funct_args | {"eps": epsilon}
 
         # jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
-        jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
+        # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
-        col_sample(
-            ps=ps, 
-            funct_args=funct_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
-        sparsification(funct_args=funct_args, kwargs=kwargs)
+        # sparsification(funct_args=funct_args, kwargs=kwargs)
+
+        sparse_jl_combo(funct_args=jl_args, kwargs=kwargs)
         
         col_sample_dec(
             funct_args=funct_args, 
