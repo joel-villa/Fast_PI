@@ -180,10 +180,10 @@ def sparsification(funct_args, kwargs):
     
     Return: None
     """
-    ps = (2, 4, 8, 16,)
+    ps = (4, 16,)
     types = (
         "Generic",
-        "MD",
+        "SD",
         "CD",
     )
 
