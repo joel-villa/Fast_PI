@@ -163,6 +163,9 @@ def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
                              eps=eps,
                              type=type,
                              )
+    
+    if p is None:
+        return xs, ys, f"eps={eps}, {lbl}"
 
     return xs, ys, f"{p}% {lbl}"
 
