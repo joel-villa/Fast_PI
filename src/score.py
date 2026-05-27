@@ -5,6 +5,7 @@ top-eigenvector approximation, with some score
 Where work is number of scalar mults and "score" is closeness of singular value
 """
 
+import math
 from wsgiref import types
 
 from scipy.linalg import norm # 2-norm by default
@@ -189,7 +190,7 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def col_sample_dec(funct_args, kwargs, types):
+def col_sample_dec(funct_args, kwargs, types, init_p, dec_funct, swap_tol, min_iter):
     """Test column sampling enhancement to power iteration
 
     Args: 
@@ -197,20 +198,21 @@ def col_sample_dec(funct_args, kwargs, types):
                     (except for p and type)
         kwargs: a dictionary of arguments for the test function
         types: a list of string representations of the types of column sampling
+        init_p: initial reduction percentage
+        dec_funct: function to decrease the reduction percentage
+        swap_tol: how much tolerance to wait before decreasing amount of 
+                  reduction
+        min_iter: minimum number of iterations to run
 
     Return: None
     """
-    init_p = 98
-    dec_funct = lambda p: p - 5 
-    #dec_funct = lambda p: p // 1.25 TODO: test different hyperparams w/ only single matrix maybe: bcsstk08
-
-    swap_tol = 0.01
 
     funct_args = funct_args | {
         "p0": init_p, 
         # "step": step, 
         "dec_funct": dec_funct,
         "swap_tol": swap_tol,
+        "min_iter": min_iter,
     }
 
     for type in types:
@@ -226,11 +228,19 @@ if __name__ == '__main__':
     ps = (25, 50, 97)
     tol = 1e-5
     epsilon = 0.98
-    sample_types = ("simple", "1-norm")
+    sample_types = ("simple", "1-norm") #TODO: use this
+    sample_types = ("1-norm",)
     
-    # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
-    # mats = ["bcspwr06"]
+    mats = ["bcsstk07"]
+
+    init_ps = (92,) # TODO: Redo tests
+    # dec_functs = (lambda p: p - 1, lambda p: p - 2, lambda p: p - 4,lambda p: p - 8, lambda p: p - 16)
+    dec_functs = (lambda p: p - 2,)
+    # dec_functs = (lambda p: p - 16, lambda p: p // 2)
+    swap_tols = (0.01,)
+    # swap_tol = (0.01, 0.05, 0.1)
+    min_iters = (5,)
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -266,20 +276,28 @@ if __name__ == '__main__':
         # jl_reduction(funct_args=jl_args, kwargs=kwargs)
         # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
 
-        col_sample(
-            ps=ps, 
-            funct_args=funct_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
         # sparsification(funct_args=funct_args, kwargs=kwargs)
 
-        col_sample_dec(
-            funct_args=funct_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        for init_p in init_ps:
+            for dec_funct in dec_functs:
+                for swap_tol in swap_tols:
+                    for min_iter in min_iters:
+                        col_sample_dec(
+                            funct_args=funct_args, 
+                            kwargs=kwargs, 
+                            types=sample_types,
+                            init_p=init_p,
+                            dec_funct=dec_funct,
+                            swap_tol=swap_tol,
+                            min_iter=min_iter,
+                        )
 
         plotter.finish(
             # xscale="log"
