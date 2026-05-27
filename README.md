@@ -19,15 +19,20 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 - A proof that JL reductions approximately preserve eigenvectors (not in expectation).
 
-- A Chan inspired columns subset approach
-
 - Sparsify JL, reduction, cause why not :D
+
+- Gaussian JL implementation (from 506)
+
+- 
 
 - Proof on the lowerbound of dimensionality reduction in order to preserve top eigenvectors of a matrix: $d = \frac{C \log m}{\epsilon}$?
 
 - Timing convergence of original SVD vs. a JL-enhaced SVD.
 
 - A JL-enhanced SVD algorithm which takes averages of guesses for the top eigenvector. 
+
+- Some interesting behavior: convergence independent of dec_funct, when 
+  decrementing
 
 ## Things we Could Feasibly Hope to Prove
 - JL preservation of top eigenvectors (given some spectral gap maybe?)
