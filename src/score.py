@@ -180,8 +180,12 @@ def sparsification(funct_args, kwargs):
     
     Return: None
     """
-    ps = (2, 16)
-    types = ("MD", "Generic")
+    ps = (2, 4, 8, 16,)
+    types = (
+        "Generic",
+        "MD",
+        "CD",
+    )
 
     for p in ps:
         for type in types:
@@ -279,10 +283,10 @@ if __name__ == '__main__':
         funct_args = funct_args | {"seed": seed}
 
         # Args for JL reduction tests
-        jl_args = funct_args | {"eps": epsilon}
+        # jl_args = funct_args | {"eps": epsilon}
 
-        jl_reduction(funct_args=jl_args, kwargs=kwargs)
-        jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
+        # jl_reduction(funct_args=jl_args, kwargs=kwargs)
+        # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
 
         # col_sample(
         #     ps=ps, 
@@ -291,7 +295,7 @@ if __name__ == '__main__':
         #     types=sample_types
         # )
 
-        # sparsification(funct_args=funct_args, kwargs=kwargs)
+        sparsification(funct_args=funct_args, kwargs=kwargs)
         
         col_sample_dec(
             funct_args=funct_args, 
