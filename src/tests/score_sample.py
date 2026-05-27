@@ -163,7 +163,7 @@ def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
 
 #     return xs, ys, f"{p0}% to {p}%, increasing every {step} iterations ({type})"
 
-def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, swap_tol):
+def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, swap_tol, min_iter):
     """ Test of random col sampling with an decreasing percentage of reduction
 
     Args:
@@ -180,6 +180,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         dec_funct: function to decrease the reduction percentage
         swap_tol: how much tolerance to wait before decreasing amount of 
                   reduction
+        min_iter: minimum number of iterations to run before considering reduction #TODO: fix in score.py
 
     Return:
         xs: an array of amount of scalar mults done
@@ -224,23 +225,25 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         # Track amount of work done
         xs[i] = xs[i-1] + pwr.count_mults(v0=v, A=A_tilde, maxiter=1)
 
+        if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=tol) and i > min_iter):
+            # Converged 
+            break
+
         if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=swap_tol)):
             # decrease reduction percentage
             p = dec_funct(p)
-
-            if p <= 100:
+            
+            if p <= 0:
                 # Use unreduced A
                 A_tilde = A
             else:     
                 # Reduce A again with new reduction percentage
+                # print(f"p: {p},", end=" ")
                 A_tilde = sub.reduce_A(A, p, seed * i + (i * 2), type)  
-            v =  pwr.v_from_u(A_tilde, u) #TODO: count this in work?
-
-        if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=tol)):
-            # Converged 
-            break
+            v =  pwr.v_from_u(A_tilde, u)
+            xs[i] += pwr.count_mults_v_from_u(A=A_tilde, u=u)
 
         # Save current score as previous
         s_prev = s_curr
 
-    return xs, ys, f"{p0}% to {p}%, increasing w/ tol {swap_tol} ({type})"
+    return xs, ys, f"{p0}% to {p}%, increasing w/ tol {swap_tol} ({type}, {min_iter} min iters)"
