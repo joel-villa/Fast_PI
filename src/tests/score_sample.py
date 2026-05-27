@@ -152,6 +152,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
             if p <= 0:
                 # Use unreduced A
                 A_tilde = A
+                p = 0 # for consistent labeling
             else:     
                 # Reduce A again with new reduction percentage
                 # print(f"p: {p},", end=" ")
