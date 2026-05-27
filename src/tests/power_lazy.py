@@ -45,7 +45,7 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
     ys[0] = error_rate
     xs[0] = 0
 
-    n, m = A.shape
+    m, n = A.shape
 
     projection_mat = jl.jl_matrix(n=n,
                                   d=d,
@@ -84,6 +84,8 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
 
         # Save current score as previous
         s_prev = s_curr
+
+    _, d = projection_mat.shape
 
     return xs, ys, f"jl simple (lazy) ({A.shape[0]}, {d})"
 
