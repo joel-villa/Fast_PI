@@ -122,7 +122,7 @@ def jl_reduction(funct_args, kwargs):
     
     Return: None
     """
-    ps = (80, 97)
+    ps = (80, 97, None)
     types = ("simple", "gaussian", "sparse")
 
     for p in ps:
@@ -143,6 +143,8 @@ def jl_lazy(funct_args, ps, kwargs):
         
     Return: None
     """
+    ps = (*ps, None)
+    
     for p in ps:
         p_args = funct_args | {"p": p}
         test(funct=lazy_percent,
@@ -190,7 +192,7 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def col_sample_dec(funct_args, kwargs):
+def col_sample_dec(funct_args, kwargs): #TODO: type input
     """Test column sampling enhancement to power iteration
 
     Args: 
@@ -241,7 +243,8 @@ if __name__ == '__main__':
     ps = (25, 50, 97)
     tol = 1e-5
     epsilon = 0.98
-    sample_types = ("simple", "1-norm") 
+    # sample_types = ("simple", "1-norm") 
+    sample_types = ("1-norm", ) 
     
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
     # mats = ["bcsstk07"]
@@ -277,15 +280,15 @@ if __name__ == '__main__':
         # Args for JL reduction tests
         jl_args = funct_args | {"eps": epsilon}
 
-        # jl_reduction(funct_args=jl_args, kwargs=kwargs)
-        # jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
+        jl_reduction(funct_args=jl_args, kwargs=kwargs)
+        jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
 
-        # col_sample(
-        #     ps=ps, 
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs, 
-        #     types=sample_types
-        # )
+        col_sample(
+            ps=ps, 
+            funct_args=funct_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         

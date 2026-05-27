@@ -21,20 +21,24 @@ def jl_entry_vals(d):
     upper = math.sqrt(1 / d)
     return (lower,upper)
 
-def jl_matrix(n, d, seed):
+def jl_matrix(n, d, seed, eps):
     """ Randomly generate a JL matrix of dimensions (dxn)
 
     Args: 
         n: first dimension of reduction matrix
         d: second dimension of reduction matrix
         seed: for reproducible randomness
+        eps: for jl validity checking
 
     Return: JL reduction matrix
     """
+    if d is None:
+        d = util.get_min_dim(X=np.zeros((n, n)), eps=eps)
+
     rng = np.random.default_rng(seed)
     return rng.choice(jl_entry_vals(d), size=(n, d))
 
-def jl_simple(X, d, seed, eps=0.9):
+def jl_simple(X, d, seed, eps):
     """Reduce dimensions of A, via simple jl projection
 
     Args:
@@ -45,13 +49,11 @@ def jl_simple(X, d, seed, eps=0.9):
 
     RETURN: reduced X (nxd), i.e. less columns
     """
-    
-    util.check_valid_dimensions(X)
-    util.check_safe(X, d, eps)
+    d = util.pre_jl(X=X, d=d, eps=eps)
 
     _, n = X.shape
 
-    X_reduced = X @ jl_matrix(n=n, d=d, seed=seed)
+    X_reduced = X @ jl_matrix(n=n, d=d, seed=seed, eps=eps)
 
     return X_reduced
 

@@ -57,8 +57,20 @@ def check_safe(X, d, eps):
     
     if (d < min_d):
          print(f"WARNING: eps = {eps}; unsafe dimensionality reduction d = {d} < {min_d} = min_d ")
+
+def pre_jl(X, d, eps):
+    if d is None:
+        d = get_min_dim(X=X, eps=eps)
     
-def jl_gaussian(X, d, seed, eps=0.9):
+    if d >= X.shape[1]:
+        raise ValueError(f"Invalid dimension reduction: d = {d} >= {X.shape[1]} = original dimension")
+    
+    check_valid_dimensions(X)
+    check_safe(X, d, eps)
+
+    return d
+
+def jl_gaussian(X, d=None, seed=2, eps=0.9):
     """
     X - original matrix (nxm)
     d - desired dimension
@@ -69,15 +81,13 @@ def jl_gaussian(X, d, seed, eps=0.9):
 
     Reduce dimensions of X, via scikit learn's gaussian method
     """
-    
-    check_valid_dimensions(X)
-    check_safe(X, d, eps)
+    d = pre_jl(X=X, d=d, eps=eps)
 
     transformer = random_projection.GaussianRandomProjection(n_components=d, eps=eps, random_state=seed)
     X_new = transformer.fit_transform(X)
     return X_new
 
-def jl_sparse(X, d, seed, eps=0.9):
+def jl_sparse(X, d=None, seed=2, eps=0.9):
     """
     X - original matrix
     d - desired dimension
@@ -89,8 +99,7 @@ def jl_sparse(X, d, seed, eps=0.9):
     Reduce dimensions of X, via scikit learn's gaussian method
     """
 
-    check_valid_dimensions(X)
-    check_safe(X, d, eps)
+    d = pre_jl(X=X, d=d, eps=eps)
 
     transformer = random_projection.SparseRandomProjection(n_components=d, eps=eps, random_state=seed)
     X_new = transformer.fit_transform(X)

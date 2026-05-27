@@ -49,7 +49,9 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
 
     projection_mat = jl.jl_matrix(n=n,
                                   d=d,
-                                  seed=seed)
+                                  seed=seed,
+                                  eps=eps,
+                                  )
     
     
     # jlsk.check_valid_dimensions(A)
@@ -106,7 +108,10 @@ def lazy_percent(A, u_0, s_star, max_iter, tol, seed, p, eps):
     """
     _, n = A.shape
 
-    d = jlsk.percent_reduce(n=n, p=p)
+    if p is None:
+        d = None
+    else:
+        d = jlsk.percent_reduce(n=n, p=p)
 
     xs, ys, lbl = lazy(A=A,
                      u_0=u_0,

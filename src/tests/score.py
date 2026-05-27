@@ -112,6 +112,8 @@ def jl_dimension(A, u_0, s_star, max_iter, tol, seed, d, eps, type):
             raise TypeError(f"Invalid reduction type: {type}")
 
     A_reduced = jl_funct(X=A, d=d, seed=seed, eps=eps)
+
+    n, d = A_reduced.shape # For if d was None
     
     init_mults = jlsk.reduction_cost(X=A, d=d)
 
@@ -146,7 +148,10 @@ def jl_percent(A, u_0, s_star, max_iter, tol, seed, p, eps, type):
     """
     _, n = A.shape
 
-    d = jlsk.percent_reduce(n=n, p=p)
+    if p is None:
+        d = None
+    else:
+        d = jlsk.percent_reduce(n=n, p=p)
 
     xs, ys, lbl = jl_dimension(A=A,
                              u_0=u_0,
