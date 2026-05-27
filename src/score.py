@@ -246,8 +246,7 @@ if __name__ == '__main__':
     # sample_types = ("simple", "1-norm") 
     sample_types = ("1-norm", ) 
     
-    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
-    mats = ["lp_fit1d"] #TODO: test this
+    mats = ["494_bus", "bibd_13_6", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 

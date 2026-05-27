@@ -35,6 +35,11 @@ def lazy(A, u_0, s_star, max_iter, tol, seed, d, eps):
 
 
     s_curr =  pwr.s_from_u(A, u_0)
+
+    if d is None:
+        # Set to minimum allowable based on epsilon
+        d = jlsk.get_min_dim(X=A, eps=eps)
+
     A_reduced = jl.jl_simple(X=A, d=d, seed=seed, eps=eps) #TODO: hand in v0 rather than u0
     v = pwr.v_from_u(A_reduced, u_0) #TODO: check this 
 
