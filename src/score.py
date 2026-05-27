@@ -122,7 +122,7 @@ def jl_reduction(funct_args, kwargs):
     
     Return: None
     """
-    ps = (80, 97, None)
+    ps = (97, None)
     types = ("simple", "gaussian", "sparse")
 
     for p in ps:
@@ -243,10 +243,12 @@ if __name__ == '__main__':
     ps = (25, 50, 97)
     tol = 1e-5
     epsilon = 0.5
+    # epsilon = 0.24
     # sample_types = ("simple", "1-norm") 
     sample_types = ("1-norm", ) 
     
     mats = ["494_bus", "bibd_13_6", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
+    # mats = ["bcspwr06"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
