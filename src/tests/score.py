@@ -10,6 +10,7 @@ from ..util import score as scr
 from ..util import jl_implementation as jl
 from ..util import scikit_jl as jlsk
 
+from src.util.DenseSparsifier import DenseSparsifier
 from Sparsification_Research.src.CDSparsifier import CDSparsifier
 from Sparsification_Research.src.SDSparsifier import SDSparsifier
 from Sparsification_Research.src.Sparsifier import Sparsifier
@@ -231,3 +232,82 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     new_zeros = A.nnz - sparse_A.nnz
 
     return xs, ys, f"{p}% {type} sparsified {A.shape} ({new_zeros} new zeros)"
+
+def sparse_jl_combo(
+        A, 
+        u_0, 
+        s_star, 
+        max_iter, 
+        seed, 
+        p_sparse, #TODO: implement this
+        type_sparse, #TODO: don't need this
+        tol, 
+        p_jl, 
+        eps, 
+        type_jl,
+):
+    """ Power iteration on a sparsified version of A, percentage based
+
+    Args: 
+        A: the original matrix
+        u_0: initial guess for top left eigenvector of A
+        s_star: actual top eigenvalue
+        max_iter: maximum number of iterations of power to do
+        seed: for duplicatable randomness
+        p: expected proportion of new zeroes in the sparsified A (not counting
+           diagonal entries)
+
+    Returns:
+        xs: an array of amount of scalar mults done
+        ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
+        lbl: the string representation of this test
+    """
+    _, n = A.shape
+
+    if p_jl is None:
+        d = None
+    else:
+        d = jlsk.percent_reduce(n=n, p=p_jl)
+    
+    jl_funct = None
+
+    match type_jl.lower():
+        # Get reduction function
+        case "simple":
+            jl_funct = jl.jl_simple
+        case "gaussian":
+            jl_funct = jlsk.jl_gaussian
+        case "sparse":
+            jl_funct = jlsk.jl_sparse
+        case _:
+            raise TypeError(f"Invalid reduction type: {type_jl}")
+
+    A_reduced = jl_funct(X=A, d=d, seed=seed, eps=eps)
+
+    n, d = A_reduced.shape # For if d was None
+    
+    init_mults = jlsk.reduction_cost(X=A, d=d)
+
+
+        
+    # get s associated with an expected percent sparsification p
+    expected_proportion = p_jl / 100
+
+    #TODO: s-generation for dense matrix
+    
+    sparse_A = A_reduced.copy()
+
+    sparsifier = DenseSparsifier(seed=seed)
+    sparsifier.sparsify(sparse_A, s=1.02)
+
+    xs, ys, lbl = baseline(
+        A=A,
+        u_0=u_0, 
+        s_star=s_star,
+        max_iter=max_iter,
+        tol=tol,
+        init_mults=init_mults,
+        A_tilde=sparse_A)
+    
+
+    return xs, ys, f"{p_sparse}% {type_sparse} sparsified {A_reduced.shape} ({p_jl}%, {type_jl} JL)"
