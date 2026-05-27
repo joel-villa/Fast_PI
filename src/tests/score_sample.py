@@ -155,7 +155,6 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
                 p = 0 # for consistent labeling
             else:     
                 # Reduce A again with new reduction percentage
-                # print(f"p: {p},", end=" ")
                 A_tilde = sub.reduce_A(A, p, seed * i + (i * 2), type)  
                 p = dec_funct(p)
             v =  pwr.v_from_u(A_tilde, u)
@@ -164,4 +163,4 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         # Save current score as previous
         s_prev = s_curr
 
-    return xs, ys, f"Chan*: {100 - p0}% to {100 - p}%, increasing w/ tol {swap_tol} ({type})"
+    return xs, ys, f"Sampling: {100 - p0}% to {100 - p}%, increasing w/ tol {swap_tol} ({type})"
