@@ -128,5 +128,7 @@ def lazy_percent(A, u_0, s_star, max_iter, tol, seed, p, eps):
                      seed=seed,
                      d=d,
                      eps=eps)
-
+    
+    if d is None:
+        return xs, ys, f"eps={eps} {lbl}"
     return xs, ys, f"{p}% {lbl}"
