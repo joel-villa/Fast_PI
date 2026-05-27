@@ -210,7 +210,7 @@ def col_sample_dec(funct_args, kwargs):
     # dec_functs = (lambda p: p - 2, lambda p: p // 2, lambda p: p // 1.5, lambda p: p // 1.25, lambda p: p // 1.125, lambda p: p // 1.0625)
     # dec_functs = (lambda p: p // 1.25, lambda p: p - 2, lambda p: math.log2(p), lambda p: math.log(p), lambda p: math.log10(p)) 
     dec_functs = (lambda p: p // 1.25, lambda p: p - 2) # TODO: found imeprically (how to generalize?)
-    # dec_functs = (lambda p: p // 1.25, ) # TODO: found imeprically (how to generalize?)
+    dec_functs = (lambda p: p // 1.25, ) # TODO: found imeprically (how to generalize?)
    
     # swap_tols = (0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1)
     # swap_tols = (0.0008, 0.0009, 0.0010, 0.0011, 0.0012,)
@@ -236,7 +236,7 @@ def col_sample_dec(funct_args, kwargs):
 
 if __name__ == '__main__':
     seed = 10
-    max_iter = 64
+    max_iter = 128
     num_avg = 1
     ps = (25, 50, 97)
     tol = 1e-5
