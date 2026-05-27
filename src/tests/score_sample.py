@@ -246,4 +246,4 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         # Save current score as previous
         s_prev = s_curr
 
-    return xs, ys, f"{p0}% to {p}%, increasing w/ tol {swap_tol} ({type}, {min_iter} min iters)"
+    return xs, ys, f"Chan*: {100 - p0}% to {100 - p}%, increasing w/ tol {swap_tol} ({type})"
