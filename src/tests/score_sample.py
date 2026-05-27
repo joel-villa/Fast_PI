@@ -107,8 +107,10 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         
     # Reduce A initially
     p = p0
-    
     A_tilde = sub.reduce_A(A, p, seed, type)
+
+    # Reduce p for next reduction
+    p = dec_funct(p)
 
     s_curr =  pwr.s_from_u(A, u_0)
     v =  pwr.v_from_u(A_tilde, u_0)
@@ -147,8 +149,6 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
 
         if (scr.converged(s_curr=s_curr, s_prev=s_prev, tol=swap_tol)):
             # decrease reduction percentage
-            p = dec_funct(p)
-            
             if p <= 0:
                 # Use unreduced A
                 A_tilde = A
@@ -156,6 +156,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
                 # Reduce A again with new reduction percentage
                 # print(f"p: {p},", end=" ")
                 A_tilde = sub.reduce_A(A, p, seed * i + (i * 2), type)  
+                p = dec_funct(p)
             v =  pwr.v_from_u(A_tilde, u)
             xs[i] += pwr.count_mults_v_from_u(A=A_tilde, u=u)
 
