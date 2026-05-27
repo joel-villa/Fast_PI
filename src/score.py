@@ -190,36 +190,49 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def col_sample_dec(funct_args, kwargs, types, init_p, dec_funct, swap_tol, min_iter):
+def col_sample_dec(funct_args, kwargs):
     """Test column sampling enhancement to power iteration
 
     Args: 
         funct_args: dictionary of arguments for the function col_p_sample() 
                     (except for p and type)
         kwargs: a dictionary of arguments for the test function
-        types: a list of string representations of the types of column sampling
-        init_p: initial reduction percentage
-        dec_funct: function to decrease the reduction percentage
-        swap_tol: how much tolerance to wait before decreasing amount of 
-                  reduction
-        min_iter: minimum number of iterations to run
 
     Return: None
     """
+    min_iter = 4
+
+    # init_ps = (99, 98, 96, 92, 84, 68, 36) 
+    # init_ps = (98, 97,96, 95, 94) 
+    init_ps = (97, ) # TODO: 97 found imeprically (how to generalize?)
+
+    # dec_functs = (lambda p: p - 1, lambda p: p - 2, lambda p: p - 4,lambda p: p - 8, lambda p: p - 16, lambda p: p - 32)
+    # dec_functs = (lambda p: p - 2, lambda p: p // 2, lambda p: p // 1.5, lambda p: p // 1.25, lambda p: p // 1.125, lambda p: p // 1.0625)
+    # dec_functs = (lambda p: p // 1.25, lambda p: p - 2, lambda p: math.log2(p), lambda p: math.log(p), lambda p: math.log10(p)) 
+    dec_functs = (lambda p: p // 1.25, lambda p: p - 2) # TODO: found imeprically (how to generalize?)
+    # dec_functs = (lambda p: p // 1.25, ) # TODO: found imeprically (how to generalize?)
+   
+    # swap_tols = (0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1)
+    # swap_tols = (0.0008, 0.0009, 0.0010, 0.0011, 0.0012,)
+    swap_tols = (0.001,)
+    
 
     funct_args = funct_args | {
-        "p0": init_p, 
-        # "step": step, 
-        "dec_funct": dec_funct,
-        "swap_tol": swap_tol,
         "min_iter": min_iter,
+        "type": "1-norm",
     }
 
-    for type in types:
-        p_args = funct_args | {"type": type}
-        test(funct=smpl.col_sample_dec_p,
-             kwargs=p_args,
-             **kwargs)
+    for init_p in init_ps:
+        for dec_funct in dec_functs:
+            for swap_tol in swap_tols:
+                test_args = funct_args | {
+                    "p0": init_p, 
+                    "dec_funct": dec_funct,
+                    "swap_tol": swap_tol,
+                }
+                test(funct=smpl.col_sample_dec_p,
+                     kwargs=test_args,
+                     **kwargs)
 
 if __name__ == '__main__':
     seed = 10
@@ -228,19 +241,10 @@ if __name__ == '__main__':
     ps = (25, 50, 97)
     tol = 1e-5
     epsilon = 0.98
-    sample_types = ("simple", "1-norm") #TODO: use this
-    sample_types = ("1-norm",)
+    sample_types = ("simple", "1-norm") 
     
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
-    mats = ["bcsstk07"]
-
-    init_ps = (92,) # TODO: Redo tests
-    # dec_functs = (lambda p: p - 1, lambda p: p - 2, lambda p: p - 4,lambda p: p - 8, lambda p: p - 16)
-    dec_functs = (lambda p: p - 2,)
-    # dec_functs = (lambda p: p - 16, lambda p: p // 2)
-    swap_tols = (0.01,)
-    # swap_tol = (0.01, 0.05, 0.1)
-    min_iters = (5,)
+    # mats = ["bcsstk07"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -284,20 +288,11 @@ if __name__ == '__main__':
         # )
 
         # sparsification(funct_args=funct_args, kwargs=kwargs)
-
-        for init_p in init_ps:
-            for dec_funct in dec_functs:
-                for swap_tol in swap_tols:
-                    for min_iter in min_iters:
-                        col_sample_dec(
-                            funct_args=funct_args, 
-                            kwargs=kwargs, 
-                            types=sample_types,
-                            init_p=init_p,
-                            dec_funct=dec_funct,
-                            swap_tol=swap_tol,
-                            min_iter=min_iter,
-                        )
+        
+        col_sample_dec(
+            funct_args=funct_args, 
+            kwargs=kwargs,
+        )
 
         plotter.finish(
             # xscale="log"
