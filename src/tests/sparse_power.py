@@ -1,4 +1,4 @@
-from Sparsification_Research.src.MDSparsifier import MDSparsifier
+from Sparsification_Research.src.SDSparsifier import SDSparsifier
 from Sparsification_Research.src.Sparsifier import Sparsifier
 from Sparsification_Research.src.SGenerator import SGenerator
 
@@ -9,7 +9,7 @@ from ..util import power as pwr
 
 #TODO: tests w/ sparsifier that doesn't scale up diagonal, but keeps it nonzero
 
-def sparse_pwr(A, u_0, u_star, num_iter, seed, s, type="MD"):
+def sparse_pwr(A, u_0, u_star, num_iter, seed, s, type="SD"):
     """ Power iteration on a sparsified version of A
 
     Args: 
@@ -27,8 +27,8 @@ def sparse_pwr(A, u_0, u_star, num_iter, seed, s, type="MD"):
     """
 
     match type.upper():
-        case "MD":
-            sparsifier = MDSparsifier(seed=seed)
+        case "SD":
+            sparsifier = SDSparsifier(seed=seed)
         case "GENERIC":
             sparsifier = Sparsifier(seed=seed)
         case _:
@@ -117,7 +117,7 @@ def percent_sparse_pwr(A, u_0, u_star, num_iter, seed, p, type, tol):
     s_generator = SGenerator(A.shape[0], A.nnz)
     
     match type.upper():
-        case "MD":
+        case "SD":
             # s based off of off-diagonal non-zeroes
             include_diags = False
         case "GENERIC":
@@ -163,7 +163,7 @@ def sparse_pwr_tol(A, u_0, u_star, num_iter, seed, s, tolerance=1e-07):
         ys: the residual per iteration
         lbl: the label associated with this function call (for easy plotting)
     """
-    sparsifier = MDSparsifier(seed=seed)
+    sparsifier = SDSparsifier(seed=seed)
 
     # xs = np.zeros(num_iter)
     # ys = np.zeros(num_iter)

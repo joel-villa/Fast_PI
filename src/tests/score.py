@@ -11,7 +11,7 @@ from ..util import jl_implementation as jl
 from ..util import scikit_jl as jlsk
 
 from Sparsification_Research.src.CDSparsifier import CDSparsifier
-from Sparsification_Research.src.MDSparsifier import MDSparsifier
+from Sparsification_Research.src.SDSparsifier import SDSparsifier
 from Sparsification_Research.src.Sparsifier import Sparsifier
 from Sparsification_Research.src.SGenerator import SGenerator
 
@@ -190,8 +190,8 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     s_generator = SGenerator(A.shape[0], A.nnz)
     
     match type.lower():
-        case "md":
-            sparsifier = MDSparsifier(seed=seed)
+        case "sd":
+            sparsifier = SDSparsifier(seed=seed)
 
             # s based off of off-diagonal non-zeroes
             include_diags = False
