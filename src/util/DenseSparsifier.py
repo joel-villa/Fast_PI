@@ -2,8 +2,7 @@
 For sparsifying a Dense matrix via Thm 8.2.2 in 
 https://users.cs.utah.edu/~jeffp/teaching/cs7931-S15/cs7931/8-sparsification.pdf
 """
-
-from Sparsification_Reasearch.src.Sparsifier import Sparsifier
+from Sparsification_Research.src.Sparsifier import Sparsifier
 from scipy.sparse import coo_array
 
 class DenseSparsifier(Sparsifier):
