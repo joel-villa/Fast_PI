@@ -144,7 +144,7 @@ def jl_lazy(funct_args, ps, kwargs):
     Return: None
     """
     ps = (*ps, None)
-    
+
     for p in ps:
         p_args = funct_args | {"p": p}
         test(funct=lazy_percent,
@@ -242,12 +242,12 @@ if __name__ == '__main__':
     num_avg = 1
     ps = (25, 50, 97)
     tol = 1e-5
-    epsilon = 0.98
+    epsilon = 0.5
     # sample_types = ("simple", "1-norm") 
     sample_types = ("1-norm", ) 
     
     mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
-    # mats = ["bcsstk07"]
+    mats = ["lp_fit1d"] #TODO: test this
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -283,12 +283,12 @@ if __name__ == '__main__':
         jl_reduction(funct_args=jl_args, kwargs=kwargs)
         jl_lazy(funct_args=jl_args, ps=ps, kwargs=kwargs)
 
-        col_sample(
-            ps=ps, 
-            funct_args=funct_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         
