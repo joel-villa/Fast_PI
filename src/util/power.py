@@ -19,20 +19,31 @@ def s_from_u(A, u):
     return s
 
 def v_from_u(A, u):
-    """
-    A - matrix (nxm) s.t. n >= m
-    u - top left eigenvector of A (n-dimensional)
+    """  Get the top right eigenvector of A, given the top left eigenvector of A
+    NOTE: A * v = s * u -> A^T * u = s * v
 
-    RETURN: v - m-dimensional top right eigenvector of A
+    Args:
+        A: matrix (nxm) s.t. n >= m
+        u: top left eigenvector of A (n-dimensional)
 
-    Get the top right eigenvector of A, given the top left eigenvector of A
-    NOTE: 
-    A * v = s * u -> A^T * u = s * v
+    RETURN: v: m-dimensional top right eigenvector of A
     """
     s = s_from_u(A, u)
     
     v = A.T @ u / s
     return v
+
+def count_mults_v_from_u(A, u):
+    """ Calculate the number of scalar mults required for a v_frum_u() function
+    call (The cost of A.T @ u)
+
+    Args: A: matrix (nxm) s.t. n >= m
+          u: top left eigenvector of A (n-dimensional)
+    RETURN: number of scalar mults required for v_from_u()
+    """
+    n, m = A.shape
+    cost_ATu = m * n * 1 # A.T is mxn and u
+    return cost_ATu
     
 def topsing(v0, A, maxiter=10):
     """
