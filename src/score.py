@@ -19,7 +19,7 @@ from src.tests import score as tst
 from src.tests import score_sample as smpl
 from src.tests.power_lazy import lazy_percent
 
-def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
+def test(funct, plotter, num_avg, A, num_iter, kwargs={}, show_more=False): #TODO: ensure show_more working
     """Test the given function from src/tests
     
     Args:
@@ -37,7 +37,7 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
     """
     ys = np.zeros(num_iter)
     xs = np.zeros(num_iter)
-    ys_i = np.zeros((num_avg, num_iter)) # for averaging
+    ys_i = np.full((num_avg, num_iter), np.nan) # for averaging
 
     label = ""
 
@@ -51,25 +51,35 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}):
 
         xs_temp, ys_i[i], label = funct(A=A, max_iter=num_iter, **kwargs)
 
-        trim_size = np.trim_zeros(xs_temp).shape[0]
+        curr_iter = np.trim_zeros(xs_temp).shape[0]
 
-        if (min_iter > trim_size):
+        if (not show_more) and (min_iter > curr_iter):
             # Smaller x value, store this one for consistent averaging
             xs = xs_temp
-            min_iter = trim_size
+            min_iter = curr_iter
+        elif show_more and (max_iter < curr_iter):
+            # Larger x value, store this one for consistent averaging
+            xs = xs_temp
+            max_iter = curr_iter
 
     # Calculate average
-    ys = np.mean(ys_i, axis=0)
+    ys = np.nanmean(ys_i, axis=0)
 
     # Remove trailing zeros only ('b' for back)
-    xs = np.trim_zeros(xs, trim='b')
-    ys = np.trim_zeros(ys, trim='b')
+    if not show_more:
+        xs = xs[:min_iter]
+        ys = ys[:min_iter]
+    else:
+        xs = xs[:max_iter]
+        ys = ys[:max_iter]
+    # xs = np.trim_zeros(xs, trim='b')
+    # ys = np.trim_zeros(ys, trim='b')
 
-    if (ys.shape[0] < xs.shape[0]):
-        # print(f"ys: [{ys[:3]}, ..., {ys[-3:]}], xs: [{xs[:3]}, ..., {xs[-3:]}]")
-        raise ValueError("ys has fewer non-zero entries than xs, cannot plot")
+    # if (ys.shape[0] < xs.shape[0]):
+    #     # print(f"ys: [{ys[:3]}, ..., {ys[-3:]}], xs: [{xs[:3]}, ..., {xs[-3:]}]")
+    #     raise ValueError("ys has fewer non-zero entries than xs, cannot plot")
     
-    ys = ys[:xs.shape[0]]
+    # ys = ys[:xs.shape[0]]
 
     #UNCOMMENT FOLLOWING LINE FOR ITTERATIVE VIEW
     # xs = np.arange(xs.shape[0])
@@ -263,7 +273,7 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 128
     num_avg = 5
-    ps = (25, 50, 97)
+    ps = (25, 50, 96)
     jl_ps = (97, None)
     tol = 1e-5
     epsilon = 0.5
@@ -308,12 +318,12 @@ if __name__ == '__main__':
         # jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
         # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
-        # col_sample(
-        #     ps=ps, 
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs, 
-        #     types=sample_types
-        # )
+        col_sample(
+            ps=ps, 
+            funct_args=funct_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         # sparsification(funct_args=funct_args, kwargs=kwargs)
 
