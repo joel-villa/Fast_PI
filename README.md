@@ -21,7 +21,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 - Sparsify JL, reduction, cause why not :D
 
-- Do parameter sweep for Chan approach on 494_bus, see if it's results generalize better
+- Empirically find better swap tolerance? 
 
 - Change lbl for sparsification to expected # of new zeros?
 
@@ -29,13 +29,11 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 - Proof on the lowerbound of dimensionality reduction in order to preserve top eigenvectors of a matrix: $d = \frac{C \log m}{\epsilon}$?
 
-- Timing convergence of original SVD vs. a JL-enhaced SVD.
+- Timing convergence of original Power vs. a JL-enhaced Power.
 
-- A JL-enhanced SVD algorithm which takes averages of guesses for the top eigenvector. 
-
-- Some interesting behavior: convergence independent of dec_funct, when 
-  decrementing
+- A JL-enhanced Power algorithm which takes averages of guesses for the top eigenvector. 
 
 ## Things we Could Feasibly Hope to Prove
+- How to choose apt hyperparameters for the Upscaling approach? Other than guess and check? 
 - JL preservation of top eigenvectors (given some spectral gap maybe?)
 - Expected number of JL reductions before getting one that preserves top eigenvectors 
