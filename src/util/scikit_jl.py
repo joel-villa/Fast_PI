@@ -24,11 +24,17 @@ def percent_reduce(n, p):
      return d
 
 def check_valid_dimensions(A):
+    """Check if A has valid dimensions for scikit's JL implementations
+
+    Args:
+        A: the matrix to check
+    Return: None, but raises an error if dimensions are invalid
+    """
     if (A.shape[0] > A.shape[1]):
-        raise ValueError(f"Scikit JL requires rows < cols, but A has shape: {A.shape}")
+        print(f"WARNNIN: Scikit JL requires rows < cols, but A has shape: {A.shape}")
     
     if (min(A.shape) <= 1):
-            raise ValueError(f"Matrix too small: {A.shape}")
+        raise ValueError(f"Matrix too small: {A.shape}")
     
 def get_min_dim(X, eps):
     """Get the minimum number of dimensions allowed for a reduction in the 
