@@ -208,18 +208,26 @@ def col_sample_dec(funct_args, kwargs): #TODO: type input
 
     # init_ps = (99, 98, 96, 92, 84, 68, 36) 
     # init_ps = (98, 97,96, 95, 94) 
-    init_ps = (97, ) # TODO: 97 found imeprically (how to generalize?)
+    # init_ps = (97, ) # TODO: 97 found imeprically (how to generalize?)
+    # init_ps = (96, ) # TODO: 96 found imeprically (how to generalize?) 494_bus
 
     # dec_functs = (lambda p: p - 1, lambda p: p - 2, lambda p: p - 4,lambda p: p - 8, lambda p: p - 16, lambda p: p - 32)
-    # dec_functs = (lambda p: p - 2, lambda p: p // 2, lambda p: p // 1.5, lambda p: p // 1.25, lambda p: p // 1.125, lambda p: p // 1.0625)
-    # dec_functs = (lambda p: p // 1.25, lambda p: p - 2, lambda p: math.log2(p), lambda p: math.log(p), lambda p: math.log10(p)) 
-    dec_functs = (lambda p: p // 1.25, lambda p: p - 2) # TODO: found imeprically (how to generalize?)
-    dec_functs = (lambda p: p // 1.25, ) # TODO: found imeprically (how to generalize?)
+    # dec_functs = (lambda p: p - 4,lambda p: p // 2, lambda p: p // 1.5, lambda p: p // 1.25, lambda p: p // 1.125, lambda p: p // 1.0625, lambda p: p // 1.03125, lambda p: p // 1.015625,) 
+    # dec_functs = (lambda p: p // 1.03125, lambda p: p - 2, lambda p: math.log2(p), lambda p: math.log(p), lambda p: math.log10(p)) 
+    # dec_functs = (lambda p: p // 1.25, lambda p: p - 2) # TODO: found imeprically (how to generalize?)
+    # dec_functs = (lambda p: p // 1.25,) # TODO: found imeprically (how to generalize?)
+    # dec_functs = (lambda p: p - 4, lambda p: p // 1.03125) # TODO: found imeprically (how to generalize?) 494_bus
+    # dec_functs = (lambda p: p // 1.03125,) # TODO: found imeprically (how to generalize?) 494_bus
    
-    # swap_tols = (0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1)
+    # swap_tols = (0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5)
     # swap_tols = (0.0008, 0.0009, 0.0010, 0.0011, 0.0012,)
-    swap_tols = (0.001,)
-    
+    # swap_tols = (0.001,) #TODO: found imperically
+    # swap_tols = (0.005,) #TODO: found imperically 494_bus    
+
+    #BEST PERFORMING PARAMETERS FOUND EMPIRICALLY:
+    init_ps = (96, )
+    dec_functs = (lambda p: p // 1.25,)
+    swap_tols = (0.005,)
 
     funct_args = funct_args | {
         "min_iter": min_iter,
@@ -264,7 +272,7 @@ if __name__ == '__main__':
     sample_types = ("1-norm", ) 
     
     mats = ["494_bus", "bibd_13_6", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
-    # mats = ["bcspwr06"]
+    # mats = ["bibd_13_6"]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -309,7 +317,7 @@ if __name__ == '__main__':
 
         # sparsification(funct_args=funct_args, kwargs=kwargs)
 
-        sparse_jl_combo(funct_args=jl_args, kwargs=kwargs)
+        # sparse_jl_combo(funct_args=jl_args, kwargs=kwargs)
         
         col_sample_dec(
             funct_args=funct_args, 
