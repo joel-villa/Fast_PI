@@ -17,7 +17,7 @@ from Sparsification_Research.src.SSGetter import SSGetter
 
 from src.tests import score as tst
 from src.tests import score_sample as smpl
-from src.tests.power_lazy import lazy_percent
+from src.tests import power_lazy as lzy
 
 def test(funct, plotter, num_avg, A, num_iter, kwargs={}, show_more=False): #TODO: ensure show_more working
     """Test the given function from src/tests
@@ -147,7 +147,7 @@ def jl_lazy(funct_args, ps, kwargs):
     """
     for p in ps:
         p_args = funct_args | {"p": p}
-        test(funct=lazy_percent,
+        test(funct=lzy.lazy_percent,
             kwargs=p_args,
             **kwargs)
         
@@ -247,6 +247,14 @@ def col_sample_dec(funct_args, kwargs): #TODO: type input
                 test(funct=smpl.col_sample_dec_p,
                      kwargs=test_args,
                      **kwargs)
+                
+def sample_lazy_combo(ps, types, funct_args, kwargs):
+    for p in ps: 
+        for type in types:
+            p_args = funct_args | {"p": p, "type": type}
+            test(funct=lzy.sample_lazy,
+                 kwargs=p_args,
+                 **kwargs)
 
 def sparse_jl_combo(funct_args, kwargs): #TODO: make this better? is there a way to do this lazily? Prob not 
     funct_args = funct_args | {
@@ -328,6 +336,13 @@ if __name__ == '__main__':
         #     funct_args=funct_args, 
         #     kwargs=kwargs,
         # )
+
+        # COMBINATION TESTS
+        # sample_lazy_combo(ps=(30, 50, 70), 
+        #                   types=sample_types, 
+        #                   funct_args=jl_args, 
+        #                   kwargs=kwargs,
+        #                   )
 
         # sparse_jl_combo(funct_args=jl_args, kwargs=kwargs)
 
