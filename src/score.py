@@ -292,43 +292,42 @@ if __name__ == '__main__':
                   "A": A,
                   }
         
-        # Baseline test
+        # BASELINE TEST
         test(funct=tst.baseline,
              num_avg=1,
              kwargs=funct_args,
              **kwargs,
              )
         
-        # The following tests have some randomness, so we average them over num_avg runs
+        # Arguments for randomized tests
         kwargs = kwargs | {"num_avg" : num_avg} 
-        # Add seed to funct_args for tests which require randomness
         funct_args = funct_args | {"seed": seed}
 
         # Args for JL reduction tests
         jl_args = funct_args | {"eps": epsilon}
 
         # JL REDUCTION TEST
-        # jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
+        jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
 
         # JL LAZY TEST
         # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
-       # COLUMN SAMPLING TEST
-        col_sample(
-            ps=ps, 
-            funct_args=funct_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # COLUMN SAMPLING TEST
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
         # SPARSIFICATION TEST
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
-        col_sample_dec(
-            funct_args=funct_args, 
-            kwargs=kwargs,
-        )
+        # col_sample_dec(
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs,
+        # )
 
         # sparse_jl_combo(funct_args=jl_args, kwargs=kwargs)
 
