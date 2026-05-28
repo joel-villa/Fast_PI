@@ -72,14 +72,6 @@ def test(funct, plotter, num_avg, A, num_iter, kwargs={}, show_more=False): #TOD
     else:
         xs = xs[:max_iter]
         ys = ys[:max_iter]
-    # xs = np.trim_zeros(xs, trim='b')
-    # ys = np.trim_zeros(ys, trim='b')
-
-    # if (ys.shape[0] < xs.shape[0]):
-    #     # print(f"ys: [{ys[:3]}, ..., {ys[-3:]}], xs: [{xs[:3]}, ..., {xs[-3:]}]")
-    #     raise ValueError("ys has fewer non-zero entries than xs, cannot plot")
-    
-    # ys = ys[:xs.shape[0]]
 
     #UNCOMMENT FOLLOWING LINE FOR ITTERATIVE VIEW
     # xs = np.arange(xs.shape[0])
