@@ -23,9 +23,9 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 - Do parameter sweep for Chan approach on 494_bus, see if it's results generalize better
 
-- Enable averaging of Chan approach
-
 - Change lbl for sparsification to expected # of new zeros?
+
+- Parallelize things: GET EASLEY ACCESS
 
 - Proof on the lowerbound of dimensionality reduction in order to preserve top eigenvectors of a matrix: $d = \frac{C \log m}{\epsilon}$?
 

@@ -238,7 +238,7 @@ def col_sample_dec(funct_args, kwargs): #TODO: type input
                      kwargs=test_args,
                      **kwargs)
 
-def sparse_jl_combo(funct_args, kwargs):
+def sparse_jl_combo(funct_args, kwargs): #TODO: make this better? is there a way to do this lazily? Prob not 
     funct_args = funct_args | {
         "p_sparse": 3,
         "type_sparse": "Generic",
