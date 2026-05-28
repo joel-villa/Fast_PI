@@ -294,11 +294,9 @@ def sparse_jl_combo(
     expected_proportion = p_jl / 100
 
     #TODO: s-generation for dense matrix
-    
-    sparse_A = A_reduced.copy()
 
     sparsifier = DenseSparsifier(seed=seed)
-    sparsifier.sparsify(sparse_A, s=1.02)
+    sparse_A = sparsifier.sparsify(A_reduced, s=1.02)
 
     xs, ys, lbl = baseline(
         A=A,
