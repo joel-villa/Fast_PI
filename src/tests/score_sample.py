@@ -12,7 +12,7 @@ from ..util import power as pwr
 from ..util import score as scr
 from ..util import scikit_jl as jl
 
-def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
+def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type, gamma):
     """ Test of random col-sampling 
 
     Args:
@@ -24,16 +24,14 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
         seed: for repeatable randomness
         d: reduced dimension
         type: string representation of sampling type
+        gamma: gamma parameter for the gamma-ridge leverage score (only used for nystrom sampling)
     Return:
         xs: an array of amount of scalar mults done
         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
         lbl: the string representation of this test
     """
 
-    A_reduced = None
-
-    reduce = sub.get_reduce_funct(type)
-    A_reduced = reduce(A=A, d=d, seed=seed)
+    A_reduced = sub.reduce_A(A, d, seed, type, gamma)
 
     xs, ys, _ = baseline(A=A,
                          A_tilde=A_reduced,
@@ -45,7 +43,7 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type):
 
     return xs, ys, f"col sample ({type}), {A_reduced.shape}"
 
-def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
+def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type, gamma):
     """ Test of random col sampling based on percent of reduction
 
     Args:
@@ -58,6 +56,7 @@ def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
         p: reduction percentage
         eps: for jl-reduction
         type: string representation of reduction type
+        gamma: gamma parameter for the gamma-ridge leverage score
     Return:
         xs: an array of amount of scalar mults done
         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
@@ -75,11 +74,12 @@ def col_sample_p(A, u_0, s_star, max_iter, tol, seed, p, type):
                              seed=seed,
                              d=d,
                              type=type,
+                             gamma=gamma,
                              )
 
     return xs, ys, f"{100 - p}% {lbl}"
 
-def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, swap_tol, min_iter):
+def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, swap_tol, min_iter, gamma):
     """ Test of random col sampling with an decreasing percentage of reduction
 
     Args:
@@ -97,6 +97,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         swap_tol: how much tolerance to wait before decreasing amount of 
                   reduction
         min_iter: minimum number of iterations to run before considering reduction #TODO: fix in score.py
+        gamma: gamma parameter for the gamma-ridge leverage score
 
     Return:
         xs: an array of amount of scalar mults done
@@ -107,7 +108,13 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         
     # Reduce A initially
     p = p0
-    A_tilde = sub.reduce_A(A, p, seed, type)
+    A_tilde = sub.p_reduce_A(
+        A=A, 
+        p=p, 
+        seed=seed, 
+        type=type, 
+        gamma=gamma,
+    )
 
     # Reduce p for next reduction
     p = dec_funct(p)
@@ -155,7 +162,13 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
                 p = 0 # for consistent labeling
             else:     
                 # Reduce A again with new reduction percentage
-                A_tilde = sub.reduce_A(A, p, seed * i + (i * 2), type)  
+                A_tilde = sub.p_reduce_A(
+                    A=A, 
+                    p=p, 
+                    seed=seed * i + (i * 2), 
+                    type=type, 
+                    gamma=gamma,
+                )  
                 p = dec_funct(p)
             v =  pwr.v_from_u(A_tilde, u)
             xs[i] += pwr.count_mults_v_from_u(A=A_tilde, u=u)
