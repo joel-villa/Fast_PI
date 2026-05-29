@@ -31,7 +31,9 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type, gamma):
         lbl: the string representation of this test
     """
 
-    A_reduced = sub.reduce_A(A, d, seed, type, gamma)
+    A_reduced = sub.reduce_A(A=A, d=d, seed=seed, type=type, gamma=gamma)
+
+    init_mults = sub.init_cost(A=A, d=d, seed=seed, type=type, gamma=gamma)
 
     xs, ys, _ = baseline(A=A,
                          A_tilde=A_reduced,
@@ -39,7 +41,7 @@ def col_sample(A, u_0, s_star, max_iter, tol, seed, d, type, gamma):
                          s_star=s_star,
                          max_iter=max_iter,
                          tol=tol,
-                         init_mults=0)
+                         init_mults=init_mults)
 
     return xs, ys, f"col sample ({type}), {A_reduced.shape}"
 
@@ -116,6 +118,14 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         gamma=gamma,
     )
 
+    init_cost = sub.p_init_cost(
+        A=A, 
+        p=p, 
+        seed=seed, 
+        type=type, 
+        gamma=gamma,
+    )
+
     # Reduce p for next reduction
     p = dec_funct(p)
 
@@ -127,7 +137,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
 
     error_rate = scr.error(s_approx=s_curr, s_star=s_star)
     ys[0] = error_rate
-    xs[0] = 0 # Initially no scalar mults done
+    xs[0] = init_cost # Initially no scalar mults done
 
     s_prev = s_curr
 
