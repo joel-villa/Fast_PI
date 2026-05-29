@@ -45,6 +45,8 @@ def weighted_select(n, d, seed, weights):
 
     sorted_cols = np.sort(cols)
 
+    # print(f"First 10 selected columns: {sorted_cols[:10]}")
+
     return sorted_cols
 
 def select_d_random_columns(A, d, seed):
@@ -191,6 +193,45 @@ def cost_nystrom(A, d, seed, gamma):
 
     return cost_B_inv + cost_dot_prod
 
+def init_cost(A, d, seed, type, gamma):
+    """ Get the cost of doing the initial reduction, in terms of scalar 
+    multiplications
+
+    Args:
+        A: a matrix (mxn)
+        d: the number of columns to get
+        seed: for predictable randomness
+        type: the type of reduction to do (string representation)
+        gamma: the gamma parameter for the gamma-ridge leverage score
+
+    Return: the cost of doing the initial reduction, in terms of scalar 
+            multiplications
+    """
+    if type.lower() == "nystrom":
+        return cost_nystrom(A=A, d=d, seed=seed, gamma=gamma)
+
+    return 0 # for other reductions, we are not counting the cost of reduction
+
+def p_init_cost(A, p, seed, type, gamma):
+    """ Get the cost of doing the initial reduction, in terms of scalar 
+    multiplications
+
+    Args:
+        A: a matrix (mxn)
+        p: reduction percentage
+        seed: for predictable randomness
+        type: the type of reduction to do (string representation)
+        gamma: the gamma parameter for the gamma-ridge leverage score
+
+    Return: the cost of doing the initial reduction, in terms of scalar 
+            multiplications
+    """
+    _, n = A.shape
+
+    d = percent_reduce(n=n, p=p)
+
+    return init_cost(A=A, d=d, seed=seed, type=type, gamma=gamma)    
+
 
 def get_reduce_funct(type):
     """ Get the reduction function based on the type of reduction
@@ -228,7 +269,7 @@ def reduce_A(A, d, seed, type, gamma):
         # Nystrom sampling requires gamma parameter, handle it separately
         return nystrom_select(A, d, seed, gamma)
     
-
+    # print (f"Reducing A with type {type} and d = {d}")
     reduce = get_reduce_funct(type)
     return reduce(A, d, seed)
 
