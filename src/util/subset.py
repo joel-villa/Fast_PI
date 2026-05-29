@@ -3,7 +3,7 @@ Contains a method for selecting d columns from a matrix
 """
 import numpy as np
 
-from scipy.linalg import norm # 2-norm by default
+from scipy import linalg
 
 from .scikit_jl import percent_reduce
 
@@ -116,8 +116,10 @@ def two_norm_select(A, d, seed):
     RETURN: An (nxd) column subset of A
     """
 
-    weights = np.linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    weights = weights * weights # square the 2-norm of the columns
+    # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
+    weights = np.asarray(np.sum(A * A, axis=0)).ravel() # 2-norm of each column, squared
+
+    # weights = weights * weights # square the 2-norm of the columns
     weights = weights / np.sum(weights) # normalize to get probabilities
 
     cols = weighted_select(
@@ -143,7 +145,7 @@ def nystrom_select(A, d, seed, gamma):
     """
     B = A + gamma * np.eye(A.shape[0])
     #TODO: presumably inefficient (not being accounted for in scalar mult count)
-    B_inv = np.linalg.inv(B) 
+    B_inv = linalg.inv(B) 
     
     #i'th column of original matrix dot product with i'th column of B_inv
     # NOTE: '*' in numpy is elementwise multiplication
