@@ -208,12 +208,31 @@ def get_reduce_funct(type):
             return  one_norm_select
         case "2-norm":
             return two_norm_select
-        case "nystrom":
-            return nystrom_select
         case _:
             raise TypeError(f"Invalid sampling type: {type}")
         
-def reduce_A(A, p, seed, type):
+def reduce_A(A, d, seed, type, gamma):
+    """ Reduce A based on percent reduction and reduction function
+    
+    Args:
+        A: the matrix to reduce
+        d: the number of columns to select
+        seed: for repeatable randomness
+        type: the type of reduction to do (string representation)
+        gamma: the gamma parameter for the gamma-ridge leverage score (only 
+               used for nystrom sampling)
+    
+    Return: the reduced A
+    """
+    if type.lower() == "nystrom":
+        # Nystrom sampling requires gamma parameter, handle it separately
+        return nystrom_select(A, d, seed, gamma)
+    
+
+    reduce = get_reduce_funct(type)
+    return reduce(A, d, seed)
+
+def p_reduce_A(A, p, seed, type, gamma):
     """ Reduce A based on percent reduction and reduction function
     
     Args:
@@ -221,11 +240,13 @@ def reduce_A(A, p, seed, type):
         p: reduction percentage
         seed: for repeatable randomness
         type: the type of reduction to do (string representation)
+        gamma: the gamma parameter for the gamma-ridge leverage score (only 
+               used for nystrom sampling)
     
     Return: the reduced A
     """
     _, n = A.shape
 
     d = percent_reduce(n=n, p=p)
-    reduce = get_reduce_funct(type)
-    return reduce(A, d, seed)
+    
+    return reduce_A(A=A, d=d, seed=seed, type=type, gamma=gamma)
