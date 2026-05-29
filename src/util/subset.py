@@ -117,7 +117,8 @@ def two_norm_select(A, d, seed):
     """
 
     # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    weights = np.asarray(np.sum(A * A, axis=0)).ravel() # 2-norm of each column, squared
+    hadamard_matrix = A.multiply(A) # element-wise square of A
+    weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
 
     # weights = weights * weights # square the 2-norm of the columns
     weights = weights / np.sum(weights) # normalize to get probabilities
@@ -148,8 +149,7 @@ def nystrom_select(A, d, seed, gamma):
     B_inv = linalg.inv(B) 
     
     #i'th column of original matrix dot product with i'th column of B_inv
-    # NOTE: '*' in numpy is elementwise multiplication
-    dot_prod_matrix = A * B_inv
+    dot_prod_matrix = A.multiply(B_inv) # Sparse mat -> hadamard product w/ .multipy()
     leverage_scores = np.asarray(np.sum(dot_prod_matrix, axis=0)).ravel()
 
     effective_dimension = np.sum(leverage_scores)
@@ -186,8 +186,8 @@ def cost_nystrom(A, d, seed, gamma):
     # Cost of computing B_inv (not accounting for sparsity)
     cost_B_inv = (n**3) 
 
-    # Cost of computing dot_prod_matrix (not accounting for sparsity)
-    cost_dot_prod = n * m
+    # Cost of computing dot_prod_matrix (sparse -> dependent on nnz of A)
+    cost_dot_prod = A.nnz 
 
     return cost_B_inv + cost_dot_prod
 
@@ -206,6 +206,10 @@ def get_reduce_funct(type):
         case "1-norm":
             # random sampling of columns, with weight based on 1-norm of column
             return  one_norm_select
+        case "2-norm":
+            return two_norm_select
+        case "nystrom":
+            return nystrom_select
         case _:
             raise TypeError(f"Invalid sampling type: {type}")
         
