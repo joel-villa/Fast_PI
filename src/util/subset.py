@@ -3,6 +3,8 @@ Contains a method for selecting d columns from a matrix
 """
 import numpy as np
 
+from scipy.linalg import norm # 2-norm by default
+
 from .scikit_jl import percent_reduce
 
 def get_subset(A, cols):
@@ -82,8 +84,7 @@ def one_norm_select(A, d, seed):
     RETURN: An (nxd) column subset of A
     """
 
-    # weights = np.asarray(np.sum(np.abs(A), axis=0)).ravel()# 1-norm of each column
-    weights = np.linalg.norm(A, ord=1, axis=0) # TODO: chek this is the same 
+    weights = np.asarray(np.sum(np.abs(A), axis=0)).ravel()# 1-norm of each column
     weights = weights / np.sum(weights) # normalize to get probabilities
 
     cols = weighted_select(
