@@ -196,7 +196,7 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def col_sample_dec(funct_args, kwargs): #TODO: type input
+def col_sample_dec(funct_args, kwargs, types): #TODO: type input
     """Test column sampling enhancement to power iteration
 
     Args: 
@@ -233,20 +233,21 @@ def col_sample_dec(funct_args, kwargs): #TODO: type input
 
     funct_args = funct_args | {
         "min_iter": min_iter,
-        "type": "1-norm",
     }
 
     for init_p in init_ps:
         for dec_funct in dec_functs:
             for swap_tol in swap_tols:
-                test_args = funct_args | {
-                    "p0": init_p, 
-                    "dec_funct": dec_funct,
-                    "swap_tol": swap_tol,
-                }
-                test(funct=smpl.col_sample_dec_p,
-                     kwargs=test_args,
-                     **kwargs)
+                for type in types:
+                    test_args = funct_args | {
+                        "p0": init_p, 
+                        "dec_funct": dec_funct,
+                        "swap_tol": swap_tol,
+                        "type": type,
+                    }
+                    test(funct=smpl.col_sample_dec_p,
+                         kwargs=test_args,
+                         **kwargs)
                 
 def sample_lazy_combo(ps, types, funct_args, kwargs):
     for p in ps: 
@@ -315,27 +316,28 @@ if __name__ == '__main__':
         jl_args = funct_args | {"eps": epsilon}
 
         # JL REDUCTION TEST
-        jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
+        # jl_reduction(funct_args=jl_args, kwargs=kwargs, ps=jl_ps)
 
         # JL LAZY TEST
         # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
         # COLUMN SAMPLING TEST
-        # col_sample(
-        #     ps=ps, 
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs, 
-        #     types=sample_types
-        # )
+        col_sample(
+            ps=ps, 
+            funct_args=funct_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         # SPARSIFICATION TEST
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
-        # col_sample_dec(
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs,
-        # )
+        col_sample_dec(
+            funct_args=funct_args, 
+            kwargs=kwargs,
+            types=sample_types,
+        )
 
         # COMBINATION TESTS
         # sample_lazy_combo(ps=(30, 50, 70), 
