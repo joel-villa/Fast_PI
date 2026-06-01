@@ -188,7 +188,8 @@ def main_no_swap():
 
 
     # SOME MATS THAT SHOW GOOD BEHVIOR: ["bcsstk07", "bcsstk19", "bcsstm07", "impcol_d"]
-    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d"]
+    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07"]
+    # mats = ["impcol_d"] # Not positive definite: doesn't work for nystrom sampling
 
     """These mats seem to imperically have this in common: small spectral gap,
       and large eigenvalues
@@ -219,16 +220,16 @@ def main_no_swap():
                         seed=seed,
                         kwargs=kwargs | {"tol": 1e-7})
         
-        for type in types:
-            for i in range(num_tests):
-                test(funct=pwr.jl_percent_reduced, 
-                     plotter=plotter, 
-                     num_avg=num_avg, 
-                     A=A, 
-                     num_iter=num_iter,
-                     seed=seed * i + i, 
-                     kwargs=kwargs | {"p": p, "type" : type},
-                     )
+        # for type in types:
+        #     for i in range(num_tests):
+        #         test(funct=pwr.jl_percent_reduced, 
+        #              plotter=plotter, 
+        #              num_avg=num_avg, 
+        #              A=A, 
+        #              num_iter=num_iter,
+        #              seed=seed * i + i, 
+        #              kwargs=kwargs | {"p": p, "type" : type},
+        #              )
             
         for i in range(num_tests):
             for type in ("random", "1-norm", "2-norm", "nystrom"):
@@ -242,15 +243,15 @@ def main_no_swap():
                     kwargs=kwargs | {"p": p, "type": type, "gamma": 0.5},
                 )
 
-        for i in range(num_tests):
-            test(funct=spwr.percent_sparse_pwr,
-                 plotter=plotter,
-                 num_avg=num_avg,
-                 A=A,
-                 num_iter= num_iter, 
-                 seed=seed * i + i,
-                 kwargs=kwargs | {"p": 4, "type": "Generic", "tol": None},
-                 )
+        # for i in range(num_tests):
+        #     test(funct=spwr.percent_sparse_pwr,
+        #          plotter=plotter,
+        #          num_avg=num_avg,
+        #          A=A,
+        #          num_iter= num_iter, 
+        #          seed=seed * i + i,
+        #          kwargs=kwargs | {"p": 4, "type": "Generic", "tol": None},
+        #          )
 
         plotter.finish()
 
