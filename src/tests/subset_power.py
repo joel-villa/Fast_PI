@@ -51,7 +51,7 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d, type, gamma):
     
     num_mults = pwr.count_mults(v0=v, A=A_reduced, maxiter=num_iter - 1)
 
-    return xs, ys, f"column subset {A_reduced.shape}; {num_mults:,} mults"
+    return xs, ys, f"{type} subset {A_reduced.shape}; {num_mults:,} mults"
 
 def percent_subset_pow(A, u_0, u_star, num_iter, seed, p, type, gamma):
     """Measure convergence of Power with some random subset of the columns of A
