@@ -291,7 +291,8 @@ if __name__ == '__main__':
         "nystrom",
     ) 
     
-    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
+    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "bcspwr06"]
+    # mats = ["impcol_d"] #NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
     # mats = ["bibd_13_6"] # RECTANGULAR: Doesn't work with Nystrom
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
