@@ -20,6 +20,13 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 - Nystrom APPROACH + PERFORMANCE: https://arxiv.org/pdf/2604.20077
   - 7 & 8 are of importance
 
+- Box plots: how much work (floating point mults), until converged to
+  a vector with score epsilon away from the score of the top eigenvector? 
+  Additional info: how many do not converge to this within n-iterations?
+
+- TODO: why are sample, 1-norm, and 2-norm sometimes behaving the exact same? 
+- TODO: decreasing alg w/ nystrom -> extra cost per re-sampling
+
 - Volume Sampling Approach:
   - https://d1wqtxts1xzle7.cloudfront.net/32456103/v002a012-libre.pdf?1391557305=&response-content-disposition=inline%3B+filename%3DMatrix_approximation_and_projective_clus.pdf&Expires=1780071764&Signature=IoUR4r2G~3-89YYE15LLvbQaZ-5QULDJ5ZbzJKWwkQcvSZYh9sLaTdNKOI5v7FsCo8DF8tjivO-bx~4hGEriLK3anXKCXk1MfWSU3lmYkQckcWbG29x4gNMp6ZR-RF3CKzui~Y2czH4AHh6FyaAJZma3ixeUNSix-snRe2nCxtbWTGlIhBM86Bisp81IJ2qfHDDoRSt2Uq68ygFRglYaRIkyvfNjj5hsvGjkyGIx15Jn2JE15kJKYZbgnQEnFAuwHZw8yL4OsW1hXZSxlsXp7-gihCz7mf~7cjYdcio3AgIC0JYrXSTaEzT14kwRfQ8I0G6YeYV4ZX69vc6vZi51bQ__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA#page=2&zoom=100,106,750
   - Thm 1.1, and 2.2 Algorithm are of importance
