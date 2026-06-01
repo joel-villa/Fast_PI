@@ -285,7 +285,7 @@ if __name__ == '__main__':
     # epsilon = 0.24
 
     sample_types = (
-        "simple", 
+        "random", 
         "1-norm", 
         "2-norm", 
         "nystrom",

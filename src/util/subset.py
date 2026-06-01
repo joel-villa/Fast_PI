@@ -243,7 +243,7 @@ def get_reduce_funct(type):
 
     Return: the reduction function"""
     match type.lower():
-        case "simple":
+        case "random":
             # simple random sampling of columns
             return select_d_random_columns
         case "1-norm":
