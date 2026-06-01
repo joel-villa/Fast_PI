@@ -137,6 +137,9 @@ def two_norm_select(A, d, seed):
 def nystrom_select(A, d, seed, gamma):
     """ Select those columns with a high gamma-ridge leverage score, as defined 
     in Definition 1. in https://arxiv.org/pdf/2604.20077
+
+    *** Only works on positive semidefinte matrices (gamma-ridge leverage score is 
+    only non-negative for positive definite matrices) ***
     
     Args: 
         A: a matrix (mxn)
