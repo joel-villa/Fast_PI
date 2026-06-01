@@ -10,7 +10,7 @@ from ..util import subset as sub
 
 #TODO: something similar to Chan's (randomly pick larger and larger sample-sizes)
 
-def subset_pow(A, u_0, u_star, num_iter, seed, d, type):
+def subset_pow(A, u_0, u_star, num_iter, seed, d, type, gamma):
     """Measure convergence of Power with some random subset of the columns of A
 
     Args: 
@@ -21,6 +21,7 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d, type):
         seed: for repeatable tests
         d: reduction size: A_reduced is (nxd)
         type: the type of reduction to do
+        gamma: for nystrom sampling
 
     Return: 
         xs: a list of iterations [0, 1, 2, ..., num_iter - 1]
@@ -33,7 +34,7 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d, type):
     ys[0] = eig.euclidean_dist(u_0, u_star)
     xs[0] = 0
 
-    A_reduced = sub.reduce_A(A=A, d=d, seed=seed, type="col_random", gamma=None)
+    A_reduced = sub.reduce_A(A=A, d=d, seed=seed, type=type, gamma=gamma)
 
     v =  pwr.v_from_u(A_reduced, u_0)
 
@@ -52,7 +53,7 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d, type):
 
     return xs, ys, f"column subset {A_reduced.shape}; {num_mults:,} mults"
 
-def percent_subset_pow(A, u_0, u_star, num_iter, seed, p, type):
+def percent_subset_pow(A, u_0, u_star, num_iter, seed, p, type, gamma):
     """Measure convergence of Power with some random subset of the columns of A
 
     Args: 
@@ -63,6 +64,7 @@ def percent_subset_pow(A, u_0, u_star, num_iter, seed, p, type):
         seed: for repeatable tests
         p: reduction percentage
         type: the type of reduction to do
+        gamma: for nystrom sampling
 
     Return: 
         xs: a list of iterations [0, 1, 2, ..., num_iter - 1]
@@ -71,11 +73,11 @@ def percent_subset_pow(A, u_0, u_star, num_iter, seed, p, type):
 
     d = jl.percent_reduce(A.shape[1], p)
 
-    xs, ys, label = subset_pow(A, u_0, u_star, num_iter, seed, d, type)
+    xs, ys, label = subset_pow(A, u_0, u_star, num_iter, seed, d, type, gamma)
 
     return xs, ys, f"{p}% {label}"
 
-def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
+def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size): #TODO: add type and gamma parameters
     """
     A - the matrix (nxm)
     u_0 - an initial guess for the top left eigenvector of A
@@ -120,7 +122,7 @@ def subset_pow_swap(A, u_0, u_star, num_iter, seed, d, step_size):
 
     return xs, ys, f"column subset {A_reduced.shape} swapping every {step_size}; {num_mults:,} mults"
 
-def percent_subset_pow_swap(A, u_0, u_star, num_iter, seed, p, step_size):
+def percent_subset_pow_swap(A, u_0, u_star, num_iter, seed, p, step_size): #TODO: add type and gamma parameters
     """
     A - the matrix (nxm)
     u_0 - an initial guess for the top left eigenvector of A
