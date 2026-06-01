@@ -33,9 +33,7 @@ def subset_pow(A, u_0, u_star, num_iter, seed, d, type):
     ys[0] = eig.euclidean_dist(u_0, u_star)
     xs[0] = 0
 
-    sub.reduce_A(A=A, d=d, seed=seed, type="col_random", gamma=None)
-
-    A_reduced = sub.select_d_random_columns(A, d, seed)
+    A_reduced = sub.reduce_A(A=A, d=d, seed=seed, type="col_random", gamma=None)
 
     v =  pwr.v_from_u(A_reduced, u_0)
 
