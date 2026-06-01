@@ -99,7 +99,7 @@ def baseline_pwr_tolerance_termination(A, u_0, u_star, num_iter, seed, tol=1e-07
 
         s_prev = s_curr
     
-    return xs, ys, f"standard power {A.shape}; {pwr.count_mults(A, num_iter - 1):,} mults"
+    return xs, ys, f"standard power {A.shape}; {pwr.count_mults(v0=v,A=A, maxiter=num_iter - 1):,} mults"
 
 def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gaussian"):
     """
@@ -141,7 +141,7 @@ def jl_reduced_pow_convergence(A, u_0, u_star, num_iter, seed, d, type="jl_gauss
         xs[i] = i
 
     # Number of scalar mults for power
-    scalar_mults += pwr.count_mults(reduced_A, num_iter - 1)
+    scalar_mults += pwr.count_mults(v0=v, A=reduced_A, maxiter=num_iter - 1)
 
     return xs, ys, f"{type} {reduced_A.shape}; {scalar_mults:,} mults"
 

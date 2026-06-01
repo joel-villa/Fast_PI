@@ -59,7 +59,7 @@ def sparse_pwr(A, u_0, u_star, num_iter, seed, s, type="SD"):
         ys[i] = euclidean_dist(u, u_star)
     
     # print(ys)
-    num_mults = pwr.count_mults(A=sparse_A, maxiter=num_iter - 1)
+    num_mults = pwr.count_mults(v0=v, A=sparse_A, maxiter=num_iter - 1)
     return xs, ys, f"s = {s:0.6g}, sparsification type: {type}; {A.nnz - sparse_A.nnz} new zeros;{num_mults:,} mults"
 
 def expected_sparse_pwr(A, u_0, u_star, num_iter, seed, x, type, tol):
