@@ -207,6 +207,8 @@ def init_cost(A, d, seed, type, gamma):
     Return: the cost of doing the initial reduction, in terms of scalar 
             multiplications
     """
+    return 0 #TODO: delete this
+
     if type.lower() == "nystrom":
         return cost_nystrom(A=A, d=d, seed=seed, gamma=gamma)
 
