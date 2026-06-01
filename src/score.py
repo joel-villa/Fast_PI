@@ -163,6 +163,9 @@ def col_sample(ps, funct_args, kwargs, types):
 
     Return: None
     """
+    funct_args = funct_args | {
+        "gamma": 0.5, # for nystrom sampling
+    }
     for p in ps: 
         for type in types:
             p_args = funct_args | {"p": p, "type": type}
@@ -232,7 +235,8 @@ def col_sample_dec(funct_args, kwargs, types): #TODO: type input
     swap_tols = (0.005,)
 
     funct_args = funct_args | {
-        "min_iter": min_iter,
+        "min_iter": min_iter, 
+        "gamma": 0.5, # for nystrom sampling
     }
 
     for init_p in init_ps:
@@ -286,10 +290,9 @@ if __name__ == '__main__':
         "2-norm", 
         "nystrom",
     ) 
-    # sample_types = ("1-norm", ) 
     
-    mats = ["494_bus", "bibd_13_6", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
-    # mats = ["bibd_13_6"]
+    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "impcol_d", "bcspwr06"]
+    # mats = ["bibd_13_6"] # RECTANGULAR: Doesn't work with Nystrom
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -339,11 +342,11 @@ if __name__ == '__main__':
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
-        col_sample_dec(
-            funct_args=funct_args, 
-            kwargs=kwargs,
-            types=sample_types,
-        )
+        # col_sample_dec(
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs,
+        #     types=sample_types,
+        # )
 
         # COMBINATION TESTS
         # sample_lazy_combo(ps=(30, 50, 70), 
