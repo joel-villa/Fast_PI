@@ -231,13 +231,16 @@ def main_no_swap():
                      )
             
         for i in range(num_tests):
-            test(funct=sub.percent_subset_pow, 
-                 plotter=plotter, 
-                 num_avg=num_avg,
-                 A=A,
-                 num_iter=num_iter,
-                 seed=seed * i + i, 
-                 kwargs=kwargs | {"p": p})
+            for type in ("random", "1-norm", "2-norm", "nystrom"):
+                test(
+                    funct=sub.percent_subset_pow, 
+                    plotter=plotter, 
+                    num_avg=num_avg,
+                    A=A,
+                    num_iter=num_iter,
+                    seed=seed * i + i, 
+                    kwargs=kwargs | {"p": p, "type": type, "gamma": 0.5},
+                )
 
         for i in range(num_tests):
             test(funct=spwr.percent_sparse_pwr,
