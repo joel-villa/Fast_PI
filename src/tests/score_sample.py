@@ -98,7 +98,7 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
         dec_funct: function to decrease the reduction percentage
         swap_tol: how much tolerance to wait before decreasing amount of 
                   reduction
-        min_iter: minimum number of iterations to run before considering reduction #TODO: fix in score.py
+        min_iter: minimum number of iterations to run before considering reduction 
         gamma: gamma parameter for the gamma-ridge leverage score
 
     Return:

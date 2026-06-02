@@ -186,7 +186,7 @@ def multi_jl_pow(A, u_0, u_star, num_iter, seed, d, step_size, type="jl_gaussian
         if (i % step_size == 0):
             # Randomly regenerate A
             reduced_A = reduct_funct(A, d=d, seed=seed*i, eps=0.99)
-            v = pwr.v_from_u(reduced_A, u) #TODO: count this in number of scalar mults? 
+            v = pwr.v_from_u(reduced_A, u)  
             num_mults += jl.reduction_cost(X=A, d=d)
 
         # NOTE: using scikit-learn -> top left eig (u) is of significance

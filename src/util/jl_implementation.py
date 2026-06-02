@@ -70,28 +70,6 @@ def jl_gauss_mat(n, d, seed):
     See Section 4.1 of:
     https://www.cs.unm.edu/~saia/classes/506-s24/lec/HighDim+JLProjection.pdf
     """
-    #TODO: untested
     rng = np.random.default_rng(seed)
     G = rng.normal(0, 1, size=(n, d))
     return G * (1 / math.sqrt(n))
-
-# def jl_gauss(X, d, seed, eps=0.9):
-#     """Reduce dimensions of A, via simple jl projection
-
-#     Args:
-#         X: original matrix (mxn)
-#         d: desired dimension
-#         seed: for repeatable randomness
-#         eps: allowable error
-
-#     RETURN: reduced X (nxd), i.e. less columns
-#     """
-    
-#     util.check_valid_dimensions(X)
-#     util.check_safe(X, d, eps)
-
-#     _, n = X.shape
-
-#     X_reduced = X @ jl_gauss_mat(n=n, d=d, seed=seed)
-
-#     return X_reduced

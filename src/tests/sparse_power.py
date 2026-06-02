@@ -7,8 +7,6 @@ import numpy as np
 from ..util.eig_functs import euclidean_dist
 from ..util import power as pwr
 
-#TODO: tests w/ sparsifier that doesn't scale up diagonal, but keeps it nonzero
-
 def sparse_pwr(A, u_0, u_star, num_iter, seed, s, type="SD"):
     """ Power iteration on a sparsified version of A
 

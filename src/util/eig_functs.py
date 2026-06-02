@@ -142,7 +142,6 @@ def eig_diff(A, A_reduced):
     if (n > m):
         # non square matrix, get top eigenvector w/ SVD
         _, _, orig_eig = svds(A, k=1)
-        #TODO
             
     elif (n == m):
         # square matrix, get top eigenvector w/ eigs()
