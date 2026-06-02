@@ -188,6 +188,7 @@ def sparsification(funct_args, kwargs):
         "Generic",
         "SD",
         "CD",
+        # "Mag-Based", #TODO test this
     )
 
     for p in ps:
@@ -291,9 +292,16 @@ if __name__ == '__main__':
         "nystrom",
     ) 
     
-    mats = ["494_bus", "bcsstk07", "bcsstk08", "bcsstk19", "bcsstm07", "bcspwr06"]
-    # mats = ["impcol_d"] #NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-    # mats = ["bibd_13_6"] # RECTANGULAR: Doesn't work with Nystrom
+    mats = [
+        "494_bus", 
+        "bcsstk07", 
+        "bcsstk08", 
+        "bcsstk19", 
+        "bcsstm07", 
+        "bcspwr06",
+        # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+    ]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
@@ -332,22 +340,22 @@ if __name__ == '__main__':
         # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
         # COLUMN SAMPLING TEST
-        col_sample(
-            ps=ps, 
-            funct_args=funct_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=funct_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
         # SPARSIFICATION TEST
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
-        # col_sample_dec(
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs,
-        #     types=sample_types,
-        # )
+        col_sample_dec(
+            funct_args=funct_args, 
+            kwargs=kwargs,
+            types=sample_types,
+        )
 
         # COMBINATION TESTS
         # sample_lazy_combo(ps=(30, 50, 70), 
