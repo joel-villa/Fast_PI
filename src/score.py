@@ -188,7 +188,7 @@ def sparsification(funct_args, kwargs):
         "Generic",
         "SD",
         "CD",
-        # "Mag-Based", #TODO test this
+        "MB", #TODO test this
     )
 
     for p in ps:
@@ -348,7 +348,7 @@ if __name__ == '__main__':
         # )
 
         # SPARSIFICATION TEST
-        # sparsification(funct_args=funct_args, kwargs=kwargs)
+        sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
         col_sample_dec(
