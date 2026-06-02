@@ -74,6 +74,17 @@ def select_d_random_columns(A, d, seed):
 
     return get_subset(A=A, cols=cols)
 
+def invalid_weights(d, weights):
+    """ Check that there are more than d nonzero weights
+    
+    Args:
+        d: the number of columns to select
+        weights: the weights to select columns with
+
+    Return: True if there are more than d nonzero weights, False otherwise
+    """
+    return d > np.count_nonzero(weights)
+
 def one_norm_select(A, d, seed):
     """Given a matrix A, get d of its columns randomly (putting more weight on 
     columns with higher 1-norm)
@@ -88,6 +99,10 @@ def one_norm_select(A, d, seed):
 
     weights = np.asarray(np.sum(np.abs(A), axis=0)).ravel()# 1-norm of each column
     weights = weights / np.sum(weights) # normalize to get probabilities
+
+    if invalid_weights(d=d, weights=weights):
+        print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
+        return select_d_random_columns(A=A, d=d, seed=seed)
 
     cols = weighted_select(
         n=A.shape[1], 
@@ -124,6 +139,10 @@ def two_norm_select(A, d, seed):
 
     # weights = weights * weights # square the 2-norm of the columns
     weights = weights / np.sum(weights) # normalize to get probabilities
+
+    if invalid_weights(d=d, weights=weights):
+        print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
+        return select_d_random_columns(A=A, d=d, seed=seed)
 
     cols = weighted_select(
         n=A.shape[1], 
@@ -163,6 +182,10 @@ def nystrom_select(A, d, seed, gamma):
         print(f"WARNING: d = {d} < {effective_dimension} = effective dimension; may not be selecting enough columns for good approximation")
 
     weights = leverage_scores / effective_dimension
+
+    if invalid_weights(d=d, weights=weights):
+        print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
+        return select_d_random_columns(A=A, d=d, seed=seed)
 
     cols = weighted_select(
         n=A.shape[1], 
