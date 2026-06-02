@@ -191,7 +191,7 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     """
     
     
-    if type.lower() == "mag-based":
+    if type.lower() == "mb":
         # P-Based Sparsifier
         sparsifier = MagSparsifier(seed=seed)
         sparse_A = A.copy()
