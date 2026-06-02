@@ -19,7 +19,7 @@ from src.tests import score as tst
 from src.tests import score_sample as smpl
 from src.tests import power_lazy as lzy
 
-def test(funct, plotter, num_avg, A, num_iter, kwargs={}, show_more=False): #TODO: ensure show_more working
+def test(funct, plotter, num_avg, A, num_iter, kwargs={}, show_more=False):
     """Test the given function from src/tests
     
     Args:
@@ -199,7 +199,7 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def col_sample_dec(funct_args, kwargs, types): #TODO: type input
+def col_sample_dec(funct_args, kwargs, types):
     """Test column sampling enhancement to power iteration
 
     Args: 
