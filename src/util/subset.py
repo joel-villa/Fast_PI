@@ -101,6 +101,8 @@ def one_norm_select(A, d, seed):
     weights = weights / np.sum(weights) # normalize to get probabilities
 
     if invalid_weights(d=d, weights=weights):
+        #TODO: this? 
+        raise ValueError(f"d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
         print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
         return select_d_random_columns(A=A, d=d, seed=seed)
 
@@ -141,6 +143,8 @@ def two_norm_select(A, d, seed):
     weights = weights / np.sum(weights) # normalize to get probabilities
 
     if invalid_weights(d=d, weights=weights):
+        #TODO: this? 
+        raise ValueError(f"d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
         print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
         return select_d_random_columns(A=A, d=d, seed=seed)
 
@@ -184,6 +188,8 @@ def nystrom_select(A, d, seed, gamma):
     weights = leverage_scores / effective_dimension
 
     if invalid_weights(d=d, weights=weights):
+        #TODO: this? 
+        raise ValueError(f"d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
         print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
         return select_d_random_columns(A=A, d=d, seed=seed)
 
