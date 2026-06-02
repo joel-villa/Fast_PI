@@ -39,16 +39,17 @@ class Sparsifier():
         process
 
         Thm 1.5 (1)
-            probability of error is: 1 - exp(-19(log n)^4)
+            probability of validity is: 1 - exp(-19(log n)^4)
+            probability of error is: exp(-19(log n)^4)
 
         Args:
             n: the number of nonzeroes in the matrix being sparsified? TODO: confirm
 
         Return: the probability of error
         """
-        return 1 - np.exp(-19 * (np.log(n))**4)
+        return np.exp(-19 * (np.log(n))**4)
     
-    def exp_nnz(self, A, p, m, n, b):
+    def exp_nnz_bound(self, A, p, m, n, b):
         """ Get the expected number of nonzeroes in the sparsified matrix
 
         Thm 1.5 (2):
@@ -114,7 +115,8 @@ class Sparsifier():
         n_approx = np.ceil(sqrt_nnz) 
         m_approx = np.floor(sqrt_nnz)
 
-        print(f"probability of error: {self.prob_error(n=n_approx)}")
+        if self.prob_error(n=n_approx) > 0.01:
+            print(f"WARNING: probability of error {self.prob_error(n=n_approx)} is greater than 0.01, sparsification may not be valid")
 
         for i, datum in enumerate(A.data):
             importance = p * (datum / b) ** 2
@@ -123,11 +125,11 @@ class Sparsifier():
 
         A.eliminate_zeros()
         
-        exp_nnz = self.exp_nnz(A=A, p=p, m=m_approx - 1, n=n_approx, b=b)
+        exp_nnz_bound = self.exp_nnz_bound(A=A, p=p, m=m_approx - 1, n=n_approx, b=b)
         act_nnz = A.nnz
 
-        if (abs(act_nnz - exp_nnz) > 0.025 * exp_nnz):
-            print(f"WARNING: number of nonzeroes in sparsified matrix is more than 2.5% off expected number of nonzeroes")
+        if (abs(act_nnz - exp_nnz_bound) > 0.025 * exp_nnz_bound):
+            print(f"WARNING: number of nonzeroes {act_nnz}in sparsified matrix is more than 2.5% off expected number of nonzeroes {exp_nnz_bound}")
 
         return None
     
