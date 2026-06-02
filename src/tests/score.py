@@ -193,9 +193,9 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
     
     if type.lower() == "mag-based":
         # P-Based Sparsifier
-        sparse_A = A.copy()
         sparsifier = MagSparsifier(seed=seed)
-        sparsifier.sparsify(A, p=p)
+        sparse_A = A.copy()
+        sparsifier.sparsify(sparse_A, p=p)
     else:
         # S-Based Sparsifiers
         s_generator = SGenerator(A.shape[0], A.nnz)
