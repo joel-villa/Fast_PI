@@ -192,7 +192,7 @@ def cost_nystrom(A, d, seed, gamma):
     cost_B_inv = (n**3) 
 
     # Cost of computing dot_prod_matrix (sparse -> dependent on nnz of A)
-    cost_dot_prod = A.nnz 
+    cost_dot_prod = A.nnz * m * n #TODO: is this right? each nonzero element of A is multiplied by m * n elements of B_inv
 
     return cost_B_inv + cost_dot_prod
 
