@@ -14,6 +14,7 @@ from src.util.DenseSparsifier import DenseSparsifier
 from Sparsification_Research.src.CDSparsifier import CDSparsifier
 from Sparsification_Research.src.SDSparsifier import SDSparsifier
 from Sparsification_Research.src.Sparsifier import Sparsifier
+from ..util.Sparsifier import Sparsifier as MagSparsifier
 from Sparsification_Research.src.SGenerator import SGenerator
 
 
@@ -188,37 +189,44 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
         lbl: the string representation of this test
     """
-    s_generator = SGenerator(A.shape[0], A.nnz)
     
-    match type.lower():
-        case "sd":
-            sparsifier = SDSparsifier(seed=seed)
-
-            # s based off of off-diagonal non-zeroes
-            include_diags = False
-        
-        case "cd":
-            sparsifier = CDSparsifier(seed=seed)
-            # s based off of off-diagonal non-zeroes
-            include_diags = False
-            
-        case "generic":
-            sparsifier = Sparsifier(seed=seed)
-
-            # s based off of nnzs
-            include_diags = True
-
-        case _:
-            raise TypeError(f"Invalid sparisifier type {type}")
-        
-    # get s associated with an expected percent sparsification p
-    expected_proportion = p / 100
-    s = s_generator.proportion_sparse_s(p=expected_proportion, 
-                                        include_diags=include_diags)
     
-    sparse_A = A.copy()
+    if type.lower() == "mag-based":
+        # P-Based Sparsifier
+        sparse_A = A.copy()
+        sparsifier = MagSparsifier(seed=seed)
+        sparsifier.sparsify(A, p=p)
+    else:
+        # S-Based Sparsifiers
+        s_generator = SGenerator(A.shape[0], A.nnz)
+        include_diags = True
+        match type.lower():
+            case "sd":
+                sparsifier = SDSparsifier(seed=seed)
 
-    sparsifier.sparsify(sparse_A, s)
+                # s based off of off-diagonal non-zeroes
+                include_diags = False
+
+            case "cd":
+                sparsifier = CDSparsifier(seed=seed)
+                # s based off of off-diagonal non-zeroes
+                include_diags = False
+
+            case "generic":
+                sparsifier = Sparsifier(seed=seed)
+
+                # s based off of nnzs
+                include_diags = True
+            case _:
+                raise TypeError(f"Invalid sparisifier type {type}")
+        # get s associated with an expected percent sparsification p
+        expected_proportion = p / 100
+        s = s_generator.proportion_sparse_s(p=expected_proportion, 
+                                            include_diags=include_diags)
+
+        # Sparsify A with s
+        sparse_A = A.copy()
+        sparsifier.sparsify(sparse_A, s)
 
     xs, ys, lbl = baseline(
         A=A,
