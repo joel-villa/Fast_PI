@@ -4,6 +4,7 @@ Based on Thm 1.5 in: https://doi.org/10.1145/1219092.1219097
 Sparsifying matrix based on its entries, with higher probability of keeping
 entries with higher magnitude
 """
+#TODO: this is sparsifying drastically
 
 import numpy as np
 
@@ -115,6 +116,9 @@ class Sparsifier():
         n_approx = np.ceil(sqrt_nnz) 
         m_approx = np.floor(sqrt_nnz)
 
+        if (m_approx < 76):
+            print(f"WARNING: m_approx {m_approx} is less than 76, sparsification may not be valid")
+
         if self.prob_error(n=n_approx) > 0.01:
             print(f"WARNING: probability of error {self.prob_error(n=n_approx)} is greater than 0.01, sparsification may not be valid")
 
@@ -125,11 +129,12 @@ class Sparsifier():
 
         A.eliminate_zeros()
         
-        exp_nnz_bound = self.exp_nnz_bound(A=A, p=p, m=m_approx - 1, n=n_approx, b=b)
-        act_nnz = A.nnz
+        exp_nnz_bound = self.exp_nnz_bound(A=A, p=p, m=m_approx, n=n_approx, b=b)
+        # print(f"Expected number of nonzeroes in sparsified matrix is at most {exp_nnz_bound}")
+        act_nnz = nnz - A.nnz
 
-        if (abs(act_nnz - exp_nnz_bound) > 0.025 * exp_nnz_bound):
-            print(f"WARNING: number of nonzeroes {act_nnz}in sparsified matrix is more than 2.5% off expected number of nonzeroes {exp_nnz_bound}")
+        if (act_nnz > exp_nnz_bound):
+            raise ValueError(f"Actual number of nonzeroes in sparsified matrix {act_nnz} is greater than expected bound {exp_nnz_bound}, sparsification may not be valid")
 
         return None
     
