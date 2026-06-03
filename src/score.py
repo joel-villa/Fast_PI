@@ -183,7 +183,11 @@ def sparsification(funct_args, kwargs):
     
     Return: None
     """
-    ps = (4, 16,)
+    ps = (
+        # 0.1, 
+        4, 
+        16,
+    )
     types = (
         "Generic",
         "SD",
@@ -293,7 +297,7 @@ if __name__ == '__main__':
     ) 
     
     mats = [
-        "494_bus", 
+        "494_bus", # Invalid for mag-based sparsifification
         "bcsstk07", 
         "bcsstk08", 
         "bcsstk19", 
