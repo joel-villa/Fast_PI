@@ -5,9 +5,6 @@ top-eigenvector approximation, with some score
 Where work is number of scalar mults and "score" is closeness of singular value
 """
 
-import math
-from wsgiref import types
-
 from scipy.linalg import norm # 2-norm by default
 from scipy.sparse.linalg import svds
 
@@ -163,11 +160,21 @@ def col_sample(ps, funct_args, kwargs, types):
 
     Return: None
     """
-    funct_args = funct_args | {
-        "gamma": 0.5, # for nystrom sampling
-    }
+    # gammas = (
+    #     0.8,
+    #     0.85,
+    #     0.9,
+    #     0.95,
+    # ) # for nystrom sampling
     for p in ps: 
         for type in types:
+            # if type == "nystrom":
+            #     for gamma in gammas:
+            #         p_args = funct_args | {"p": p, "type": type, "gamma": gamma}
+            #         test(funct=smpl.col_sample_p,
+            #              kwargs=p_args,
+            #              **kwargs)
+            # else:
             p_args = funct_args | {"p": p, "type": type}
             test(funct=smpl.col_sample_p,
                  kwargs=p_args,
@@ -241,7 +248,6 @@ def col_sample_dec(funct_args, kwargs, types):
 
     funct_args = funct_args | {
         "min_iter": min_iter, 
-        "gamma": 0.5, # for nystrom sampling
     }
 
     for init_p in init_ps:
@@ -343,20 +349,23 @@ if __name__ == '__main__':
         # JL LAZY TEST
         # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
+        # Args for column sampling tests
+        sample_args = funct_args | {"gamma": 0.9} # for nystrom sampling
+
         # COLUMN SAMPLING TEST
-        # col_sample(
-        #     ps=ps, 
-        #     funct_args=funct_args, 
-        #     kwargs=kwargs, 
-        #     types=sample_types
-        # )
+        col_sample(
+            ps=ps, 
+            funct_args=sample_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         # SPARSIFICATION TEST
-        sparsification(funct_args=funct_args, kwargs=kwargs)
+        # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
         col_sample_dec(
-            funct_args=funct_args, 
+            funct_args=sample_args, 
             kwargs=kwargs,
             types=sample_types,
         )
