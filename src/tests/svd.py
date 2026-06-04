@@ -16,6 +16,8 @@ All methods in this file return three things:
 import scipy.sparse.linalg as spla
 import numpy as np
 
+from ..util.subset import p_reduce_A
+
 def svd_test(A, seed, max_k, err_type, A_tilde=None):
     """ Baseline test of svd on the matrix A
 
@@ -36,6 +38,10 @@ def svd_test(A, seed, max_k, err_type, A_tilde=None):
             (2) ||A - A_k||_2 / ||A||_2  
                 diff in top singular value 
         lbl: the string representation of this test
+
+    TODO: doesn't work w/ dimensionality reductions, is there a way to get 
+    arround this? Maybe pad with zeroes? But that way would still not work for 
+    jl reductions
     """
     if A_tilde is None:
         # BASELINE TEST
@@ -73,5 +79,45 @@ def svd_test(A, seed, max_k, err_type, A_tilde=None):
 
 #TODO: sparse, jl, and subset tests
 
-def subset(A, seed, max_k, err_type, sub_type, p):
-    """ Test behavior of subset reduction on svd"""
+def subset(A, seed, max_k, err_type, sub_type, p, gamma):
+    """ Test behavior of subset reduction on svd
+    
+    Args: 
+        A: the original matrix (in CSR format)
+        seed: for repeatable randomness
+        max_k: the maximum k for top k singular values to approximate
+        err_type: '2' -> 2-norm error 
+                  'fro' -> Frobenius norm
+        sub_type: type of subset selection
+        p: percent reduction
+        gamma: for Nystrom gamma-leverage-score sampling
+
+    Return: 
+        xs: k in range (1, 2, ...) where k is the number of top k singular values
+            being approximated
+        ys: an array of error of one of the two types:
+            (1) ||A - A_k||_F / ||A||_F 
+                this is akin to treating mat as vector and taking 2-norm
+            (2) ||A - A_k||_2 / ||A||_2  
+                diff in top singular value 
+        lbl: the string representation of this test
+    """    
+    A_reduced = p_reduce_A(
+        A=A, 
+        p=p, 
+        seed=seed, 
+        type=sub_type, 
+        gamma=gamma,
+    )
+
+    xs, ys, lbl = svd_test(
+        A=A, 
+        seed=seed, 
+        max_k=max_k, 
+        err_type=err_type, 
+        A_tilde=A_reduced,
+    )
+
+    return xs, ys, f"{100 - p}% {lbl}"
+
+
