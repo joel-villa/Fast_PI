@@ -353,15 +353,15 @@ if __name__ == '__main__':
         sample_args = funct_args | {"gamma": 0.9} # for nystrom sampling
 
         # COLUMN SAMPLING TEST
-        col_sample(
-            ps=ps, 
-            funct_args=sample_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=sample_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
         # SPARSIFICATION TEST
-        # sparsification(funct_args=funct_args, kwargs=kwargs)
+        sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
         col_sample_dec(

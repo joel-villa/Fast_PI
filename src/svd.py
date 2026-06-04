@@ -27,7 +27,7 @@ def init(mat_name):
 
 if __name__ == '__main__':
     seed = 10
-    max_k = 10
+    max_k = 25
     # err_type = "fro"
     err_type = 2
     sub_types = (

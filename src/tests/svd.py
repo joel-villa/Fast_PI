@@ -47,6 +47,8 @@ def svd_test(A, seed, max_k, err_type, A_tilde=None):
     POTENTIAL (UNVERIFIED) SOLUTION: 
         A_k = (U U^T) A
         Where U is the one found by svd on A_tilde
+
+    TODO: big bug, always return 1, other than last k-value, what's up with that? 
     """
     if A_tilde is None:
         # BASELINE TEST
