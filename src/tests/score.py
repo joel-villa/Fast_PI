@@ -10,12 +10,9 @@ from ..util import score as scr
 from ..util import jl_implementation as jl
 from ..util import scikit_jl as jlsk
 
+from ..util.sparsify import p_sparse
+
 from src.util.DenseSparsifier import DenseSparsifier
-from Sparsification_Research.src.CDSparsifier import CDSparsifier
-from Sparsification_Research.src.SDSparsifier import SDSparsifier
-from Sparsification_Research.src.Sparsifier import Sparsifier
-from ..util.Sparsifier import Sparsifier as MagSparsifier
-from Sparsification_Research.src.SGenerator import SGenerator
 
 
 def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
@@ -189,44 +186,12 @@ def percent_sparse(A, u_0, s_star, max_iter, seed, p, type, tol):
         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
         lbl: the string representation of this test
     """
-    
-    
-    if type.lower() == "mb":
-        # P-Based Sparsifier
-        sparsifier = MagSparsifier(seed=seed)
-        sparse_A = A.copy()
-        sparsifier.sparsify(sparse_A, p=p)
-    else:
-        # S-Based Sparsifiers
-        s_generator = SGenerator(A.shape[0], A.nnz)
-        include_diags = True
-        match type.lower():
-            case "sd":
-                sparsifier = SDSparsifier(seed=seed)
-
-                # s based off of off-diagonal non-zeroes
-                include_diags = False
-
-            case "cd":
-                sparsifier = CDSparsifier(seed=seed)
-                # s based off of off-diagonal non-zeroes
-                include_diags = False
-
-            case "generic":
-                sparsifier = Sparsifier(seed=seed)
-
-                # s based off of nnzs
-                include_diags = True
-            case _:
-                raise TypeError(f"Invalid sparisifier type {type}")
-        # get s associated with an expected percent sparsification p
-        expected_proportion = p / 100
-        s = s_generator.proportion_sparse_s(p=expected_proportion, 
-                                            include_diags=include_diags)
-
-        # Sparsify A with s
-        sparse_A = A.copy()
-        sparsifier.sparsify(sparse_A, s)
+    sparse_A = p_sparse(
+        A=A,
+        p=p,
+        type=type,
+        seed=seed,
+    )
 
     xs, ys, lbl = baseline(
         A=A,
