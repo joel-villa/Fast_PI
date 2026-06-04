@@ -8,7 +8,7 @@ from scipy.sparse.linalg import svds
 import numpy as np
 from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
-from src.tests.svd import svd_test
+from src.tests import svd as tst
 
 
 def init(mat_name):
@@ -30,6 +30,14 @@ if __name__ == '__main__':
     max_k = 10
     # err_type = "fro"
     err_type = 2
+    sub_types = (
+        "random", 
+        "1-norm", 
+        "2-norm", 
+        "nystrom",
+    ) 
+    p = 50
+    gamma = 0.9
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
@@ -55,14 +63,26 @@ if __name__ == '__main__':
          
         A= init(mat_name=mat_name)
 
-        xs, ys, lbl = svd_test(
+        # BASELINE
+        xs, ys, lbl = tst.svd_test(
             A=A, 
             seed=seed,
             max_k=max_k,
             err_type=err_type,
         )
-        
         plotter.add_to_plot(xs, ys, label=lbl)
+
+        # SUBSET TODO: doesn't work due to dimension change
+        # xs, ys, lbl = tst.subset(
+        #     A=A, 
+        #     seed=seed,
+        #     max_k=max_k,
+        #     err_type=err_type,
+        #     sub_type=sub_types[0],
+        #     p=p,
+        #     gamma=gamma,
+        # )
+        # plotter.add_to_plot(xs, ys, label=lbl)
 
         plotter.finish()
 
