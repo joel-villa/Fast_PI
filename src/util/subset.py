@@ -127,6 +127,8 @@ def two_norm_select(A, d, seed):
     Volume Sampling' by Amit Deshpande, Luis Rademacher, Santosh Vempala, 
     Grant Wang
 
+    See also Theorem 4 in: https://doi.org/10.1137/S0097539704442696
+
     Args: 
         A: a matrix (mxn)
         d: the number of columns to get
@@ -224,6 +226,22 @@ def cost_nystrom(A, d, seed, gamma):
     cost_dot_prod = A.nnz * m * n #TODO: is this right? each nonzero element of A is multiplied by m * n elements of B_inv
 
     return cost_B_inv + cost_dot_prod
+
+def gamma_ridge_lev_score(A, d, seed, gamma):
+    """ the gamma-ridge leverage score, as defined in Section 3.6 (Page 5) of
+    https://doi.org/10.1137/1.9781611974782.115
+
+    *** Only works on positive semidefinte matrices (gamma-ridge leverage score is 
+    only non-negative for positive definite matrices) ***
+
+    Args: 
+        A: a matrix (mxn)
+        d: the number of columns to get
+        gamma: the gamma parameter for the gamma-ridge leverage score
+        seed: for predictable randomness
+    Return: the gamma-ridge leverage score
+    """
+    #TODO: is this the same as the other? 
 
 def init_cost(A, d, seed, type, gamma):
     """ Get the cost of doing the initial reduction, in terms of scalar 
