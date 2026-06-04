@@ -16,15 +16,16 @@ All methods in this file return three things:
 import scipy.sparse.linalg as spla
 import numpy as np
 
-def svd_test(A, seed, max_k, err_type):
+def svd_test(A, seed, max_k, err_type, A_tilde=None):
     """ Baseline test of svd on the matrix A
 
     Args:
-        A: the matrix to do power iteration on (in CSR format)
+        A: the original matrix (in CSR format)
         seed: for repeatable randomness
         max_k: the maximum k for top k singular values to approximate
         err_type: '2' -> 2-norm error 
                   'fro' -> Frobenius norm
+        A_tilde: the reduced version of A
 
     Return:
         xs: k in range (1, 2, ...) where k is the number of top k singular values
@@ -36,6 +37,9 @@ def svd_test(A, seed, max_k, err_type):
                 diff in top singular value 
         lbl: the string representation of this test
     """
+    if A_tilde is None:
+        # BASELINE TEST
+        A_tilde = A
     # TODO: does spla.svds() work w/ dense matrices? 
     # if type(A) is not np.ndarray:
     #     # A is in sparse format, use spla.svds
@@ -44,8 +48,8 @@ def svd_test(A, seed, max_k, err_type):
     #     # A is in dense format, use np.linalg.svd
     #     U, S, Vt = np.linalg.svd(A, full_matrices=False)
 
-    # Get the top k singular values and vectors of A
-    U, S, Vt = spla.svds(A, k=max_k, rng=seed)
+    # Get the top k singular values and vectors of A_tilde
+    U, S, Vt = spla.svds(A=A_tilde, k=max_k, rng=seed)
 
     # Compute the error for each k
     xs = []
@@ -68,3 +72,6 @@ def svd_test(A, seed, max_k, err_type):
     return xs, ys, lbl
 
 #TODO: sparse, jl, and subset tests
+
+def subset(A, seed, max_k, err_type, sub_type, p):
+    """ Test behavior of subset reduction on svd"""
