@@ -36,6 +36,12 @@ if __name__ == '__main__':
         "2-norm", 
         "nystrom",
     ) 
+    spa_types = (
+        "Generic",
+        "SD",
+        "CD",
+        "MB", 
+    )
     p = 50
     gamma = 0.9
     
@@ -83,6 +89,16 @@ if __name__ == '__main__':
         #     gamma=gamma,
         # )
         # plotter.add_to_plot(xs, ys, label=lbl)
+
+        xs, ys, lbl = tst.sparse(
+            A=A, 
+            seed=seed,
+            max_k=max_k,
+            err_type=err_type,
+            spa_type=spa_types[0],
+            p=p,
+        )
+        plotter.add_to_plot(xs, ys, label=lbl)
 
         plotter.finish()
 
