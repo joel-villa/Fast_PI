@@ -28,6 +28,8 @@ def init(mat_name):
 if __name__ == '__main__':
     seed = 10
     max_k = 10
+    # err_type = "fro"
+    err_type = 2
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
@@ -43,13 +45,21 @@ if __name__ == '__main__':
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
+        plotter.init_plot(
+            title=None, 
+            x_label="k",
+            y_label=None, 
+            save_name=f"{mat_name}_svd",
+            grid_on=True,
+        ) 
+         
         A= init(mat_name=mat_name)
 
         xs, ys, lbl = svd_test(
             A=A, 
             seed=seed,
             max_k=max_k,
-            err_type="fro",
+            err_type=err_type,
         )
         
         plotter.add_to_plot(xs, ys, label=lbl)
