@@ -132,7 +132,7 @@ def two_norm_select(A, d, seed):
     """
 
     # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    hadamard_matrix = A.multiply(A) # element-wise square of A
+    hadamard_matrix = np.square(A) # square of A
     weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
 
     # weights = weights * weights # square the 2-norm of the columns
@@ -169,7 +169,7 @@ def two_norm_proven(A, d, seed):
     """
 
     # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    hadamard_matrix = A.multiply(A) # element-wise square of A
+    hadamard_matrix = np.square(A) # square of A
     weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
 
     # weights = weights * weights # square the 2-norm of the columns
