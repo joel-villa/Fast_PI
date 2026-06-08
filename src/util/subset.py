@@ -41,7 +41,7 @@ def weighted_select(n, d, seed, weights):
     Return: a list of column indices, of length d (sorted)
     """
     rng = np.random.default_rng(seed=seed)
-    cols = rng.choice(n, size=d, replace=False, p=weights)
+    cols = rng.choice(n, size=d, replace=True, p=weights)
 
     sorted_cols = np.sort(cols)
 
@@ -100,12 +100,6 @@ def one_norm_select(A, d, seed):
     weights = np.asarray(np.sum(np.abs(A), axis=0)).ravel()# 1-norm of each column
     weights = weights / np.sum(weights) # normalize to get probabilities
 
-    if invalid_weights(d=d, weights=weights):
-        #TODO: this? 
-        raise ValueError(f"d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
-        print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
-        return select_d_random_columns(A=A, d=d, seed=seed)
-
     cols = weighted_select(
         n=A.shape[1], 
         d=d, 
@@ -144,11 +138,42 @@ def two_norm_select(A, d, seed):
     # weights = weights * weights # square the 2-norm of the columns
     weights = weights / np.sum(weights) # normalize to get probabilities
 
-    if invalid_weights(d=d, weights=weights):
-        #TODO: this? 
-        raise ValueError(f"d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
-        print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
-        return select_d_random_columns(A=A, d=d, seed=seed)
+    cols = weighted_select(
+        n=A.shape[1], 
+        d=d, 
+        seed=seed, 
+        weights=weights
+    )
+
+    return get_subset(A=A, cols=cols)
+
+def two_norm_proven(A, d, seed):
+    """ A selection which involves selecting and scaling the i'th column 
+    with probability p_i^2, where p_i = ||A^(i)||^2 / ||A||_F^2
+    The following has been proven to preserve Matrix Vector multiplication in
+    expectation
+
+    PF:
+        E(|Cx|^2) = E(sum_i(x_i^2 * |C^(i)|^2))
+                  = sum_i(x_i^2 * |A^(i)|^2)
+                  = |Ax|^2
+    
+    Args: 
+        A: a matrix (mxn)
+        d: the number of columns to get
+        seed: for predictable randomness
+
+    RETURN: An (nxd) column subset of A
+
+    (TODO: prove for selection w/o replacement)
+    """
+
+    # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
+    hadamard_matrix = A.multiply(A) # element-wise square of A
+    weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
+
+    # weights = weights * weights # square the 2-norm of the columns
+    weights = weights / np.sum(weights) # normalize to get probabilities
 
     cols = weighted_select(
         n=A.shape[1], 
@@ -188,12 +213,6 @@ def nystrom_select(A, d, seed, gamma):
         print(f"WARNING: d = {d} < {effective_dimension} = effective dimension; may not be selecting enough columns for good approximation")
 
     weights = leverage_scores / effective_dimension
-
-    if invalid_weights(d=d, weights=weights):
-        #TODO: this? 
-        raise ValueError(f"d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
-        print(f"WARNING: d = {d} > {np.count_nonzero(weights)} = number of nonzero weights, defaulting to uniform distribution")
-        return select_d_random_columns(A=A, d=d, seed=seed)
 
     cols = weighted_select(
         n=A.shape[1], 
