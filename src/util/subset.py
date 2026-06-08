@@ -130,15 +130,12 @@ def two_norm_select(A, d, seed):
 
     RETURN: An (nxd) column subset of A
     """
-
-    # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    hadamard_matrix = np.square(A) # element-wise square of A
-    weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
+    # element-wise square of A (NOTE: CSR mats do not support np.square)
+    square_A = A.multiply(A) 
+    weights = np.asarray(np.sum(square_A, axis=0)).ravel() # 2-norm of each column, squared
 
     # weights = weights * weights # square the 2-norm of the columns
     weights = weights / np.sum(weights) # normalize to get probabilities
-
-    print(f"weights: {weights[:10]}")
 
     cols = weighted_select(
         n=A.shape[1], 
@@ -170,8 +167,8 @@ def two_norm_scale(A, d, seed):
     (TODO: prove for selection w/o replacement)
     """
 
-    # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    sq_mat = np.square(A) # element-wise square of A
+    # element-wise square of A (NOTE: CSR mats do not support np.square)
+    sq_mat = np.square(A)
 
     # The square of the two norm of the columns of A: ||A^(i)||^2
     square_of_norm = np.asarray(np.sum(sq_mat, axis=0)).ravel() 
@@ -195,7 +192,7 @@ def two_norm_scale(A, d, seed):
     scales = np.sum(square_of_norm) / square_of_norm
 
     # Only those selected columns
-    scales = scales[:, cols]
+    scales = scales[cols]
 
     # Scale the columns for better behavior (in expectation)
     C = C * scales
