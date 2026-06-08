@@ -186,7 +186,11 @@ def two_norm_scale(A, d, seed):
         weights=weights
     )
 
+    # The subset matrix
     C = get_subset(A=A, cols=cols)
+
+    # # Cast to csc format, for efficient column scaling
+    # C = C.tocsc()
 
     # Scaling distribution
     scales = np.sum(square_of_norm) / square_of_norm
@@ -194,8 +198,15 @@ def two_norm_scale(A, d, seed):
     # Only those selected columns
     scales = scales[cols]
 
-    # Scale the columns for better behavior (in expectation)
-    C = C * scales
+    # Loop through the columns of C, and scale them by the associated ammount
+    for col in range(C.shape[1]):
+        const_fact = scales[col] 
+        start = C.indptr[col]
+        end = C.indptr[col + 1]
+
+        values = C.data[start:end]
+        values = values * const_fact
+        
     return C
 
 def nystrom_select(A, d, seed, gamma):
