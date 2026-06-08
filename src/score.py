@@ -299,7 +299,8 @@ if __name__ == '__main__':
         "random", 
         "1-norm", 
         "2-norm", 
-        "nystrom",
+        # "nystrom",
+        "scale",
     ) 
     
     mats = [
@@ -349,19 +350,19 @@ if __name__ == '__main__':
         # JL LAZY TEST
         # jl_lazy(funct_args=jl_args, ps=jl_ps, kwargs=kwargs)
 
-        # Args for column sampling tests
+        # ARGS for column sampling tests
         sample_args = funct_args | {"gamma": 0.9} # for nystrom sampling
 
         # COLUMN SAMPLING TEST
-        # col_sample(
-        #     ps=ps, 
-        #     funct_args=sample_args, 
-        #     kwargs=kwargs, 
-        #     types=sample_types
-        # )
+        col_sample(
+            ps=ps, 
+            funct_args=sample_args, 
+            kwargs=kwargs, 
+            types=sample_types
+        )
 
         # SPARSIFICATION TEST
-        sparsification(funct_args=funct_args, kwargs=kwargs)
+        # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
         col_sample_dec(

@@ -132,11 +132,13 @@ def two_norm_select(A, d, seed):
     """
 
     # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    hadamard_matrix = np.square(A) # square of A
+    hadamard_matrix = np.square(A) # element-wise square of A
     weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
 
     # weights = weights * weights # square the 2-norm of the columns
     weights = weights / np.sum(weights) # normalize to get probabilities
+
+    print(f"weights: {weights[:10]}")
 
     cols = weighted_select(
         n=A.shape[1], 
@@ -147,7 +149,7 @@ def two_norm_select(A, d, seed):
 
     return get_subset(A=A, cols=cols)
 
-def two_norm_proven(A, d, seed):
+def two_norm_scale(A, d, seed):
     """ A selection which involves selecting and scaling the i'th column 
     with probability p_i^2, where p_i = ||A^(i)||^2 / ||A||_F^2
     The following has been proven to preserve Matrix Vector multiplication in
@@ -169,11 +171,16 @@ def two_norm_proven(A, d, seed):
     """
 
     # weights = linalg.norm(A, ord=2, axis=0) # 2-norm of each column
-    hadamard_matrix = np.square(A) # square of A
-    weights = np.asarray(np.sum(hadamard_matrix, axis=0)).ravel() # 2-norm of each column, squared
+    sq_mat = np.square(A) # element-wise square of A
 
-    # weights = weights * weights # square the 2-norm of the columns
-    weights = weights / np.sum(weights) # normalize to get probabilities
+    # The square of the two norm of the columns of A: ||A^(i)||^2
+    square_of_norm = np.asarray(np.sum(sq_mat, axis=0)).ravel() 
+
+    # The fourth power of the two norm of the columns of A: ||A^(i)||^4
+    fourth_of_norm = np.square(square_of_norm) 
+
+    # Probability distribution
+    weights = fourth_of_norm / np.sum(fourth_of_norm) 
 
     cols = weighted_select(
         n=A.shape[1], 
@@ -182,7 +189,17 @@ def two_norm_proven(A, d, seed):
         weights=weights
     )
 
-    return get_subset(A=A, cols=cols)
+    C = get_subset(A=A, cols=cols)
+
+    # Scaling distribution
+    scales = np.sum(square_of_norm) / square_of_norm
+
+    # Only those selected columns
+    scales = scales[:, cols]
+
+    # Scale the columns for better behavior (in expectation)
+    C = C * scales
+    return C
 
 def nystrom_select(A, d, seed, gamma):
     """ Select those columns with a high gamma-ridge leverage score, as defined 
@@ -320,6 +337,8 @@ def get_reduce_funct(type):
             return  one_norm_select
         case "2-norm":
             return two_norm_select
+        case "scale":
+            return two_norm_scale
         case _:
             raise TypeError(f"Invalid sampling type: {type}")
         
