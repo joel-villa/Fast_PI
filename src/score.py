@@ -243,6 +243,7 @@ def col_sample_dec(funct_args, kwargs, types):
 
     #BEST PERFORMING PARAMETERS FOUND EMPIRICALLY:
     init_ps = (96, )
+    init_ps = (99, ) #BETTER FOR SCALING ALG? 
     dec_functs = (lambda p: p // 1.25,)
     swap_tols = (0.005,)
 
@@ -289,15 +290,15 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 128
     num_avg = 5
-    ps = (25, 50, 96)
+    ps = (25, 50, 75, 99)
     jl_ps = (97, None)
     tol = 1e-5
     epsilon = 0.5
     # epsilon = 0.24
 
     sample_types = (
-        "random", 
-        "1-norm", 
+        # "random", 
+        # "1-norm", 
         "2-norm", 
         # "nystrom",
         "scale",
@@ -311,7 +312,7 @@ if __name__ == '__main__':
         "bcsstm07", 
         "bcspwr06",
         # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
