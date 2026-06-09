@@ -41,13 +41,34 @@ def weighted_select(n, d, seed, weights):
     Return: a list of column indices, of length d (sorted)
     """
     rng = np.random.default_rng(seed=seed)
-    cols = rng.choice(n, size=d, replace=True, p=weights)
+    #TODO: prove for replace=False (only proven for replace=True)
+    cols = rng.choice(n, size=d, replace=False, p=weights)
 
     sorted_cols = np.sort(cols)
 
     # print(f"First 10 selected columns: {sorted_cols[:10]}")
 
     return sorted_cols
+
+def deterministic_weighted_select(d, weights):
+    """ Pick those d columns with the highest associated weights
+
+    Args:
+        d: number of columns to select
+        weights: the weights to select columns with (should sum to 1)
+
+    Return: a list of column indices, of length d (sorted)
+    TODO
+    """
+
+    # Those indices that would sort he array
+    indices_sorted = np.argsort(weights)
+
+    # Those d columns with the highest weight
+    top_d_cols = indices_sorted[:d]
+
+    return top_d_cols
+
 
 def select_d_random_columns(A, d, seed):
     """Given a matrix A, get d of its columns randomly
@@ -168,10 +189,10 @@ def two_norm_scale(A, d, seed):
     """
 
     # element-wise square of A (NOTE: CSR mats do not support np.square)
-    sq_mat = np.square(A)
+    square_A = A.multiply(A)
 
     # The square of the two norm of the columns of A: ||A^(i)||^2
-    square_of_norm = np.asarray(np.sum(sq_mat, axis=0)).ravel() 
+    square_of_norm = np.asarray(np.sum(square_A, axis=0)).ravel() 
 
     # The fourth power of the two norm of the columns of A: ||A^(i)||^4
     fourth_of_norm = np.square(square_of_norm) 
