@@ -69,6 +69,31 @@ def deterministic_weighted_select(d, weights):
 
     return top_d_cols
 
+def select_d_cols(n, d, seed, weights, random):
+    """ Will get d columns based on weights, either determinalistically, or 
+    randomly
+    
+    Args: 
+        n: number of columns to select from
+        d: number of columns to select
+        seed: for predictable randomness
+        weights: the weights to select columns with (should sum to 1)
+        random: True -> use weights as probability density
+                False -> use weights for determinstic selection 
+    """
+    if random:
+        return weighted_select(
+            n=n,
+            d=d,
+            seed=seed,
+            weights=weights,
+        )
+    
+    return deterministic_weighted_select(
+        d=d,
+        weights=weights,
+    )
+
 
 def select_d_random_columns(A, d, seed):
     """Given a matrix A, get d of its columns randomly
