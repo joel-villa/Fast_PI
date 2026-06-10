@@ -432,6 +432,10 @@ def p_reduce_A(A, p, seed, type, gamma):
     """
     _, n = A.shape
 
+    if (p == 0):
+        # Not reducing A
+        return A
+
     d = percent_reduce(n=n, p=p)
     
     return reduce_A(A=A, d=d, seed=seed, type=type, gamma=gamma)
