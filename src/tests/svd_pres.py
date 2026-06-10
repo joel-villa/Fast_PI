@@ -46,8 +46,10 @@ def eig_pres(A_tilde, u0, u_star, k, seed):
     # Error relative to the magnitude of the solution
     relative_error = eig_perturbance / norm_u
 
-    if relative_error.shape() != k:
-        raise ValueError(f"{relative_error.shape()} != {k} = k")
+    relative_error = relative_error.flatten()
+
+    if relative_error.shape[0] != k:
+        raise ValueError(f"{relative_error.shape} != {k} = k")
     
     return relative_error
 
@@ -65,9 +67,12 @@ def subset_p(A, u_0, u_star, k, seed, ps, type, gamma):
         gamma: gamma parameter for the gamma-ridge leverage score
     Return:
         xs: an array of reduction percentages (ps)
-        ys: a 2d array of relative error in top k left singular vectors
+        ys: a 2d array of relative error in top k left singular vectors 
+            (each column represents a distinct k-value)
     """
-    ys = np.zeros_like(ps)
+    ys_shape = (ps.shape[0], k)
+    ys = np.zeros(ys_shape)
+
     for i, p in enumerate(ps):
         A_reduced = p_reduce_A(
             A=A, 
@@ -76,12 +81,14 @@ def subset_p(A, u_0, u_star, k, seed, ps, type, gamma):
             type=type,
             gamma=gamma,
         )
-        ys[i] = eig_pres(
+        ys_i = eig_pres(
             A_tilde=A_reduced,
             u0=u_0,
             u_star=u_star,
             k=k,
             seed=seed,
         )
+        # print(f"type(ys_i): {type(ys_i)}, type(ys): {type(ys)}")
+        ys[i] = ys_i
     
     return ps, ys
