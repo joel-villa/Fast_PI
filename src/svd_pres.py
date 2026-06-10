@@ -28,34 +28,35 @@ def init(mat_name):
 
 if __name__ == '__main__':
     seed = 10
-    k = 3
+    k = 5
     sub_types = (
-        "random", 
-        "1-norm", 
-        "2-norm", 
-        "nystrom",
+        # "random", 
+        # "1-norm", 
+        # "2-norm", 
+        "scale",
+        # "nystrom",
     )
-    ps = range(0, 100, 10)
+    ps = np.arange(0, 100, 10)
     gamma = 0.9
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
-        # "bcsstk07", 
-        # "bcsstk08", 
-        # "bcsstk19", 
-        # "bcsstm07", 
-        # "bcspwr06",
-        # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "bcsstk07", 
+        "bcsstk08", 
+        "bcsstk19", 
+        "bcsstm07", 
+        "bcspwr06",
+        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
         plotter.init_plot(
-            title=None, 
+            title=mat_name, 
             x_label="ps",
-            y_label=None, 
+            y_label=r"$\frac{|v - v^*|_2}{|v^*|_2}$", 
             save_name=f"{mat_name}_svd_pres",
             grid_on=True,
         ) 
@@ -73,6 +74,8 @@ if __name__ == '__main__':
             rng=seed,
         )
 
+        sub_i = 0
+
         xs, ys = subset_p(
             A=A, 
             u_0=u0, 
@@ -80,12 +83,12 @@ if __name__ == '__main__':
             k=k, 
             seed=seed, 
             ps=ps, 
-            type=sub_types[0], 
+            type=sub_types[sub_i], 
             gamma=gamma,
         )
 
-        for i in range(ys.shape[0]):
-            plotter.add_to_plot(xs, ys[i], label=f"{i}")
+        for i in range(ys.shape[1]):
+            plotter.add_to_plot(xs, ys[:, i], label=f"k = {i + 1} ({sub_types[sub_i]})")
 
         plotter.finish()
 
