@@ -243,6 +243,7 @@ def two_norm_scale(A, d, seed):
 
     # Only those selected columns
     scales = scales[cols]
+    #TODO: necessitates some additional scaling based on reduction amount
 
     # Loop through the columns of C, and scale them by the associated ammount
     for col in range(C.shape[1]):
