@@ -6,6 +6,7 @@ import numpy as np
 from scipy import linalg
 
 from .scikit_jl import percent_reduce
+from .sparse_rows import two_norm
 
 def get_subset(A, cols):
     """Given a matrix A, get the columns specified by cols
@@ -195,7 +196,7 @@ def two_norm_select(A, d, seed):
 def two_norm_scale(A, d, seed):
     """ A selection which involves selecting and scaling the i'th column 
     with probability p_i^2, where p_i = ||A^(i)||^2 / ||A||_F^2
-    
+
     Args: 
         A: a matrix (mxn)
         d: the number of columns to get
@@ -387,6 +388,9 @@ def get_reduce_funct(type):
             return two_norm_select
         case "scale":
             return two_norm_scale
+        case "row":
+            # The row-wise 'reduction' proven to have some nice qualities
+            return two_norm 
         case _:
             raise TypeError(f"Invalid sampling type: {type}")
         
