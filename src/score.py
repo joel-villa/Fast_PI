@@ -302,7 +302,8 @@ if __name__ == '__main__':
         # "2-norm", 
         # "nystrom",
         "scale",
-        "row",
+        # "row",
+        "row_choice",
     ) 
     
     mats = [

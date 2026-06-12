@@ -6,7 +6,7 @@ import numpy as np
 from scipy import linalg
 
 from .scikit_jl import percent_reduce
-from .sparse_rows import two_norm
+from . import sparse_rows as rows
 
 def get_subset(A, cols):
     """Given a matrix A, get the columns specified by cols
@@ -390,7 +390,10 @@ def get_reduce_funct(type):
             return two_norm_scale
         case "row":
             # The row-wise 'reduction' proven to have some nice qualities
-            return two_norm 
+            return rows.two_norm 
+        case "row_choice":
+            # Doing row-wise in a way that hasn't been proven correct
+            return rows.two_norm_choice
         case _:
             raise TypeError(f"Invalid sampling type: {type}")
         
