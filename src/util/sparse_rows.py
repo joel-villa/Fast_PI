@@ -153,4 +153,7 @@ def two_norm_choice(A, d, seed):
 
     return A_tilde
 
+# TODO: 1-norm? 
 # TODO: row reduction, rather than keeping those zero rows
+# TODO: maybe I'm testing the wrong thing (xA rather than Ax) in terms of vector
+#       scores
