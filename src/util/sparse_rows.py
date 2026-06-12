@@ -6,7 +6,10 @@ The idea: turn those ROWS with low 2-norm to zero with higher probability
 """
 
 import numpy as np
+
 from scipy.sparse.linalg import norm
+
+from . import subset as util
 
 def two_norm(A, d, seed):
     """ A selection which involves keeping and scaling the i'th row 
@@ -78,6 +81,64 @@ def two_norm(A, d, seed):
         
         # Update row_prev
         row_prev = row_curr
+    
+    # Update A to no longer store those new zero rows in memory
+    A_tilde.eliminate_zeros()
+
+    return A_tilde
+
+def two_norm_choice(A, d, seed):
+    """ Keep and scale d of those rows of A, using np.choice
+
+    TODO: Problem with this implementation: since using np.choice, don't know the 
+    exact p_i to divide the i'th row of A by..
+
+    Args: 
+        A: a matrix (mxn)
+        d: the number of columns to get
+        seed: for predictable randomness
+
+    RETURN: A w/ d nonzero rows
+    (TODO: prove for selection w/o replacement)
+    """
+
+    # element-wise square of A (NOTE: CSR mats do not support np.square)
+    square_A = A.multiply(A)
+
+    # The square of the two norm of the columns of A: ||A^(i)||^2
+    square_of_norm = np.asarray(np.sum(square_A, axis=0)).ravel() 
+
+    # Probability distribution
+    weights = square_of_norm / np.sum(square_of_norm) 
+
+    # Those rows to keep and scale
+    rows = util.weighted_select(
+        n=A.shape[1], 
+        d=d, 
+        seed=seed, 
+        weights=weights
+    )
+
+    # Those significant weights
+    weights_sig = weights[rows]
+
+    # Scaling distribution
+    scales = np.zeros_like(weights)
+    scales[rows] = 1 / np.sqrt(weights_sig)
+
+    # Copy of A, to update
+    A_tilde = A.copy()
+
+    # The rows array
+    rows = A.coords[0]
+
+    # Remove or keep and scale the i'th row
+    for i in range(A.nnz):
+        # TODO: could be optimized w/ CSR format
+        row = rows[i]
+
+        # Update A_tilde
+        A_tilde.data[i] = A.data[i] * scales[row]
     
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
