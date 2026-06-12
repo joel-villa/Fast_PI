@@ -35,8 +35,9 @@ if __name__ == '__main__':
         # "random", 
         # "1-norm", 
         # "2-norm", 
-        "scale",
+        # "scale",
         # "nystrom",
+        "row",
     )
     spr_types = (
         # "Generic",
@@ -61,6 +62,7 @@ if __name__ == '__main__':
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
 
     for mat_name in mats:
+        # TODO: fix labeling, allow for looping through hyper-params
         plotter.init_plot(
             title=mat_name, 
             x_label="ps",
