@@ -40,7 +40,7 @@ def two_norm(A, d, seed):
     probabilites = root_d * row_norms / norm(A, ord="fro")
 
     # The amount to scale up each row
-    scales = np.sqrt(probabilites)
+    scales = 1 / np.sqrt(probabilites)
 
     # Random Number Generator
     rng = np.random.default_rng(seed=seed)
