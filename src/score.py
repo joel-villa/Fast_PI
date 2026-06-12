@@ -299,9 +299,10 @@ if __name__ == '__main__':
     sample_types = (
         # "random", 
         # "1-norm", 
-        "2-norm", 
+        # "2-norm", 
         # "nystrom",
         "scale",
+        "row",
     ) 
     
     mats = [
