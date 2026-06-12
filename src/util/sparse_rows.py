@@ -108,6 +108,12 @@ def two_norm_choice(A, d, seed):
     # The square of the two norm of the columns of A: ||A^(i)||^2
     square_of_norm = np.asarray(np.sum(square_A, axis=0)).ravel() 
 
+    # # The fourth power of the two norm of the columns of A: ||A^(i)||^4
+    # fourth_of_norm = np.square(square_of_norm) 
+
+    # # Probability distribution
+    # weights = fourth_of_norm / np.sum(fourth_of_norm) 
+
     # Probability distribution
     weights = square_of_norm / np.sum(square_of_norm) 
 
@@ -142,5 +148,9 @@ def two_norm_choice(A, d, seed):
     
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
+     
+    print(A.nnz - A_tilde.nnz)
 
     return A_tilde
+
+# TODO: row reduction, rather than keeping those zero rows
