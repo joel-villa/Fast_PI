@@ -16,7 +16,7 @@ def two_norm(A, d, seed):
     multiplication in expectation
 
     PF:
-        E[||\tilde Ax||^2] = E[\langle \tilde Ax, \tilde Ax \rangle]
+        E[||\tilde Ax||^2] = E[ \tilde Ax dot \tilde Ax ]
                            = E[(\tilde Ax)^T (\tilde Ax)]
                            = E[x^T \tilde A^T \tilde A x]
                            = x^T E[\tilde A^T \tilde A] x
@@ -28,7 +28,7 @@ def two_norm(A, d, seed):
         d: the expected number of rows to keep
         seed: for predictable randomness
 
-    RETURN: None (in place)
+    RETURN: A w/ d nonzero rows in expectation
     """
     root_d = np.sqrt(d)
 
@@ -45,12 +45,21 @@ def two_norm(A, d, seed):
     # Random Number Generator
     rng = np.random.default_rng(seed=seed)
 
-    # Remove or keep and scale the i'th row
+    # Some helper variables
     row_prev = -1
     ith_prob = 0
 
+    # The new matrix
+    A_tilde = A.copy()
+
+    # The rows array
+    rows = A.coords[0]
+
+    # Remove or keep and scale the i'th row
     for i in range(A.nnz):
-        (row_curr, col) = A.coords[i]
+        # TODO: could be optimized w/ CSR format
+        # print(A.coords[i])
+        row_curr = rows[i]
 
         # Probaility to keep this entry
         prob_keep = probabilites[row_curr]
@@ -61,16 +70,16 @@ def two_norm(A, d, seed):
         
         if ith_prob < prob_keep:
             # Keep this value and scale it up the associated ammount
-            A.data[i] = A.data[i] * scales[row_curr]
+            A_tilde.data[i] = A.data[i] * scales[row_curr]
 
         else:
             # Turn this value to zero
-            A.data[i] = 0
+            A_tilde.data[i] = 0
         
         # Update row_prev
         row_prev = row_curr
     
     # Update A to no longer store those new zero rows in memory
-    A.eliminate_zeros()
+    A_tilde.eliminate_zeros()
 
-    return None
+    return A_tilde
