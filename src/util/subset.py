@@ -195,13 +195,6 @@ def two_norm_select(A, d, seed):
 def two_norm_scale(A, d, seed):
     """ A selection which involves selecting and scaling the i'th column 
     with probability p_i^2, where p_i = ||A^(i)||^2 / ||A||_F^2
-    The following has been proven to preserve Matrix Vector multiplication in
-    expectation
-
-    PF:
-        E(|Cx|^2) = E(sum_i(x_i^2 * |C^(i)|^2))
-                  = sum_i(x_i^2 * |A^(i)|^2)
-                  = |Ax|^2
     
     Args: 
         A: a matrix (mxn)
