@@ -6,6 +6,21 @@ import numpy as np
 from scipy.linalg import norm # 2-norm by default
 from scipy.sparse import issparse
 
+def nnz(A):
+    """ Get the number of nonzeros in the matrix A
+
+    Args:
+        A: a matrix, can be sparse or dense
+    Return: Number of nonzeroes in A
+    """
+    m, n = A.shape
+    if issparse(A):
+        # Sparse matrix, matrix vector mults are dependent on NNZs
+        return A.nnz
+    else: 
+        # Dense matrix, matrix vector mults dependent on matrix dimensions 
+        return m * n
+
 def s_from_u(A, u):
     """Get the 'score' of the left vector of A
 
@@ -42,8 +57,10 @@ def count_mults_v_from_u(A, u):
           u: top left eigenvector of A (n-dimensional)
     RETURN: number of scalar mults required for v_from_u()
     """
-    n, m = A.shape
-    cost_ATu = m * n * 1 # A.T is mxn and u
+
+    # Cost of A.T @ u (ignoring transpose cost) is the number of nonzeros in A
+    cost_ATu = nnz(A)
+    
     return cost_ATu
     
 def topsing(v0, A, maxiter=10):
@@ -82,14 +99,7 @@ def count_mults(v0, A, maxiter=10):
     n0 = v0.shape[0]
     m, n = A.shape
 
-    A_nnz = 0
-    
-    if issparse(A):
-        # Sparse matrix, matrix vector mults are dependent on NNZs
-        A_nnz = A.nnz
-    else: 
-        # Dense matrix, matrix vector mults dependent on matrix dimensions 
-        A_nnz = m * n
+    A_nnz = nnz(A)
 
     if (n0 != n):
         raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}")
@@ -156,17 +166,20 @@ def count_mults_lazy(v0, A, P, maxiter=10):
     if (n0 != n) or (d0 != d):
         raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}, P {P.shape}")
     
-    # Cost of P @ x is nxdx1 scalar mults (Assuming P non-sparse)
-    cost_Px = n * d * 1
+    A_nnz = nnz(A)
+    P_nnz = nnz(P)
+    
+    # Cost of P @ x is the number of nonzeros in P
+    cost_Px = P_nnz
 
     # Cost of A @ (P @ x) is A.nnz (b/c A is sparse)
-    cost_APx = A.nnz
+    cost_APx = A_nnz
 
     # Ignoring cost of transposing, Cost of A.T @ (A @ P @ x) is also A.nnz
-    cost_ATAPx = A.nnz
+    cost_ATAPx = A_nnz
 
-    # Cost of P @ x is dxnx1 scalar mults (Assuming P non-sparse)
-    cost_PTATAPx = d * n * 1
+    # Cost of P @ x is the number of nonzeros in P
+    cost_PTATAPx = P_nnz
 
     # Number of scalar mults for a single iteration
     single_iter_cost = cost_Px + cost_APx + cost_ATAPx + cost_PTATAPx
