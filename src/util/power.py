@@ -133,8 +133,8 @@ def count_mults_lazy(v0, A, P, maxiter=10):
     
     Args: 
         v0: some vector with same dimension as A's top right eigenvectors (dx1)
-        A: the orignal matrix (mxn)
-        P: the projection matrix (nxd)
+        A: the orignal matrix (mxn) - SPARSE MATRIX
+        P: the projection matrix (nxd) - COULD BE SPARSE (most likely not)
         maxiter: number of iterations of Power Iteration
 
     RETURN: total number of scalar mults
@@ -145,13 +145,17 @@ def count_mults_lazy(v0, A, P, maxiter=10):
 
     if (n0 != n) or (d0 != d):
         raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}, P {P.shape}")
-
+    
+    # Cost of P @ x is nxdx1 scalar mults (Assuming P non-sparse)
     cost_Px = n * d * 1
 
-    cost_APx = m * n * 1
+    # Cost of A @ (P @ x) is A.nnz (b/c A is sparse)
+    cost_APx = A.nnz
 
-    cost_ATAPx = n * m * 1
+    # Ignoring cost of transposing, Cost of A.T @ (A @ P @ x) is also A.nnz
+    cost_ATAPx = A.nnz
 
+    # Cost of P @ x is dxnx1 scalar mults (Assuming P non-sparse)
     cost_PTATAPx = d * n * 1
 
     # Number of scalar mults for a single iteration
