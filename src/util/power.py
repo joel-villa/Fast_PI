@@ -4,6 +4,7 @@ For Power Iteration helper functions
 
 import numpy as np
 from scipy.linalg import norm # 2-norm by default
+from scipy.sparse import issparse
 
 def s_from_u(A, u):
     """Get the 'score' of the left vector of A
@@ -81,14 +82,23 @@ def count_mults(v0, A, maxiter=10):
     n0 = v0.shape[0]
     m, n = A.shape
 
+    A_nnz = 0
+    
+    if issparse(A):
+        # Sparse matrix, matrix vector mults are dependent on NNZs
+        A_nnz = A.nnz
+    else: 
+        # Dense matrix, matrix vector mults dependent on matrix dimensions 
+        A_nnz = m * n
+
     if (n0 != n):
         raise ValueError(f"Dimension mismatch: v0 {v0.shape}, A {A.shape}")
 
-    # Cost of A @ x: A is (mxn), x is (nx1)
-    cost_Ax = m * n * 1
+    # Cost of A @ x is the number of nnzs in A
+    cost_Ax = A_nnz
 
-    # Cost of A.T @ (A @ x): A.T is nxm and A @ x is mx1
-    cost_ATAx = n * m * 1
+    # Cost of A.T @ (A @ x) is the number of nnzs in A
+    cost_ATAx = A_nnz
 
     # Number of scalar mults for a single iteration
     scalar_mults = cost_Ax + cost_ATAx
