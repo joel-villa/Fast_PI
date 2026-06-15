@@ -223,29 +223,31 @@ def col_sample_dec(funct_args, kwargs, types):
     """
     min_iter = 4
 
-    # init_ps = (99, 98, 96, 92, 84, 68, 36) 
+    # init_ps = (99.5, 99, 98, 96, 92, 84, 68, 36) 
     # init_ps = (98, 97,96, 95, 94) 
     # init_ps = (97, ) # TODO: 97 found imeprically (how to generalize?)
     # init_ps = (96, ) # TODO: 96 found imeprically (how to generalize?) 494_bus
 
-    # dec_functs = (lambda p: p - 1, lambda p: p - 2, lambda p: p - 4,lambda p: p - 8, lambda p: p - 16, lambda p: p - 32)
-    # dec_functs = (lambda p: p - 4,lambda p: p // 2, lambda p: p // 1.5, lambda p: p // 1.25, lambda p: p // 1.125, lambda p: p // 1.0625, lambda p: p // 1.03125, lambda p: p // 1.015625,) 
+    # dec_functs = (lambda p: p - 1, lambda p: p - 2, lambda p: p - 4,lambda p: p - 8, lambda p: p - 16, lambda p: p - 32, lambda p: p - 64, lambda p: p - 100)
+    # dec_functs = (lambda p: p - 16, lambda p: p // 4, lambda p: p // 2, lambda p: p // 1.5, lambda p: p // 1.25, lambda p: p // 1.125, lambda p: p // 1.0625, lambda p: p // 1.03125, lambda p: p // 1.015625,) 
     # dec_functs = (lambda p: p // 1.03125, lambda p: p - 2, lambda p: math.log2(p), lambda p: math.log(p), lambda p: math.log10(p)) 
     # dec_functs = (lambda p: p // 1.25, lambda p: p - 2) # TODO: found imeprically (how to generalize?)
     # dec_functs = (lambda p: p // 1.25,) # TODO: found imeprically (how to generalize?)
     # dec_functs = (lambda p: p - 4, lambda p: p // 1.03125) # TODO: found imeprically (how to generalize?) 494_bus
     # dec_functs = (lambda p: p // 1.03125,) # TODO: found imeprically (how to generalize?) 494_bus
    
-    # swap_tols = (0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5)
+    # swap_tols = (0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1,)
     # swap_tols = (0.0008, 0.0009, 0.0010, 0.0011, 0.0012,)
     # swap_tols = (0.001,) #TODO: found imperically
     # swap_tols = (0.005,) #TODO: found imperically 494_bus    
 
     #BEST PERFORMING PARAMETERS FOUND EMPIRICALLY:
-    init_ps = (96, )
-    init_ps = (99, ) #BETTER FOR SCALING ALG? 
-    dec_functs = (lambda p: p // 1.25,)
-    swap_tols = (0.005,)
+    # init_ps = (96, ) # BETTER FOR NON-SCALING
+    init_ps = (99, ) #BETTER FOR SCALING ALGORITHM
+    dec_functs = (lambda p: p // 1.25,) #Better for col-sampling
+    dec_functs = (lambda p: p // 2,) # Better for row-sampling
+    swap_tols = (0.005,) #BETTER FOR COL SAMPLING
+    swap_tols = (0.05,) #BETTER FOR ROW SAMPLING
 
     funct_args = funct_args | {
         "min_iter": min_iter, 
@@ -290,8 +292,8 @@ if __name__ == '__main__':
     seed = 10
     max_iter = 128
     num_avg = 5
-    ps = (25, 50, 75, 99)
-    jl_ps = (97, None)
+    ps = (1, 50, 99)
+    jl_ps = (97, 50, None)
     tol = 1e-5
     epsilon = 0.5
     # epsilon = 0.24
@@ -313,8 +315,8 @@ if __name__ == '__main__':
         "bcsstk19", 
         "bcsstm07", 
         "bcspwr06",
-        # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
