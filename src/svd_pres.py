@@ -37,8 +37,8 @@ if __name__ == '__main__':
         # "2-norm", 
         # "scale",
         # "nystrom",
-        # "row",
-        "row_choice",
+        "row",
+        # "row_choice",
     )
     spr_types = (
         # "Generic",
@@ -51,13 +51,14 @@ if __name__ == '__main__':
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
-        "bcsstk07", 
+        # "bp_0",
+        # "bcsstk07", 
         "bcsstk08", 
-        "bcsstk19", 
-        "bcsstm07", 
-        "bcspwr06",
-        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        # "bcsstk19", 
+        # "bcsstm07", 
+        # "bcspwr06",
+        # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
