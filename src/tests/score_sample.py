@@ -180,8 +180,11 @@ def col_sample_dec_p(A, u_0, s_star, max_iter, tol, seed, p0, type, dec_funct, s
                     gamma=gamma,
                 )  
                 p = dec_funct(p)
-            v =  pwr.v_from_u(A_tilde, u)
-            xs[i] += pwr.count_mults_v_from_u(A=A_tilde, u=u)
+            
+            if type.lower() not in ("row", "row_choice"):
+                # Changing dimensions -> must recompute v w/ respect to higher dim
+                v =  pwr.v_from_u(A_tilde, u)
+                xs[i] += pwr.count_mults_v_from_u(A=A_tilde, u=u)
 
         # Save current score as previous
         s_prev = s_curr
