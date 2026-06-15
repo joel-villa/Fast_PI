@@ -394,6 +394,11 @@ def get_reduce_funct(type):
         case "row_choice":
             # Doing row-wise in a way that hasn't been proven correct
             return rows.two_norm_choice
+        case "row_ind":
+            # Independently turning to zero/scaling the entries, in a way which 
+            # may be easier to prove following: https://dl.acm.org/doi/pdf/10.1145/1219092.1219097
+            return rows.ind_sparse
+        
         case _:
             raise TypeError(f"Invalid sampling type: {type}")
         

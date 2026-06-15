@@ -32,6 +32,8 @@ def two_norm(A, d, seed):
         seed: for predictable randomness
 
     RETURN: A w/ d nonzero rows in expectation
+    TODO: version which each entry is independent, then could use the article: 
+        The eigenvalues of random symmetric matrices
     """
     root_d = np.sqrt(d)
 
@@ -157,3 +159,60 @@ def two_norm_choice(A, d, seed):
 # TODO: row reduction, rather than keeping those zero rows
 # TODO: maybe I'm testing the wrong thing (xA rather than Ax) in terms of vector
 #       scores
+
+def ind_sparse(A, d, seed):
+    """ A selection which involves keeping and scaling the j'th element in the 
+    i'th row with probability p_i^2, where p_i = sqrt(s) * ||A^(i)|| / ||A||_F
+    
+    Args: 
+        A: a sparse matrix (mxn) in COO format #TODO: could be optimized for CSR format
+        d: the expected number of rows to keep
+        seed: for predictable randomness
+
+    RETURN: A w/ d nonzero rows in expectation
+    TODO: version which each entry is independent, then could use the articles: 
+        - The eigenvalues of random symmetric matrices
+        - https://dl.acm.org/doi/pdf/10.1145/1219092.1219097
+    """
+    root_d = np.sqrt(d)
+
+    # The 2-norm of each row
+    row_norms = norm(A, ord=2, axis=1)
+
+    # The probability of keeping each row 
+    # (NOTE: numpy `*` operator and `/` are element-wise)
+    probabilites = root_d * row_norms / norm(A, ord="fro")
+
+    # The amount to scale up each row
+    scales = 1 / np.sqrt(probabilites)
+
+    # Random Number Generator
+    rng = np.random.default_rng(seed=seed)
+
+    # The new matrix
+    A_tilde = A.copy()
+
+    # The rows array
+    rows = A.coords[0]
+
+    # Remove or keep and scale the i'th row
+    for i in range(A.nnz):
+        # TODO: could be optimized w/ CSR format
+        # print(A.coords[i])
+        row = rows[i]
+
+        # Probaility to keep this entry
+        prob_keep = probabilites[row]
+        
+        if rng.random() < prob_keep:
+            # Keep this value and scale it up the associated ammount
+            A_tilde.data[i] = A.data[i] * scales[row]
+
+        else:
+            # Turn this value to zero
+            A_tilde.data[i] = 0
+    
+    # Update A to no longer store those new zero rows in memory
+    A_tilde.eliminate_zeros()
+
+    return A_tilde
