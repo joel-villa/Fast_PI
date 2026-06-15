@@ -39,6 +39,7 @@ if __name__ == '__main__':
         # "nystrom",
         "row",
         # "row_choice",
+        "row_ind",
     )
     spr_types = (
         # "Generic",
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
-        # "bp_0",
+        "bp_0",
         # "bcsstk07", 
         "bcsstk08", 
         # "bcsstk19", 
