@@ -8,6 +8,7 @@ The idea: turn those ROWS with low 2-norm to zero with higher probability
 import numpy as np
 
 from scipy.sparse.linalg import norm
+from scipy.sparse.coo_matrix import tocsr
 
 from . import subset as util
 
@@ -35,14 +36,18 @@ def two_norm(A, d, seed):
     TODO: version which each entry is independent, then could use the article: 
         The eigenvalues of random symmetric matrices
     """
+    #TODO, must use CSR to prevent independence within rows
     root_d = np.sqrt(d)
 
     # The 2-norm of each row
     row_norms = norm(A, ord=2, axis=1)
 
+    fro_norm = np.sqrt(np.sum(row_norms * row_norms))
+
     # The probability of keeping each row 
     # (NOTE: numpy `*` operator and `/` are element-wise)
-    probabilites = root_d * row_norms / norm(A, ord="fro")
+    # probabilites = root_d * row_norms / norm(A, ord="fro")
+    probabilites = root_d * row_norms / fro_norm
 
     # The amount to scale up each row
     scales = 1 / np.sqrt(probabilites)
@@ -60,6 +65,8 @@ def two_norm(A, d, seed):
     # The rows array
     rows = A.coords[0]
 
+    sparsed_rows = 0
+
     # Remove or keep and scale the i'th row
     for i in range(A.nnz):
         # TODO: could be optimized w/ CSR format
@@ -72,6 +79,8 @@ def two_norm(A, d, seed):
         if row_curr != row_prev:
             # Update the probability for this row
             ith_prob = rng.random()
+            if ith_prob < prob_keep:
+                sparsed_rows += 1
         
         if ith_prob < prob_keep:
             # Keep this value and scale it up the associated ammount
@@ -86,6 +95,8 @@ def two_norm(A, d, seed):
     
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
+
+    print(f"d = {d}, sparsed_rows: {sparsed_rows}, new zeros: {A.nnz - A_tilde.nnz}")
 
     return A_tilde
 
@@ -151,7 +162,7 @@ def two_norm_choice(A, d, seed):
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
      
-    print(A.nnz - A_tilde.nnz)
+    print(f"d = {d}, new zeros: {A.nnz - A_tilde.nnz}")
 
     return A_tilde
 
@@ -214,5 +225,7 @@ def ind_sparse(A, d, seed):
     
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
+
+    print(f"d = {d} new zeros: {A.nnz - A_tilde.nnz}")
 
     return A_tilde
