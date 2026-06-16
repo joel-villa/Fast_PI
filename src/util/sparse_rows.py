@@ -32,8 +32,8 @@ def two_norm(A, d, seed):
         seed: for predictable randomness
 
     RETURN: A w/ d nonzero rows in expectation
-    TODO: version which each entry is independent, then could use the article: 
-        The eigenvalues of random symmetric matrices
+    BUG: p_i^2 exceeds 1, meaning some rows have all the probability density, 
+         others have little -> behaves poorly
     """
     #TODO, must use CSR to prevent independence within rows
     root_d = np.sqrt(d)
