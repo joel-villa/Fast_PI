@@ -303,8 +303,8 @@ if __name__ == '__main__':
         # "1-norm", 
         # "2-norm", 
         # "nystrom",
-        "scale",
-        # "row",
+        # "scale",
+        "row",
         # "row_choice",
         "row_ind",
     ) 
