@@ -149,8 +149,8 @@ def two_norm_choice(A, d, seed):
     # element-wise square of A (NOTE: CSR mats do not support np.square)
     square_A = A.multiply(A)
 
-    # The square of the two norm of the columns of A: ||A^(i)||^2
-    square_of_norm = np.asarray(np.sum(square_A, axis=0)).ravel() 
+    # The square of the two norm of the row of A: ||A^(i)||^2
+    square_of_norm = np.asarray(np.sum(square_A, axis=1)).ravel() 
 
     # # The fourth power of the two norm of the columns of A: ||A^(i)||^4
     # fourth_of_norm = np.square(square_of_norm) 
