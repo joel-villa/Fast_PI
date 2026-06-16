@@ -8,7 +8,6 @@ The idea: turn those ROWS with low 2-norm to zero with higher probability
 import numpy as np
 
 from scipy.sparse.linalg import norm
-from scipy.sparse.coo_matrix import tocsr
 
 from . import subset as util
 
@@ -43,14 +42,17 @@ def two_norm(A, d, seed):
     row_norms = norm(A, ord=2, axis=1)
 
     fro_norm = np.sqrt(np.sum(row_norms * row_norms))
+    fro_norm = norm(A, ord="fro")
 
-    # The probability of keeping each row 
+    # The sqrt of the probabiility of keeping each row
     # (NOTE: numpy `*` operator and `/` are element-wise)
-    # probabilites = root_d * row_norms / norm(A, ord="fro")
     probabilites = root_d * row_norms / fro_norm
 
     # The amount to scale up each row
-    scales = 1 / np.sqrt(probabilites)
+    scales = 1 / probabilites
+
+    # The probability of keeping each row
+    probabilites = probabilites * probabilites
 
     # Random Number Generator
     rng = np.random.default_rng(seed=seed)
@@ -60,45 +62,74 @@ def two_norm(A, d, seed):
     ith_prob = 0
 
     # The new matrix
-    A_tilde = A.copy()
+    A_tilde = A.tocsr(copy=True)
 
     # The rows array
     rows = A.coords[0]
 
-    sparsed_rows = 0
+    kept_rows = 0
+
+    print("rows:", A.shape[0])
+    print("sum p_i^2 =", probabilites.sum())
 
     # Remove or keep and scale the i'th row
-    for i in range(A.nnz):
-        # TODO: could be optimized w/ CSR format
-        # print(A.coords[i])
-        row_curr = rows[i]
+    for row in range(A_tilde.shape[0]):
+        # Where this row's data starts and ends
+        start = A_tilde.indptr[row]
+        end = A_tilde.indptr[row + 1]
 
-        # Probaility to keep this entry
-        prob_keep = probabilites[row_curr]
+        # Probability to keep and scale this row
+        prob_keep = probabilites[row]
 
-        if row_curr != row_prev:
-            # Update the probability for this row
-            ith_prob = rng.random()
-            if ith_prob < prob_keep:
-                sparsed_rows += 1
-        
-        if ith_prob < prob_keep:
-            # Keep this value and scale it up the associated ammount
-            A_tilde.data[i] = A.data[i] * scales[row_curr]
+        keep = rng.random() < prob_keep
 
+        row_data = A_tilde.data[start:end]
+
+        if keep:
+            kept_rows += 1
+            A_tilde.data[start:end] = row_data * scales[row]
         else:
-            # Turn this value to zero
-            A_tilde.data[i] = 0
-        
-        # Update row_prev
-        row_prev = row_curr
+            A_tilde.data[start:end] = np.zeros_like(row_data)
     
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
 
-    print(f"d = {d}, sparsed_rows: {sparsed_rows}, new zeros: {A.nnz - A_tilde.nnz}")
+    print(f"d = {d}, kept_rows: {kept_rows}, new zeros: {A.nnz - A_tilde.nnz}, A.nnz = {A.nnz}, A_tilde.nnz = {A_tilde.nnz}")
 
     return A_tilde
+
+    # # Remove or keep and scale the i'th row
+    # for i in range(A.nnz):
+    #     # TODO: could be optimized w/ CSR format
+    #     # print(A.coords[i])
+    #     row_curr = rows[i]
+
+    #     # Probaility to keep this entry
+    #     prob_keep = probabilites[row_curr]
+
+    #     if row_curr != row_prev:
+    #         # Update the probability for this row
+    #         ith_prob = rng.random()
+    #         if ith_prob < prob_keep:
+    #             sparsed_rows += 1
+        
+    #     if ith_prob < prob_keep:
+    #         # Keep this value and scale it up the associated ammount
+    #         A_tilde.data[i] = A.data[i] * scales[row_curr]
+
+    #     else:
+    #         # Turn this value to zero
+    #         A_tilde.data[i] = 0
+        
+    #     # Update row_prev
+    #     row_prev = row_curr
+    
+    # # Update A to no longer store those new zero rows in memory
+    # A_tilde.eliminate_zeros()
+
+    # print(f"d = {d}, sparsed_rows: {sparsed_rows}, new zeros: {A.nnz - A_tilde.nnz}")
+
+    # return A_tilde
 
 def two_norm_choice(A, d, seed):
     """ Keep and scale d of those rows of A, using np.choice
