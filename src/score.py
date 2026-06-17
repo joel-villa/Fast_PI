@@ -302,11 +302,14 @@ if __name__ == '__main__':
         # "random", 
         # "1-norm", 
         # "2-norm", 
+        # "2-norm2", 
         # "nystrom",
         # "scale",
-        "row",
+        # "row",
         # "row_choice",
         "row_ind",
+        # "const-dim",
+        "det-2-norm",
     ) 
     
     mats = [

@@ -35,12 +35,16 @@ if __name__ == '__main__':
         # "random", 
         # "1-norm", 
         # "2-norm", 
-        # "scale",
+        # "2-norm2", 
         # "nystrom",
-        "row",
+        # "scale",
+        # "row",
         # "row_choice",
         "row_ind",
-    )
+        # "const-dim",
+        "det-2-norm",
+    ) 
+
     spr_types = (
         # "Generic",
         "SD",
@@ -52,8 +56,8 @@ if __name__ == '__main__':
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
-        "bp_0",
-        # "bcsstk07", 
+        # "bp_0",
+        "bcsstk07", 
         "bcsstk08", 
         # "bcsstk19", 
         # "bcsstm07", 
