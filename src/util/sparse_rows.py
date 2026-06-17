@@ -225,8 +225,13 @@ def ind_sparse(A, d, seed):
     # (NOTE: numpy `*` operator and `/` are element-wise)
     probabilites = root_d * row_norms / norm(A, ord="fro")
 
+    probabilites = np.minimum(probabilites, 1)
+
     # The amount to scale up each row
-    scales = 1 / np.sqrt(probabilites)
+    scales = 1 / probabilites
+
+    # Square the probabilities
+    probabilites = probabilites * probabilites
 
     # Random Number Generator
     rng = np.random.default_rng(seed=seed)
