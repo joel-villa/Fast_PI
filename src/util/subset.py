@@ -66,7 +66,7 @@ def deterministic_weighted_select(d, weights):
     indices_sorted = np.argsort(weights)
 
     # Those d columns with the highest weight
-    top_d_cols = indices_sorted[:d]
+    top_d_cols = indices_sorted[-d:]
 
     return top_d_cols
 
@@ -193,6 +193,51 @@ def two_norm_select(A, d, seed):
 
     return get_subset(A=A, cols=cols)
 
+def two_norm_select_v2(A, d, seed):
+    """Given a matrix A, get d of its columns randomly (putting more weight on 
+    columns with higher 2-norm)
+
+    Based on Theorem 1.1 in 'Matrix Approximation and Projective Clustering via 
+    Volume Sampling' by Amit Deshpande, Luis Rademacher, Santosh Vempala, 
+    Grant Wang
+
+    See also Theorem 4 in: https://doi.org/10.1137/S0097539704442696
+
+    Args: 
+        A: a matrix (mxn)
+        d: the number of columns to get
+        seed: for predictable randomness
+
+    RETURN: An (nxd) column subset of A
+    """
+    # element-wise square of A (NOTE: CSR mats do not support np.square)
+    square_A = A.multiply(A) 
+    square_of_norm = np.asarray(np.sum(square_A, axis=0)).ravel() # 2-norm of each column, squared
+
+    weights = square_of_norm * square_of_norm # 2-norm of each column, squared
+
+    # weights = weights * weights # square the 2-norm of the columns
+    weights = weights / np.sum(weights) # normalize to get probabilities
+
+    cols = weighted_select(
+        n=A.shape[1], 
+        d=d, 
+        seed=seed, 
+        weights=weights
+    )
+
+    return get_subset(A=A, cols=cols)
+
+def determinstic_2norm(A, d, seed):
+    """"""
+    square_A = A.multiply(A) 
+    weights = np.asarray(np.sum(square_A, axis=0)).ravel() # 2-norm of each column, squared
+
+    cols = deterministic_weighted_select(d=d, weights=weights)
+
+    return get_subset(A=A, cols=cols)
+
+
 def two_norm_scale(A, d, seed):
     """ A selection which involves selecting and scaling the i'th column 
     with probability p_i^2, where p_i = ||A^(i)||^2 / ||A||_F^2
@@ -246,9 +291,75 @@ def two_norm_scale(A, d, seed):
         end = C.indptr[col + 1]
 
         values = C.data[start:end]
-        values = values * const_fact
+        C.data[start:end] = values * const_fact
         
     return C
+
+def two_norm_keep_dimensions(A, d, seed):
+    """ Keep and scale d of those cols of A, using np.choice
+
+    TODO: Problem with this implementation: since using np.choice, don't know the 
+    exact p_i to divide the i'th row of A by..
+
+    Args: 
+        A: a matrix (mxn)
+        d: the number of columns to get
+        seed: for predictable randomness
+
+    RETURN: A w/ d nonzero cols
+    (TODO: prove for selection w/o replacement)
+    """
+
+    # element-wise square of A (NOTE: CSR mats do not support np.square)
+    square_A = A.multiply(A)
+
+    # The square of the two norm of the columns of A: ||A^(i)||^2
+    square_of_norm = np.asarray(np.sum(square_A, axis=0)).ravel() 
+
+    # # The fourth power of the two norm of the columns of A: ||A^(i)||^4
+    # fourth_of_norm = np.square(square_of_norm) 
+
+    # # Probability distribution
+    # weights = fourth_of_norm / np.sum(fourth_of_norm) 
+
+    # Probability distribution
+    weights = square_of_norm / np.sum(square_of_norm) 
+
+    # Those cols to keep and scale
+    cols = weighted_select(
+        n=A.shape[1], 
+        d=d, 
+        seed=seed, 
+        weights=weights
+    )
+
+    # Those significant weights
+    weights_sig = weights[cols]
+
+    # Scaling distribution
+    scales = np.zeros_like(weights)
+    scales[cols] = 1 / np.sqrt(weights_sig)
+
+    # Copy of A, to update
+    A_tilde = A.copy()
+
+    # The cols array
+    cols = A.coords[1]
+
+    # Remove or keep and scale the i'th col
+    for i in range(A.nnz):
+        # TODO: could be optimized w/ CSR format
+        col = cols[i]
+
+        # Update A_tilde
+        A_tilde.data[i] = A.data[i] * scales[col]
+    
+    # Update A to no longer store those new zero cols in memory
+    A_tilde.eliminate_zeros()
+     
+    print(f"d = {d}, new zeros: {A.nnz - A_tilde.nnz}")
+
+    return A_tilde
 
 def nystrom_select(A, d, seed, gamma):
     """ Select those columns with a high gamma-ridge leverage score, as defined 
@@ -386,8 +497,14 @@ def get_reduce_funct(type):
             return  one_norm_select
         case "2-norm":
             return two_norm_select
+        case "det-2-norm":
+            return determinstic_2norm
+        case "2-norm2":
+            return two_norm_select_v2
         case "scale":
             return two_norm_scale
+        case "const-dim":
+            return two_norm_keep_dimensions
         case "row":
             # The row-wise 'reduction' proven to have some nice qualities
             return rows.two_norm 
