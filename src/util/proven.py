@@ -8,12 +8,10 @@ def two_norm(A, prob_func, seed):
     multiplication in expectation
 
     PF:
-        E[||\tilde Ax||^2] = E[ \tilde Ax dot \tilde Ax ]
-                           = E[(\tilde Ax)^T (\tilde Ax)]
-                           = E[x^T \tilde A^T \tilde A x]
-                           = x^T E[\tilde A^T \tilde A] x
-                           = x^T A^T A x
-                           = ||Ax||^2
+        ||\tilde Ax||^2 = \sum_{i = 1}^n \sum_{j = 1}^n x_i x_j (\tilde A^T \tilde A)_{ij}
+                        = \sum_{i = 1}^n \sum_{j = 1}^n x_i x_j ((A^T A)_{ij} + \sum_{k=1}^n \frac{X_k - p_k^2}{p_k^2}A_{ki}A_{kj})
+                        = \sum_{i = 1}^n \sum_{j = 1}^n x_i x_j (A^TA)_{ij} + \sum_{i = 1}^n \sum_{j = 1}^n \sum_{k=1}^n \frac{X_k - p_k^2}{p_k^2} x_i x_jA_{ki}A_{kj}
+                        = || Ax||^2 + \sum_{i=1}^n \frac{X_i - p_i^2}{p_i^2} (A^{(i)}x)^2
     
     Args: 
         A: a sparse matrix (mxn) in COO format 
