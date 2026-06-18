@@ -211,6 +211,11 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
+# def col_sparse(funct_args, kwargs):
+#     test(
+#         funct=
+#     )
+
 def col_sample_dec(funct_args, kwargs, types):
     """Test column sampling enhancement to power iteration
 
@@ -379,6 +384,9 @@ if __name__ == '__main__':
             kwargs=kwargs,
             types=sample_types,
         )
+
+        # The Proven Boy TODO
+
 
         # COMBINATION TESTS
         # sample_lazy_combo(ps=(30, 50, 70), 
