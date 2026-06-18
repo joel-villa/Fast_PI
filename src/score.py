@@ -305,9 +305,9 @@ if __name__ == '__main__':
         # "2-norm2", 
         # "nystrom",
         # "scale",
-        # "row",
+        "row",
         # "row_choice",
-        "row_ind",
+        # "row_ind",
         # "const-dim",
         "det-2-norm",
     ) 

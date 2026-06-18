@@ -40,7 +40,7 @@ if __name__ == '__main__':
         # "scale",
         # "row",
         # "row_choice",
-        "row_ind",
+        # "row_ind",
         # "const-dim",
         "det-2-norm",
     ) 
@@ -56,12 +56,12 @@ if __name__ == '__main__':
     
     mats = [
         "494_bus", # Invalid for mag-based sparsifification
-        # "bp_0",
+        "bp_0",
         "bcsstk07", 
         "bcsstk08", 
-        # "bcsstk19", 
-        # "bcsstm07", 
-        # "bcspwr06",
+        "bcsstk19", 
+        "bcsstm07", 
+        "bcspwr06",
         # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
         # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
