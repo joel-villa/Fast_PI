@@ -48,6 +48,8 @@ def two_norm(A, d, seed):
     # (NOTE: numpy `*` operator and `/` are element-wise)
     probabilites = root_d * row_norms / fro_norm
 
+    probabilites = np.minimum(probabilites, 1)
+
     # The amount to scale up each row
     scales = 1 / probabilites
 
