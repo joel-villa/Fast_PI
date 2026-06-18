@@ -1,6 +1,6 @@
 import numpy as np
 
-def two_norm(A, prob_func, seed):
+def two_norm(A, scale_func, sf_kwargs, seed):
     """ A selection which involves keeping and scaling the i'th row by a factor
     of p_i, with probability p_i^2, where p_i is a function input by user
 
@@ -15,7 +15,9 @@ def two_norm(A, prob_func, seed):
     
     Args: 
         A: a sparse matrix (mxn) in COO format 
-        prob_func: How to weight the rows
+        scale_func: How to upscale the rows (Note the scale is the sqrt of the 
+                    probability)
+        sf_kwargs: Those arguments to pass to the probability function
         seed: for predictable randomness
 
     RETURN:
@@ -26,23 +28,7 @@ def two_norm(A, prob_func, seed):
     #Reading the info from A, to determine weights of each row
     A = A.tocsr(copy=False)
 
-    # A probability per row
-    probabilities = np.zeros(A.shape[0])
-
-    # Compute p_i per each row
-    for row in range(A.shape[0]):
-        # Where this row's data starts and ends
-        start = A.indptr[row]
-        end = A.indptr[row + 1]
-
-        row_data = A.data[start:end]
-
-        # Probability to keep and scale this row
-        probabilities[row] = prob_func(row_data)
-        
-        pi_squared = probabilities[row] * probabilities[row]
-        if (pi_squared < 0 or pi_squared > 1):
-            raise ValueError(f"pi^2 = {pi_squared}, pi^2 needs to be between 0 and 1 for all i")
+    scales = scale_func(A, **sf_kwargs)
 
     # Random Number Generator
     rng = np.random.default_rng(seed=seed)
@@ -51,8 +37,10 @@ def two_norm(A, prob_func, seed):
     A_tilde = A.copy()
 
     # The scaling factors, and probabilities of keeping each row
-    scales = probabilities
-    probabilities = probabilities * probabilities
+    probabilities = scales * scales
+
+    if (probabilities.max() > 1):
+        raise ValueError(f"probabilities.max() = {probabilities.max()} > 1") 
 
     kept_rows = 0
 
@@ -78,6 +66,6 @@ def two_norm(A, prob_func, seed):
     # Update A to no longer store those new zero rows in memory
     A_tilde.eliminate_zeros()
 
-    print(f"{prob_func.__name__} kept_rows: {kept_rows}, new zeros: {A.nnz - A_tilde.nnz}")
+    print(f"{scale_func.__name__} kept_rows: {kept_rows}, new zeros: {A.nnz - A_tilde.nnz}")
 
     return A_tilde
