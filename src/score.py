@@ -229,9 +229,9 @@ def test_proven(funct_args, kwargs, types):
                     }
         if s_type == "uniform":
             # flip of the coin wether we keep each column
-            test_args["sf_kwargs"] = 0.5
+            test_args["sf_kwargs"] = {"s" : 0.5}
         test(
-            funct=smpl.col_sample_dec_p,
+            funct=tst.test_proven,
             kwargs=test_args,
             **kwargs,
         )
@@ -338,7 +338,7 @@ if __name__ == '__main__':
         # "2-norm2", 
         # "nystrom",
         # "scale",
-        "row",
+        # "row",
         # "row_choice",
         # "row_ind",
         # "const-dim",
@@ -414,11 +414,11 @@ if __name__ == '__main__':
         # sparsification(funct_args=funct_args, kwargs=kwargs)
         
         # COLUMN SAMPLING WITH DECREASING P TEST
-        col_sample_dec(
-            funct_args=sample_args, 
-            kwargs=kwargs,
-            types=sample_types,
-        )
+        # col_sample_dec(
+        #     funct_args=sample_args, 
+        #     kwargs=kwargs,
+        #     types=sample_types,
+        # )
 
         # COMBINATION TESTS
         # sample_lazy_combo(ps=(30, 50, 70), 
