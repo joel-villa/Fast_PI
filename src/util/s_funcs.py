@@ -37,7 +37,7 @@ def norm_max_based(A, norm_ord, power):
     Args:
         A: a CSR sparse matrix (mxn)
         norm_ord: what order norm to use
-        power: to what power to raise the scales
+        power: to what power to raise the scales, in range: [0, inf)
             increasing power -> scales closer to zero -> less rows chosen -> higher variance
             decreasing power -> scales closer to one -> more rows chosen -> lower variance
     Return: a numpy array of length m, which gives the probability of selecting
