@@ -1,6 +1,8 @@
 import numpy as np
 
-def two_norm(A, scale_func, sf_kwargs, seed):
+from . import s_funcs as func
+
+def pi_scale_pi_squared_select(A, scale_func, sf_kwargs, seed):
     """ A selection which involves keeping and scaling the i'th row by a factor
     of p_i, with probability p_i^2, where p_i is a function input by user
 
@@ -69,3 +71,38 @@ def two_norm(A, scale_func, sf_kwargs, seed):
     print(f"{scale_func.__name__} kept_rows: {kept_rows}, new zeros: {A.nnz - A_tilde.nnz}")
 
     return A_tilde
+
+
+def get_A_tilde(A, gen_type, sf_kwargs, seed):
+    """ get a altered version of A, given some type of modification
+
+    Args:
+        A: a sparse matrix (mxn) in COO format 
+        gen_type: Determines the scaling function to use
+        sf_kwargs: Those arguments to pass to the probability function
+        seed: for predictable randomness
+    """
+    scale_func = None
+
+    # Get scaling function
+    match gen_type:
+        case "one-norm":
+            scale_func = func.norm_max_based
+            sf_kwargs = sf_kwargs | {"norm_ord", 1}
+        case "two-norm":
+            scale_func = func.norm_max_based
+            sf_kwargs = sf_kwargs | {"norm_ord", 2}
+        case "inf-norm":
+            scale_func = func.norm_max_based
+            sf_kwargs = sf_kwargs | {"norm_ord", np.inf}
+        case "uniform":
+            scale_func = func.uniform
+        case _:
+            raise ValueError(f"gen_type = {gen_type}, not an implemented method")
+        
+    return pi_scale_pi_squared_select(
+        A=A,
+        scale_func=scale_func,
+        sf_kwargs=sf_kwargs,
+        seed=seed,
+    )
