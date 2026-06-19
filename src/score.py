@@ -211,10 +211,31 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-# def col_sparse(funct_args, kwargs):
-#     test(
-#         funct=
-#     )
+def test_proven(funct_args, kwargs, types):
+    """ Testing those mathematically proven approaches
+    
+    Args:
+        funct_args: dictionary of arguments for the function col_p_sample() 
+                    (except for p and type)
+        kwargs: a dictionary of arguments for the test function
+        types: a list of string representations of the types of A_tilde 
+               generating methods
+    Return: None
+    """
+    for s_type in types:
+        test_args = funct_args | {
+                        "gen_type": s_type,
+                        "sf_kwargs": {}
+                    }
+        if s_type == "uniform":
+            # flip of the coin wether we keep each column
+            test_args["sf_kwargs"] = 0.5
+        test(
+            funct=smpl.col_sample_dec_p,
+            kwargs=test_args,
+            **kwargs,
+        )
+
 
 def col_sample_dec(funct_args, kwargs, types):
     """Test column sampling enhancement to power iteration
@@ -303,6 +324,13 @@ if __name__ == '__main__':
     epsilon = 0.5
     # epsilon = 0.24
 
+    proven_types = (
+        "one-norm", 
+        "two-norm",
+        "inf-norm",
+        "uniform",
+    )
+
     sample_types = (
         # "random", 
         # "1-norm", 
@@ -355,6 +383,13 @@ if __name__ == '__main__':
         kwargs = kwargs | {"num_avg" : num_avg} 
         funct_args = funct_args | {"seed": seed}
 
+        # The Proven Boy TODO
+        test_proven(
+            funct_args=funct_args,
+            kwargs=kwargs,
+            types=proven_types,
+        )
+
         # Args for JL reduction tests
         jl_args = funct_args | {"eps": epsilon}
 
@@ -384,9 +419,6 @@ if __name__ == '__main__':
             kwargs=kwargs,
             types=sample_types,
         )
-
-        # The Proven Boy TODO
-
 
         # COMBINATION TESTS
         # sample_lazy_combo(ps=(30, 50, 70), 
