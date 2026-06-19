@@ -7,7 +7,8 @@ Args:
     A: a CSR sparse matrix (mxn)
     ...
 Return: a numpy array of length m, which gives the probability of selecting
-        any of the m rows of A, indendently
+        any of the m rows of A, indendently, s.t. all elements of the array are 
+        in the interval [-1, 1]
 """
 
 import numpy as np
@@ -29,19 +30,19 @@ def uniform(A, s):
 
     return np.full(A.shape[0], s)
 
-def two_norm(A):
-    """ Probability of selecting i'th column is dependent on the two-norm of A
+def norm_max_based(A, norm_ord):
+    """ Probability of selecting i'th column is dependent on the norm of A, 
+    se
     
     Args:
         A: a CSR sparse matrix (mxn)
     Return: a numpy array of length m, which gives the probability of selecting
             any of the m rows of A, indendently
     """
-    row_norms = norm(A, ord=2, axis=1)
-    fro_norm = norm(A, ord="fro")
+    row_norms = norm(A, ord=norm_ord, axis=1)
+    max_row_norm = row_norms.max()
 
-    # The sqrt of the probabiility of keeping each row
-    # (NOTE: numpy `*` operator and `/` are element-wise)
-    scales = row_norms / fro_norm
+    # Divide all by the maximum row_norm
+    scales = row_norms / max_row_norm
 
     return scales
