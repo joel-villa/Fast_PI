@@ -88,13 +88,13 @@ def get_A_tilde(A, gen_type, sf_kwargs, seed):
     match gen_type:
         case "one-norm":
             scale_func = func.norm_max_based
-            sf_kwargs = sf_kwargs | {"norm_ord", 1}
+            sf_kwargs = sf_kwargs | {"norm_ord": 1}
         case "two-norm":
             scale_func = func.norm_max_based
-            sf_kwargs = sf_kwargs | {"norm_ord", 2}
+            sf_kwargs = sf_kwargs | {"norm_ord": 2}
         case "inf-norm":
             scale_func = func.norm_max_based
-            sf_kwargs = sf_kwargs | {"norm_ord", np.inf}
+            sf_kwargs = sf_kwargs | {"norm_ord": np.inf}
         case "uniform":
             scale_func = func.uniform
         case _:
