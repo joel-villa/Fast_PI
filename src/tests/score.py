@@ -79,7 +79,7 @@ def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
 
     return xs, ys, f"baseline {A.shape}"
 
-def test_proven(A, u_0, s_star, max_iter, seed, tol, sparse_type, sf_kwargs):
+def test_proven(A, u_0, s_star, max_iter, seed, tol, gen_type, sf_kwargs):
     """ Power iteration on a sparsified version of A, percentage based
 
     Args: 
@@ -89,7 +89,7 @@ def test_proven(A, u_0, s_star, max_iter, seed, tol, sparse_type, sf_kwargs):
         max_iter: maximum number of iterations of power to do
         seed: for duplicatable randomness
         tol: how much tolerance (for stopping condition of power iteration)
-        sparse_type: the type of scaling/sparsening to do
+        gen_type: the type of scaling/sparsening to do to generate A_tilde
         sf_kwargs: key word arguments for sparsification function
 
     Returns:
@@ -99,7 +99,7 @@ def test_proven(A, u_0, s_star, max_iter, seed, tol, sparse_type, sf_kwargs):
     """
     A_tilde = get_A_tilde(
         A=A, 
-        sparse_type=sparse_type, 
+        gen_type=gen_type, 
         sf_kwargs=sf_kwargs, 
         seed=seed,
         )
@@ -115,7 +115,7 @@ def test_proven(A, u_0, s_star, max_iter, seed, tol, sparse_type, sf_kwargs):
     
     new_zeros = A.nnz - A_tilde.nnz
 
-    return xs, ys, f"{sparse_type} row-sparsified {A.shape} ({new_zeros} new zeros)"
+    return xs, ys, f"{gen_type} row-sparsified {A.shape} ({new_zeros} new zeros)"
 
 def jl_dimension(A, u_0, s_star, max_iter, tol, seed, d, eps, type):
     """ Test of jl implementations
