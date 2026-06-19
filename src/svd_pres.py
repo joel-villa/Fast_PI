@@ -27,9 +27,19 @@ def init(mat_name):
     return A
 
 if __name__ == '__main__':
+    pows = np.arange(0, 1, 0.03125)
+
+
     ps = np.arange(0, 100, 5)
     seed = 10
     k = 5
+
+    proven_types = (
+        "one-norm", 
+        "two-norm",
+        "inf-norm",
+        "uniform",
+    )
 
     sub_types = (
         # "random", 
@@ -72,8 +82,8 @@ if __name__ == '__main__':
         # TODO: fix labeling, allow for looping through hyper-params
         plotter.init_plot(
             title=mat_name, 
-            x_label="ps",
-            y_label=r"$\frac{|v - v^*|_2}{|v^*|_2}$", 
+            x_label="",
+            y_label=r"$\frac{|v_k - v_k^*|_2}{|v_k^*|_2}$", 
             save_name=f"{mat_name}_svd_pres",
             grid_on=True,
         ) 
@@ -81,31 +91,43 @@ if __name__ == '__main__':
         A = init(mat_name=mat_name)
 
         rng = np.random.default_rng(seed=seed)
-        u0_shape = (A.shape[0], k)
-        u0 = rng.normal(0, 1, u0_shape)
+        u0 = rng.normal(0, 1, A.shape[0])
+        v0 = rng.normal(0, 1, A.shape[1])
 
-        u_star, s, vh = svds(
+        u_star, s, v_star = svds(
             A=A,
             k=k,
             # maxiter=256, #TODO: do we need this? Plus v0
             rng=seed,
         )
 
-        sub_i = 0
-
-        xs, ys = tst.subset_p(
-            A=A, 
-            u_0=u0, 
-            u_star=u_star, 
-            k=k, 
-            seed=seed, 
-            ps=ps, 
-            type=sub_types[sub_i], 
-            gamma=gamma,
+        xs, ys, lbl = tst.pi_inc_pow(
+            A=A,
+            v0=v0,
+            v_star=v_star,
+            k=k,
+            seed=seed,
+            pows=pows,
+            gen_type=proven_types[0],
+            sf_kwargs={},
         )
 
         for i in range(ys.shape[1]):
-            plotter.add_to_plot(xs, ys[:, i], label=f"k = {i + 1} ({sub_types[sub_i]})")
+            plotter.add_to_plot(xs, ys[:, i], label=f"k = {i + 1} ({lbl})")
+
+        # xs, ys, lbl = tst.subset_p(
+        #     A=A, 
+        #     u_0=u0, 
+        #     u_star=u_star, 
+        #     k=k, 
+        #     seed=seed, 
+        #     ps=ps, 
+        #     type=sub_types[0], 
+        #     gamma=gamma,
+        # )
+
+        # for i in range(ys.shape[1]):
+        #     plotter.add_to_plot(xs, ys[:, i], label=f"k = {i + 1} ({lbl})")
 
         # xs, ys = tst.sparse_p(
         #     A=A, 
