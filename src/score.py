@@ -302,11 +302,13 @@ def test_proven(funct_args, kwargs, types):
     for s_type in types:
         test_args = funct_args | {
                         "gen_type": s_type,
-                        "sf_kwargs": {}
                     }
         if s_type == "uniform":
             # flip of the coin wether we keep each column
             test_args["sf_kwargs"] = {"s" : 0.5}
+        else:
+            # norm based functions
+            test_args["sf_kwargs"] = {"power" : 1}
         test(
             funct=tst.test_proven,
             kwargs=test_args,
