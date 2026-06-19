@@ -211,32 +211,6 @@ def sparsification(funct_args, kwargs):
                 **kwargs,
             )
 
-def test_proven(funct_args, kwargs, types):
-    """ Testing those mathematically proven approaches
-    
-    Args:
-        funct_args: dictionary of arguments for the function col_p_sample() 
-                    (except for p and type)
-        kwargs: a dictionary of arguments for the test function
-        types: a list of string representations of the types of A_tilde 
-               generating methods
-    Return: None
-    """
-    for s_type in types:
-        test_args = funct_args | {
-                        "gen_type": s_type,
-                        "sf_kwargs": {}
-                    }
-        if s_type == "uniform":
-            # flip of the coin wether we keep each column
-            test_args["sf_kwargs"] = {"s" : 0.5}
-        test(
-            funct=tst.test_proven,
-            kwargs=test_args,
-            **kwargs,
-        )
-
-
 def col_sample_dec(funct_args, kwargs, types):
     """Test column sampling enhancement to power iteration
 
@@ -313,6 +287,31 @@ def sparse_jl_combo(funct_args, kwargs): #TODO: make this better? is there a way
                 kwargs=funct_args,
                 **kwargs,
             )
+    
+def test_proven(funct_args, kwargs, types):
+    """ Testing those mathematically proven approaches
+    
+    Args:
+        funct_args: dictionary of arguments for the function col_p_sample() 
+                    (except for p and type)
+        kwargs: a dictionary of arguments for the test function
+        types: a list of string representations of the types of A_tilde 
+               generating methods
+    Return: None
+    """
+    for s_type in types:
+        test_args = funct_args | {
+                        "gen_type": s_type,
+                        "sf_kwargs": {}
+                    }
+        if s_type == "uniform":
+            # flip of the coin wether we keep each column
+            test_args["sf_kwargs"] = {"s" : 0.5}
+        test(
+            funct=tst.test_proven,
+            kwargs=test_args,
+            **kwargs,
+        )
 
 if __name__ == '__main__':
     seed = 10
