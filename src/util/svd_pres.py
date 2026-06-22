@@ -5,6 +5,21 @@ import numpy as np
 
 from scipy.sparse.linalg import svds
 
+def sort_svd_output(u, s, vh):
+    """ Sort the output of a linalg svds call
+    
+    Args:
+        u: top left singular vectors
+        s: singular values
+        vh: top right singular vectors
+    """
+    idx = np.argsort(s)[::-1]  # descending
+
+    s = s[idx]
+    u = u[:, idx]
+    vh = vh[idx, :]
+
+    return u, s, vh
 
 def eig_pres_left(A_tilde, u0, u_star, k, seed):
     """ Test the preservation of A's top-left eigenvectors
@@ -26,6 +41,8 @@ def eig_pres_left(A_tilde, u0, u_star, k, seed):
         # maxiter=256, #TODO: do we need this? 
         rng=seed,
     )
+
+    u, s, vh = sort_svd_output(u, s, vh)
 
     # Difference from actual
     diff1 = u - u_star
@@ -71,6 +88,8 @@ def eig_pres_right(A_tilde, v0, v_star, k, seed):
         rng=seed,
         v0=v0,
     )
+
+    u, s, vh = sort_svd_output(u, s, vh)
 
     # Difference from actual
     diff1 = vh - v_star
