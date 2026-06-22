@@ -27,12 +27,20 @@ def init(mat_name):
     return A
 
 if __name__ == '__main__':
-    pows = np.arange(0, 1, 0.03125)
+    pows = np.linspace(
+        start=0,
+        stop=0.25,
+        num=16,
+    )
 
 
-    ps = np.arange(0, 100, 5)
+    ps = np.linspace(
+        start=0,
+        stop=100,
+        num=32,
+    )
     seed = 10
-    k = 5
+    k = 8
 
     proven_types = (
         "one-norm", 
