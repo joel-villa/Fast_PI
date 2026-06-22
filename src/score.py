@@ -305,7 +305,7 @@ def test_proven(funct_args, kwargs, types):
                     }
         if s_type == "uniform":
             # flip of the coin wether we keep each column
-            test_args["sf_kwargs"] = {"s" : 0.5}
+            test_args["sf_kwargs"] = {"s" : 0.25}
         else:
             # norm based functions
             test_args["sf_kwargs"] = {"power" : 1}
