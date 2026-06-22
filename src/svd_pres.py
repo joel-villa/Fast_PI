@@ -8,6 +8,7 @@ import numpy as np
 from scipy.sparse.linalg import svds
 
 from .tests import svd_pres as tst
+from .util.svd_pres import sort_svd_output
 
 from Sparsification_Research.src.Plotter import Plotter
 from Sparsification_Research.src.SSGetter import SSGetter
@@ -77,7 +78,7 @@ if __name__ == '__main__':
         "bp_0",
         "bcsstk07", 
         "bcsstk08", 
-        "bcsstk19", 
+        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
         "bcsstm07", 
         "bcspwr06",
         # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
@@ -102,12 +103,14 @@ if __name__ == '__main__':
         u0 = rng.normal(0, 1, A.shape[0])
         v0 = rng.normal(0, 1, A.shape[1])
 
-        u_star, s, v_star = svds(
+        u, s, vh = svds(
             A=A,
             k=k,
             # maxiter=256, #TODO: do we need this? Plus v0
             rng=seed,
         )
+
+        u_star, s, v_star = sort_svd_output(u, s, vh)
 
         xs, ys, lbl = tst.pi_inc_pow(
             A=A,
