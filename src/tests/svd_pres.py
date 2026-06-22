@@ -8,6 +8,8 @@ Functions in this file have Return type as follows:
 """
 import numpy as np
 
+from ..util import svd_pres as util
+
 from ..util.subset import p_reduce_A
 from ..util.sparsify import p_sparse
 from ..util.proven import get_A_tilde
@@ -40,7 +42,7 @@ def pi_inc_pow(A, v0, v_star, k, seed, pows, gen_type, sf_kwargs):
             sf_kwargs=pow_kwargs,
             seed=seed
         )
-        ys_i = eig_pres_right(
+        ys_i = util.eig_pres_right(
             A_tilde=A_tilde,
             v0=v0,
             v_star=v_star,
@@ -80,7 +82,7 @@ def subset_p(A, u_0, u_star, k, seed, ps, type, gamma):
             type=type,
             gamma=gamma,
         )
-        ys_i = eig_pres_left(
+        ys_i = util.eig_pres_left(
             A_tilde=A_reduced,
             u0=u_0,
             u_star=u_star,
@@ -119,7 +121,7 @@ def sparse_p(A, u_0, u_star, k, seed, ps, type):
             seed=seed,
             type=type,
         )
-        ys_i = eig_pres_left(
+        ys_i = util.eig_pres_left(
             A_tilde=A_sparse,
             u0=u_0,
             u_star=u_star,
