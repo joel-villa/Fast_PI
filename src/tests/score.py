@@ -79,8 +79,49 @@ def baseline(A, u_0, s_star, max_iter, tol, init_mults=0, A_tilde=None):
 
     return xs, ys, f"baseline {A.shape}"
 
+# def dec_power_test(A, u_0, s_star, max_iter, seed, tol, gen_type, sf_kwargs, swap_tol):
+#     """ Power iteration on a augmented version of A, with the ammount of column
+#     sampling increasing over time
+
+#     Args: 
+#         A: the original matrix
+#         u_0: initial guess for top left eigenvector of A
+#         s_star: actual top eigenvalue
+#         max_iter: maximum number of iterations of power to do
+#         seed: for duplicatable randomness
+#         tol: how much tolerance (for stopping condition of power iteration)
+#         gen_type: the type of scaling/sparsening to do to generate A_tilde
+#         sf_kwargs: key word arguments for sparsification function
+#         swap_tol: how much tolerance until decreasing the power used
+
+#     Returns:
+#         xs: an array of amount of scalar mults done
+#         ys: an array of error of each guess abs(lamba* - lambda) / abs(lambda*)
+#         lbl: the string representation of this test
+#     """
+#     #TODO 
+#     A_tilde = get_A_tilde(
+#         A=A, 
+#         gen_type=gen_type, 
+#         sf_kwargs=sf_kwargs, 
+#         seed=seed,
+#         )
+    
+#     xs, ys, lbl = baseline(
+#         A=A,
+#         u_0=u_0, 
+#         s_star=s_star,
+#         max_iter=max_iter,
+#         tol=tol,
+#         init_mults=0,
+#         A_tilde=A_tilde)
+    
+#     new_zeros = A.nnz - A_tilde.nnz
+
+#     return xs, ys, f"{gen_type} row-sparsified {A.shape} ({new_zeros} new zeros)"
+
 def test_proven(A, u_0, s_star, max_iter, seed, tol, gen_type, sf_kwargs):
-    """ Power iteration on a sparsified version of A, percentage based
+    """ Power iteration on a augmented version of A
 
     Args: 
         A: the original matrix
