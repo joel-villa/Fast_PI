@@ -44,7 +44,7 @@ if __name__ == '__main__':
     k = 8
 
     proven_types = (
-        "one-norm", 
+        # "one-norm", 
         "two-norm",
         "inf-norm",
         "uniform",
