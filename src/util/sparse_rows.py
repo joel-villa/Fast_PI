@@ -11,6 +11,16 @@ from scipy.sparse.linalg import norm
 
 from . import subset as util
 
+def calc_row_norms(A, ord):
+    """ Calculate the row norms of a matrix
+
+    Args: 
+        A: the matrix (scipy.sparse format)
+        ord: what order of norm (1, 2, inf, 'fro', ...)
+    Return: norm of all the rows of A
+    """
+    return norm(A, ord=ord, axis=1)
+
 def two_norm(A, d, seed):
     """ A selection which involves keeping and scaling the i'th row 
     with probability p_i^2, where p_i = sqrt(s) * ||A^(i)|| / ||A||_F
@@ -39,7 +49,7 @@ def two_norm(A, d, seed):
     root_d = np.sqrt(d)
 
     # The 2-norm of each row
-    row_norms = norm(A, ord=2, axis=1)
+    row_norms = calc_row_norms(A=A, ord=2)
 
     fro_norm = np.sqrt(np.sum(row_norms * row_norms))
     fro_norm = norm(A, ord="fro")
