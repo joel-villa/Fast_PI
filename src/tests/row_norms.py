@@ -16,7 +16,7 @@ import numpy as np
 from Sparsification_Research.src.SSGetter import SSGetter
 from ..util.sparse_rows import calc_row_norms
 
-save_path = "data/two_norms.json"
+save_path = "data/two_norms.npz"
 
 def save_data(mat_name, ys):
     """ Save the matrix's sorted row-norms to data/two_norms.json
@@ -29,11 +29,11 @@ def save_data(mat_name, ys):
     """
     data = read_data()
 
-    data[mat_name] = ys.tolist()
+    data[mat_name] = ys
 
-    with open(save_path, 'w') as f:
-        json.dump(data, f, indent=2)
-
+    # Save the dictionary by unpacking it with **
+    np.savez(save_path, **data)
+    
 def read_data(mat_name=None):
     """ Read the matrix's two-norm data from data/two_norms.json
     
@@ -42,8 +42,14 @@ def read_data(mat_name=None):
     Return: 
         None: if DNE in two_norms.json, ys otherwise
     """
-    with open(save_path, 'r') as file:
-        data = json.load(file)
+    try:
+        with np.load(save_path) as loaded_data:
+            data = dict(loaded_data)
+    except EOFError:
+        # Empty file error
+        if mat_name is None:
+            return {}
+        return None 
 
     if mat_name is None:
         return data
@@ -59,6 +65,7 @@ def calculate_two_norm(mat_name):
     Return:
         ys: sorted array of row magnitudes (2-norms)
     """
+    print("SHOULDN'T BE PRINTING")
 
     ss_getter = SSGetter(in_csr=True)
     A = ss_getter.get(mat_name)
