@@ -1,8 +1,6 @@
 """
 Functions for measuring & displaying row norm distribution
 
-Args:
-    mat_name: the name of the suite-sparse matrix
 Return:
     xs: [1, 2, ...]
     ys: sorted array of row magnitudes (2-norms)
@@ -97,6 +95,19 @@ def get_two_norm(mat_name):
     
     rows = ys.shape[0] # The number of rows
 
-    xs = range(rows)
+    xs = np.arange(start=1, stop=rows+1)
 
     return xs, ys, mat_name
+
+def fit_x_inverse(xs, ys):
+    # Transform x to 1 / x
+    x_inverse = 1 / xs
+
+    # Fit a line (degree 1) to the transformed data
+    m, b = np.polyfit(x_inverse, ys, deg=1)
+
+    # y = (m/x) + b
+    ys = m * (x_inverse) + b
+    lbl = f"y = ({m:.4f} / x) + {b:.4f}"
+
+    return xs, ys, lbl

@@ -1,6 +1,8 @@
 """
 Testing the distribution of matrix row norms of Suite-Sparse Matrix collection
 """
+import numpy as np
+
 from Sparsification_Research.src.Plotter import Plotter
 
 from .tests import row_norms
@@ -31,6 +33,10 @@ if __name__ == '__main__':
         
         xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
         
+        plotter.add_to_plot(xs, ys, lbl)
+
+        xs, ys, lbl = row_norms.fit_x_inverse(xs, ys)
+
         plotter.add_to_plot(xs, ys, lbl)
 
         plotter.finish()
