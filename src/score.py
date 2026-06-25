@@ -339,7 +339,7 @@ if __name__ == '__main__':
         # "2-norm2", 
         # "nystrom",
         # "scale",
-        # "row",
+        "row",
         # "row_choice",
         # "row_ind",
         # "const-dim",
@@ -385,11 +385,11 @@ if __name__ == '__main__':
         funct_args = funct_args | {"seed": seed}
 
         # The Proven Boy TODO
-        test_proven(
-            funct_args=funct_args,
-            kwargs=kwargs,
-            types=proven_types,
-        )
+        # test_proven(
+        #     funct_args=funct_args,
+        #     kwargs=kwargs,
+        #     types=proven_types,
+        # )
 
         # Args for JL reduction tests
         jl_args = funct_args | {"eps": epsilon}
