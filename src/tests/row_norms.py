@@ -15,6 +15,7 @@ from Sparsification_Research.src.SSGetter import SSGetter
 from ..util.sparse_rows import calc_row_norms
 
 save_path = "data/two_norms.npz"
+json_path = "data/pow_law.json"
 
 def save_data(mat_name, ys):
     """ Save the matrix's sorted row-norms to data/two_norms.json
@@ -76,6 +77,35 @@ def calculate_two_norm(mat_name):
 
     return row_norms
 
+def pow_law_calcs(mat_name, ys):
+    num_rows = ys.shape[0]
+
+    twenty_percent_rows = num_rows // 5 # Floor division
+
+    # The sum of the two-norm of the top 20% of rows
+    top_20 = ys[:twenty_percent_rows]
+    print(f"top_20.shape = {top_20.shape}")
+    top_20_sum = np.sum(top_20) 
+
+    # The sum of the two-norm of the bottom 20% of rows
+    bottom_80 = ys[twenty_percent_rows:]
+    print(f"bottom_80.shape = {bottom_80.shape}")
+    bottom_80_sum = np.sum(bottom_80)
+
+    # Reading from a file
+    with open(json_path, 'r') as file:
+        data = json.load(file)
+
+    data[mat_name] = {
+        "top    20% sum" : top_20_sum,
+        "bottom 80% sum" : bottom_80_sum,
+
+    }
+
+    # Saving to a file
+    with open(json_path, 'w') as file:
+        json.dump(data, file, indent=2)
+
 def get_two_norm(mat_name):
     """Attempt to read in the matrix data, if none, compute it, and save it
 
@@ -96,6 +126,8 @@ def get_two_norm(mat_name):
     rows = ys.shape[0] # The number of rows
 
     xs = np.arange(start=1, stop=rows+1)
+
+    pow_law_calcs(mat_name=mat_name, ys=ys)
 
     return xs, ys, mat_name
 
