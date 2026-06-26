@@ -25,18 +25,22 @@ if __name__ == '__main__':
     for mat_name in mats:
         plotter.init_plot(
             title=f"Two-Norm Distribution ({mat_name})", 
-            x_label="row (i)",
-            y_label=r"$||A^{(i)}||$", 
+            x_label=r"$\log (\text{row (i)})$",
+            y_label=r"$\log||A^{(i)}||$", 
             save_name=f"{mat_name}_two_norm_dist",
             grid_on=True,
         )
         
         xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
-        
         plotter.add_to_plot(xs, ys, lbl)
 
-        xs, ys, lbl = row_norms.fit_x_inverse(xs, ys)
+        #y = m/x + b
+        # xs, ys, lbl = row_norms.fit_x_inverse(xs, ys)
+        # plotter.add_to_plot(xs, ys, lbl)
 
+        # y = bx^m
+        xs, ys, lbl = row_norms.fit_pow_law(xs, ys)
         plotter.add_to_plot(xs, ys, lbl)
 
         plotter.finish()
+        # plotter.finish(xscale='log', yscale='log')
