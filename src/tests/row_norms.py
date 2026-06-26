@@ -127,11 +127,21 @@ def get_two_norm(mat_name):
 
     xs = np.arange(start=1, stop=rows+1)
 
-    pow_law_calcs(mat_name=mat_name, ys=ys)
+    # pow_law_calcs(mat_name=mat_name, ys=ys)
 
     return xs, ys, mat_name
 
 def fit_x_inverse(xs, ys):
+    """ fit x and y values to y = m/x + b
+
+    Args:
+        xs: x-values
+        ys: y-values
+    Return:
+        xs: x-values (unchanged)
+        ys: y-values of a line of best fit
+        lbl: string representation
+    """
     # Transform x to 1 / x
     x_inverse = 1 / xs
 
@@ -143,3 +153,33 @@ def fit_x_inverse(xs, ys):
     lbl = f"y = ({m:.4f} / x) + {b:.4f}"
 
     return xs, ys, lbl
+
+def fit_pow_law(xs, ys):
+    """ fit x and y values to y = bx^m
+
+    Args:
+        xs: x-values
+        ys: y-values
+    Return:
+        xs: x-values (unchanged)
+        ys: y-values of a line of best fit
+        lbl: string representation
+    """
+    # Transform x to ln(x), and y to ln(y)
+    x_log = np.log(xs)
+    y_log = np.log(ys)
+
+    # Fit a line (degree 1) to the transformed data
+    m, ln_b = np.polyfit(x_log, y_log, deg=1)
+
+    b = np.exp(ln_b)
+
+    # y = bx^m
+    ys = b * (xs ** m)
+    lbl = fr"$y = {b} \cdot x ^{m:.4f}$"
+    return xs, ys, lbl
+
+    # # ln y = m ln x + ln b
+    # lbl = fr"$\ln y = m \ln x + \ln {b}$"
+    # y_log = m * x_log + ln_b
+    # return x_log, y_log, lbl
