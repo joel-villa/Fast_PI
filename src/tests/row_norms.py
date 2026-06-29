@@ -131,6 +131,22 @@ def get_two_norm(mat_name):
 
     return xs, ys, mat_name
 
+def get_inner_products(mat_name):
+    """ Get the inner products of the rows of the matrix (inner product is 
+    square of the two-norm)
+
+    Args:
+        mat_name: the name of the suite-sparse matrix
+    Return:
+        xs: [1, 2, ...]
+        ys: sorted array of inner products
+        lbl: string representation of this test
+    """
+    xs, ys, lbl = get_two_norm(mat_name=mat_name)
+
+    ys = np.square(ys)
+    return xs, ys, lbl
+
 def fit_x_inverse(xs, ys):
     """ fit x and y values to y = m/x + b
 
