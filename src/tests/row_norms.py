@@ -6,6 +6,7 @@ Return:
     ys: sorted array of row magnitudes (2-norms)
     lbl: string representation of this test
 """
+from scipy.optimize import linprog
 
 import json 
 
@@ -106,11 +107,12 @@ def pow_law_calcs(mat_name, ys):
     with open(json_path, 'w') as file:
         json.dump(data, file, indent=2)
 
-def get_two_norm(mat_name):
+def get_two_norm(mat_name, max_norm):
     """Attempt to read in the matrix data, if none, compute it, and save it
 
     Args:
         mat_name: the name of the suite-sparse matrix
+        max_norm: are we multiplying the matrix by the maximum row-norm?
     Return:
         xs: [1, 2, ...]
         ys: sorted array of row magnitudes (2-norms)
@@ -127,22 +129,27 @@ def get_two_norm(mat_name):
 
     xs = np.arange(start=1, stop=rows+1)
 
-    # pow_law_calcs(mat_name=mat_name, ys=ys)
+    if max_norm:
+        # Assume max_i ||A^(i)|| <= 1
+        ys = ys / ys[0]
+    
 
     return xs, ys, mat_name
 
-def get_inner_products(mat_name):
+def get_inner_products(mat_name, max_norm):
     """ Get the inner products of the rows of the matrix (inner product is 
     square of the two-norm)
 
     Args:
         mat_name: the name of the suite-sparse matrix
+        max_norm: are we multiplying the matrix by the maximum row-norm?
+
     Return:
         xs: [1, 2, ...]
         ys: sorted array of inner products
         lbl: string representation of this test
     """
-    xs, ys, lbl = get_two_norm(mat_name=mat_name)
+    xs, ys, lbl = get_two_norm(mat_name=mat_name, max_norm=max_norm)
 
     ys = np.square(ys)
     return xs, ys, lbl
@@ -170,6 +177,20 @@ def fit_x_inverse(xs, ys):
 
     return xs, ys, lbl
 
+def pow_law_y(xs, coefficient, exponent):
+    """ Ge the power law values of x 
+
+    ys = a * x^k
+    
+    Args:
+        xs: x-values
+        coefficient: mutlitipicative constant of power law
+        exponent: exponent of power law
+    Return:
+        ys: array of power law values
+    """
+    return  coefficient * (xs ** exponent)
+
 def fit_pow_law(xs, ys):
     """ fit x and y values to y = bx^m
 
@@ -191,7 +212,7 @@ def fit_pow_law(xs, ys):
     b = np.exp(ln_b)
 
     # y = bx^m
-    ys = b * (xs ** m)
+    ys = pow_law_y(xs=xs, coefficient=b, exponent=m)
     lbl = fr"$y = {b:,.4f} \cdot x ^{{{m:.4f}}}$"
     return xs, ys, lbl
 
@@ -199,3 +220,80 @@ def fit_pow_law(xs, ys):
     # lbl = fr"$\ln y = m \ln x + \ln {b}$"
     # y_log = m * x_log + ln_b
     # return x_log, y_log, lbl
+
+def get_LP_A(ln_xs):
+    """Get the A matrix used in the linear programming problem
+    
+    Args: 
+        ln_xs: natural log of those x-values
+    Return: 
+        A_ub: can be plugged directly into scipy.optimize.linprog
+    """
+    # The column vectors
+    xT = ln_xs.reshape(-1, 1)
+    neg_ones = -1 * np.ones_like(xT)
+
+    # The matrix
+    A_ub = np.hstack((xT, neg_ones))
+    return A_ub
+
+def overfit_pow_law(xs, ys):
+    """ Finding a power-law line which overfits the data
+
+    LP Problem:
+        [k, ln(a)] = ?
+        minimizing [-1, 1][k, ln(a)]^T
+        s.t. [ln(x_i), -1][k, ln(a)]^T <= -ln(y_i) - ln(x_i), for all i
+        and [k, ln(a)] >= 0
+
+    Args:
+        xs: x-values
+        ys: y-values
+    Return:
+        xs: x-values (unchanged)
+        ys: y-values of a line of overfit
+        lbl: string representation
+    """
+    # Natural log of data
+    ln_xs = np.log(xs)
+    ln_ys = np.log(ys)
+
+    # Minimizing [-1, 1][k, ln(a)]^T
+    c = np.array([-1, 1])
+
+    # [ln(x_i), -1][k, ln(a)]^T <= -ln(y_i) - ln(x_i), for all i
+    A_ub = get_LP_A(ln_xs=ln_xs)
+    b_ub = -ln_ys - ln_xs
+
+    bounds = [
+        (0 , None),      # k >= 0
+        (None, None),   # ln(a) free
+    ]
+
+    optimize_result = linprog(
+        c=c,
+        A_ub=A_ub,
+        b_ub=b_ub,
+        bounds=bounds,
+    )
+
+    print(optimize_result.status)
+    if optimize_result.status != 0:
+        # Error occured
+        raise ValueError(f"Optimization did not proceed nominally: Error code {optimize_result.status}")
+
+    x = optimize_result.x
+
+    k = x[0]
+    ln_a = x[1]
+
+    a = np.exp(ln_a)
+
+    print(f"k={k}, a={a}, max(ys)= {np.max(ys)}")
+
+    ys = pow_law_y(xs=xs, coefficient=a, exponent= -k - 1)
+
+    print(f"k={k}, a={a}, max(ys)= {np.max(ys)}")
+
+    lbl = fr"$y = {a:,.4f} \cdot x ^{{-{k:.4f} - 1}}$"
+    return xs, ys, lbl
