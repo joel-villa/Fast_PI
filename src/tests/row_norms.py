@@ -154,6 +154,23 @@ def get_inner_products(mat_name, max_norm):
     ys = np.square(ys)
     return xs, ys, lbl
 
+def get_distribution(mat_name, max_norm, num_bins):
+    """ Get the inner products of the rows of the matrix (inner product is 
+    square of the two-norm)
+
+    Args:
+        mat_name: the name of the suite-sparse matrix
+        max_norm: are we multiplying the matrix by the maximum row-norm?
+        num_bins: number of bins to use for histogram
+    Return:
+        ys: The count of each bin
+        bin_edges: the edges of the bins 
+        lbl: string representation of this test
+    """
+    xs, ys, lbl = get_two_norm(mat_name=mat_name, max_norm=max_norm)
+
+    return np.histogram(ys, bins=num_bins), lbl
+
 def fit_x_inverse(xs, ys):
     """ fit x and y values to y = m/x + b
 
@@ -237,6 +254,23 @@ def get_LP_A(ln_xs):
     A_ub = np.hstack((xT, neg_ones))
     return A_ub
 
+def pow_integral(a, k, n):
+    """ The integral of ax^k, from x=1 to n
+    
+    Args: 
+        a: coefficient
+        k: power
+        n: number of rows in A
+    Return:
+        a / (k + 1) * (n^(k + 1) - 1), if k is not -1
+        a * ln(n), if k is -1
+    """
+
+    if k == -1:
+        return a * np.log(n)
+    else: 
+        return a / (k + 1) * (n ** (k + 1) - 1)
+
 def overfit_pow_law(xs, ys):
     """ Finding a power-law line which overfits the data
 
@@ -277,7 +311,6 @@ def overfit_pow_law(xs, ys):
         bounds=bounds,
     )
 
-    print(optimize_result.status)
     if optimize_result.status != 0:
         # Error occured
         raise ValueError(f"Optimization did not proceed nominally: Error code {optimize_result.status}")
@@ -289,11 +322,11 @@ def overfit_pow_law(xs, ys):
 
     a = np.exp(ln_a)
 
-    print(f"k={k}, a={a}, max(ys)= {np.max(ys)}")
-
     ys = pow_law_y(xs=xs, coefficient=a, exponent= -k - 1)
 
-    print(f"k={k}, a={a}, max(ys)= {np.max(ys)}")
+    print(f"n = {len(xs)}")
+    print(fr"$\sum_i ||A^{{(i)}}|| \le {pow_integral(a=a, k= -k - 1, n=len(xs))}$")
 
     lbl = fr"$y = {a:,.4f} \cdot x ^{{-{k:.4f} - 1}}$"
+    
     return xs, ys, lbl
