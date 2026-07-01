@@ -192,7 +192,7 @@ def fit_pow_law(xs, ys):
 
     # y = bx^m
     ys = b * (xs ** m)
-    lbl = fr"$y = {b} \cdot x ^{m:.4f}$"
+    lbl = fr"$y = {b:,.4f} \cdot x ^{{{m:.4f}}}$"
     return xs, ys, lbl
 
     # # ln y = m ln x + ln b

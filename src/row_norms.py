@@ -9,13 +9,18 @@ from .tests import row_norms
 
 if __name__ == '__main__':
     mats = [
+        "bcspwr06",
+        "gre_1107",
+        "can_229", 
+        "dwt_193",
+        "fs_541_1",
+        
         "494_bus", # Invalid for mag-based sparsifification
         "bp_0",
         "bcsstk07", 
         "bcsstk08", 
         "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        "bcsstm07", 
-        "bcspwr06",
+        "bcsstm07",
         "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
         "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
@@ -31,7 +36,8 @@ if __name__ == '__main__':
             grid_on=True,
         )
         
-        xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
+        # xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
+        xs, ys, lbl = row_norms.get_inner_products(mat_name=mat_name)
         plotter.add_to_plot(xs, ys, lbl)
 
         #y = m/x + b
@@ -42,5 +48,5 @@ if __name__ == '__main__':
         xs, ys, lbl = row_norms.fit_pow_law(xs, ys)
         plotter.add_to_plot(xs, ys, lbl)
 
-        plotter.finish()
-        # plotter.finish(xscale='log', yscale='log')
+        # plotter.finish()
+        plotter.finish(xscale='log', yscale='log')
