@@ -9,18 +9,22 @@ from .tests import row_norms
 
 if __name__ == '__main__':
     mats = [
+        "494_bus", # Invalid for mag-based sparsifification
+        "bp_0",
+        "bcsstk07", 
+        "fs_541_1",
+        "hor_131",
+        "bcsstk08", 
+        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
+        "bcsstm07",
+
+
+
         "bcspwr06",
         "gre_1107",
         "can_229", 
         "dwt_193",
-        "fs_541_1",
-        
-        "494_bus", # Invalid for mag-based sparsifification
-        "bp_0",
-        "bcsstk07", 
-        "bcsstk08", 
-        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        "bcsstm07",
+        "gre_1107",
         "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
         "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
@@ -37,15 +41,19 @@ if __name__ == '__main__':
         )
         
         # xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
-        xs, ys, lbl = row_norms.get_inner_products(mat_name=mat_name)
-        plotter.add_to_plot(xs, ys, lbl)
+        xs, ys_star, lbl = row_norms.get_two_norm(mat_name=mat_name, max_norm=True)
+        plotter.add_to_plot(xs, ys_star, lbl)
 
         #y = m/x + b
         # xs, ys, lbl = row_norms.fit_x_inverse(xs, ys)
         # plotter.add_to_plot(xs, ys, lbl)
 
         # y = bx^m
-        xs, ys, lbl = row_norms.fit_pow_law(xs, ys)
+        xs, ys, lbl = row_norms.fit_pow_law(xs, ys_star)
+        plotter.add_to_plot(xs, ys, lbl)
+
+        # y <= ax^k
+        xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
         plotter.add_to_plot(xs, ys, lbl)
 
         # plotter.finish()
