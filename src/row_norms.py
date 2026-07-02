@@ -18,7 +18,7 @@ def histogram(mats, loglog):
 
     for mat_name in mats:
         # Histogram
-        (bin_counts, bin_edges), lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=False, num_bins=100)
+        bin_counts, bin_edges, lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=False, num_bins=100)
 
         # Stairs -> histogram
         plt.stairs(bin_counts, bin_edges, fill=True, color='skyblue', edgecolor='black')
@@ -53,9 +53,12 @@ def histogramish(mats, loglog):
         )
 
         # Histogram(ish)
-        (ys, xs), lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=False, num_bins=100)
+        (ys_star, xs), lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=True, num_bins=100)
         xs = xs[1: ] # Remove last bin edge
-        print(f"xs: {xs[:10]}, ys: {ys[:10]}")
+        plotter.add_to_plot(xs, ys_star, lbl)
+
+        # y <= ax^k
+        xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
         plotter.add_to_plot(xs, ys, lbl)
         
         if loglog:
@@ -122,7 +125,7 @@ if __name__ == '__main__':
         "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
     
-    loglog = False
+    loglog = True
 
     # row_norms_dist(mats)
     # histogram(mats, loglog)
