@@ -155,8 +155,7 @@ def get_inner_products(mat_name, max_norm):
     return xs, ys, lbl
 
 def get_distribution(mat_name, max_norm, num_bins):
-    """ Get the inner products of the rows of the matrix (inner product is 
-    square of the two-norm)
+    """ Get the histogram distrubition of the row norms 
 
     Args:
         mat_name: the name of the suite-sparse matrix
@@ -169,7 +168,7 @@ def get_distribution(mat_name, max_norm, num_bins):
     """
     xs, ys, lbl = get_two_norm(mat_name=mat_name, max_norm=max_norm)
 
-    return np.histogram(ys, bins=num_bins), lbl
+    return *np.histogram(ys, bins=num_bins), lbl
 
 def fit_x_inverse(xs, ys):
     """ fit x and y values to y = m/x + b
@@ -270,6 +269,22 @@ def pow_integral(a, k, n):
         return a * np.log(n)
     else: 
         return a / (k + 1) * (n ** (k + 1) - 1)
+    
+def remove_zero_values(xs, ys):
+    """ Remove zero values from xs, and corresponding values from ys
+
+    Args:
+        xs: x-values
+        ys: y-values
+    Return:
+        xs: x-values w/o zero values
+        ys: y-values w/o corresponding values 
+    """
+    # Remove zero values from xs and ys
+    nonzero_indices = np.nonzero(ys)[0]
+    xs = xs[nonzero_indices]
+    ys = ys[nonzero_indices]
+    return xs, ys
 
 def overfit_pow_law(xs, ys):
     """ Finding a power-law line which overfits the data
@@ -288,12 +303,21 @@ def overfit_pow_law(xs, ys):
         ys: y-values of a line of overfit
         lbl: string representation
     """
+    if np.any(ys < 0):
+        raise ValueError("Misuse of overfit_pow_law: y-values should be positive")
+    if np.any(ys == 0):
+        print("Warning: going to reduce length of xs and ys")
+        xs, ys = remove_zero_values(xs=xs, ys=ys)
+
     # Natural log of data
     ln_xs = np.log(xs)
     ln_ys = np.log(ys)
 
     # Minimizing [-1, 1][k, ln(a)]^T
     c = np.array([-1, 1])
+
+    # FOR x < 1, we want to maxamize k and maximize ln(a): TODO what's up with this? 
+    # c = np.array([1, 1])
 
     # [ln(x_i), -1][k, ln(a)]^T <= -ln(y_i) - ln(x_i), for all i
     A_ub = get_LP_A(ln_xs=ln_xs)
