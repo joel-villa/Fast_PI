@@ -59,7 +59,7 @@ def get_inner_products(mat_name, max_norm):
     ys = np.square(ys)
     return xs, ys, lbl
 
-def get_distribution(mat_name, max_norm, num_bins):
+def histogram(mat_name, max_norm, num_bins):
     """ Get the histogram distrubition of the row norms 
 
     Args:
@@ -73,7 +73,32 @@ def get_distribution(mat_name, max_norm, num_bins):
     """
     xs, ys, lbl = get_two_norm(mat_name=mat_name, max_norm=max_norm)
 
-    return *np.histogram(ys, bins=num_bins), lbl
+    bin_counts, bin_edges = np.histogram(ys, bins=num_bins)
+
+    return bin_edges, bin_counts, lbl
+
+def binned_row_weights(mat_name, max_norm, num_bins):
+    """ For plotting i vs. iz_i, where i is the bin number and z_i is the 
+    number of rows in that bin
+    
+    Args:
+        mat_name: the name of the suite-sparse matrix
+        max_norm: are we multiplying the matrix by the maximum row-norm?
+        num_bins: number of bins to use for histogram
+    Return:
+        ys: i * z_i
+        xs: i 
+        lbl: string representation of this test
+    """
+    bin_edges, ys, lbl = histogram(mat_name, max_norm, num_bins)
+
+    delta = bin_edges[1] - bin_edges[0]
+
+    xs = np.arange(start=1, stop=len(ys)+1)
+
+    ys = xs * ys * delta
+
+    return xs, ys, r"$i \cdot z_i$"
 
 def fit_x_inverse(xs, ys):
     """ fit x and y values to y = m/x + b
@@ -159,15 +184,15 @@ def overfit_pow_law(xs, ys):
     c = np.array([-1, 1])
 
     # FOR x < 1, we want to maxamize k and maximize ln(a): TODO what's up with this? 
-    c = np.array([1, 1])
+    # c = np.array([1, 1])
 
     # [ln(x_i), -1][k, ln(a)]^T <= -ln(y_i) - ln(x_i), for all i
     A_ub = util.get_LP_A(ln_xs=ln_xs)
     b_ub = -ln_ys - ln_xs
 
     bounds = [
-        (0 , None),      # k >= 0
-        (None, None),   # ln(a) free
+        (0.0 , None), # k >= 0
+        (None, None), # ln(a) free
     ]
 
     optimize_result = linprog(
