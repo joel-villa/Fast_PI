@@ -155,7 +155,7 @@ def pow_integral(a, k, n):
         return a / (k + 1) * (n ** (k + 1) - 1)
     
 def remove_zero_values(xs, ys):
-    """ Remove zero values from xs, and corresponding values from ys
+    """ Remove zero values from ys, and corresponding values from xs
 
     Args:
         xs: x-values
