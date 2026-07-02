@@ -7,6 +7,28 @@ import matplotlib.pyplot as plt
 from Sparsification_Research.src.Plotter import Plotter
 
 from .tests import row_norms
+from .util.row_norms import remove_zero_values
+
+def plot(plotter, xs, ys, lbl, loglog):
+    """ Add the xs, ys, lbl to the plot, if loglog, take log of xs and ys
+    
+    Args:
+        plotter: Plotter object
+        xs: x-values of the plot
+        ys: y-values of the plot
+        lbl: string representation of this test
+        loglog: boolean, whether to use log-log scale
+
+    Return: NONE
+    """
+    if loglog:
+        if np.any(ys <= 0):
+            # don't log non-positive
+            xs, ys = remove_zero_values(xs, ys)
+        plotter.add_to_plot(np.log(xs), np.log(ys), lbl)
+    else: 
+        plotter.add_to_plot(xs, ys, lbl)
+
 def histogram(mats, loglog):
     """ Plot the histogram of row norms for a given matrix
     
@@ -18,19 +40,22 @@ def histogram(mats, loglog):
 
     for mat_name in mats:
         # Histogram
-        bin_counts, bin_edges, lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=False, num_bins=100)
+        bin_edges, bin_counts, lbl = row_norms.histogram(mat_name=mat_name, max_norm=False, num_bins=100)
 
         # Stairs -> histogram
-        plt.stairs(bin_counts, bin_edges, fill=True, color='skyblue', edgecolor='black')
-
         if loglog:
-            # For log-log plot
-            plt.xscale('log')
-            plt.yscale('log')
+            plt.stairs(np.log(bin_counts), np.log(bin_edges), fill=True, color='skyblue', edgecolor='black')
+        else: 
+            plt.stairs(bin_counts, bin_edges, fill=True, color='skyblue', edgecolor='black')
 
         plt.title(f"Two-Norm Distribution ({mat_name})")
-        plt.xlabel("Row Magnitude (2-Norm)")
-        plt.ylabel("Number of Rows")
+        
+        if loglog:
+            plt.xlabel("log(Row Magnitude (2-Norm))")
+            plt.ylabel("log(Number of Rows)")
+        else: 
+            plt.xlabel("Row Magnitude (2-Norm)")
+            plt.ylabel("Number of Rows")
         plt.show()
 
 def histogramish(mats, loglog):
@@ -43,28 +68,35 @@ def histogramish(mats, loglog):
     """
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6)) 
 
+    x_label=r"$i$ (Bin Number)"
+    y_label=r"Bin Weight ($i \cdot z_i$)"
+
+    if loglog:
+        x_label=r"$\log i$ (Bin Number)"
+        y_label=r"Bin Weight ($\log {i \cdot z_i}$)"
+
     for mat_name in mats:
         plotter.init_plot(
             title=f"Two-Norm Distribution ({mat_name})", 
-            x_label="Row Magnitude (2-Norm)",
-            y_label="Number of Rows", 
+            x_label=x_label,
+            y_label=y_label, 
             save_name=f"{mat_name}_two_norm_dist",
             grid_on=True,
         )
 
         # Histogram(ish)
-        ys_star, xs, lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=True, num_bins=100)
-        xs = xs[1: ] # Remove last bin edge
-        plotter.add_to_plot(xs, ys_star, lbl)
+        xs, ys_star, lbl = row_norms.binned_row_weights(mat_name=mat_name, max_norm=True, num_bins=100)
+        print(f"xs = {xs[:10]}")
+        print(f"ys_star = {ys_star[:10]}")
+        plot(plotter, xs, ys_star, lbl, loglog)
+
 
         # y <= ax^k
-        xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
-        plotter.add_to_plot(xs, ys, lbl)
+        # xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
+        # plot(plotter, xs, ys, lbl, loglog)
+
         
-        if loglog:
-            plotter.finish(xscale='log', yscale='log')
-        else: 
-            plotter.finish()
+        plotter.finish()
 def row_norms_dist(mats, loglog):
     """ Plot row vs. row-norms for matrices
     
@@ -74,19 +106,26 @@ def row_norms_dist(mats, loglog):
     Return: NONE
     """
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6)) 
-    
+
+    x_label=r"row ($i$)"
+    y_label=r"$||A^{(i)}||$" 
+
+    if loglog:
+        x_label=r"$\log (\text{row (i)})$"
+        y_label=r"$\log||A^{(i)}||$"    
+         
     for mat_name in mats:
         plotter.init_plot(
             title=f"Two-Norm Distribution ({mat_name})", 
-            x_label=r"$\log (\text{row (i)})$",
-            y_label=r"$\log||A^{(i)}||$", 
+            x_label=x_label,
+            y_label=y_label, 
             save_name=f"{mat_name}_two_norm_dist",
             grid_on=True,
         )
 
         # xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
         xs, ys_star, lbl = row_norms.get_two_norm(mat_name=mat_name, max_norm=True)
-        plotter.add_to_plot(xs, ys_star, lbl)
+        plot(plotter, xs, ys_star, lbl, loglog)
 
         #y = m/x + b
         # xs, ys, lbl = row_norms.fit_x_inverse(xs, ys)
@@ -94,19 +133,20 @@ def row_norms_dist(mats, loglog):
 
         # y = bx^m
         xs, ys, lbl = row_norms.fit_pow_law(xs, ys_star)
-        plotter.add_to_plot(xs, ys, lbl)
+        plot(plotter, xs, ys, lbl, loglog)
 
         # y <= ax^k
         xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
-        plotter.add_to_plot(xs, ys, lbl)
+        plot(plotter, xs, ys, lbl, loglog)
 
-        if loglog:
-            plotter.finish(xscale='log', yscale='log')
-        else: 
-            plotter.finish()
+        plotter.finish()
 
 if __name__ == '__main__':
     mats = [
+        "Erdos02",
+        "California", 
+        "tomography", 
+        "cage7", 
         "494_bus", # Invalid for mag-based sparsifification
         "bp_0",
         "bcsstk07", 
@@ -116,6 +156,8 @@ if __name__ == '__main__':
         "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
         "bcsstm07",
 
+        "Harvard500", 
+        "gre_343",
         "bcspwr06",
         "gre_1107",
         "can_229", 
@@ -127,6 +169,6 @@ if __name__ == '__main__':
     
     loglog = True
 
-    # row_norms_dist(mats)
+    # row_norms_dist(mats, loglog)
     # histogram(mats, loglog)
     histogramish(mats, loglog)
