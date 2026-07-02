@@ -53,7 +53,7 @@ def histogramish(mats, loglog):
         )
 
         # Histogram(ish)
-        (ys_star, xs), lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=True, num_bins=100)
+        ys_star, xs, lbl = row_norms.get_distribution(mat_name=mat_name, max_norm=True, num_bins=100)
         xs = xs[1: ] # Remove last bin edge
         plotter.add_to_plot(xs, ys_star, lbl)
 
