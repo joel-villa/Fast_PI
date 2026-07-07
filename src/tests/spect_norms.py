@@ -77,7 +77,13 @@ def get_2norms(mats):
     
     save_json(data, save_path=save_path)
 
-    return  list(data.values())
+    spect_norms = []
+
+    for mat_name in mats:
+        spect_norm = data[mat_name]
+        spect_norms.append(spect_norm)
+
+    return  spect_norms
 
 
 

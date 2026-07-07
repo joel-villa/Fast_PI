@@ -8,29 +8,29 @@ from .tests import spect_norms as sn
 
 if __name__ == '__main__':
     mats = [
-        "bcsstk08",
+        # "bcsstk08",
         "Erdos02",
         "California", 
 
-        "494_bus", # Invalid for mag-based sparsifification
+        # "494_bus", # Invalid for mag-based sparsifification
         "Harvard500", 
 
-        # "gre_343",
+        "gre_343",
         # "bcsstm07",
         # "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        # "hor_131",
-        # "fs_541_1",
+        "hor_131",
+        "fs_541_1",
         # "bcsstk07", 
-        # "bp_0",
+        "bp_0",
         # "tomography", 
-        # "cage7", 
-        # "bcspwr06",
-        # "gre_1107",
-        # "can_229", 
-        # "dwt_193",
-        # "gre_1107",
-        # "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "cage7", 
+        "bcspwr06",
+        "gre_1107",
+        "can_229", 
+        "dwt_193",
+        "gre_1107",
+        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
     
 
