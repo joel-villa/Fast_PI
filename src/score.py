@@ -326,10 +326,10 @@ if __name__ == '__main__':
     # epsilon = 0.24
 
     proven_types = (
-        "one-norm", 
+        # "one-norm", 
         "two-norm",
-        "inf-norm",
-        "uniform",
+        # "inf-norm",
+        # "uniform",
     )
 
     sample_types = (
@@ -347,9 +347,9 @@ if __name__ == '__main__':
     ) 
     
     mats = [
+        "bcsstk08", 
         "494_bus", # Invalid for mag-based sparsifification
         "bcsstk07", 
-        "bcsstk08", 
         "bcsstk19", 
         "bcsstm07", 
         "bcspwr06",
@@ -385,11 +385,11 @@ if __name__ == '__main__':
         funct_args = funct_args | {"seed": seed}
 
         # The Proven Boy TODO
-        # test_proven(
-        #     funct_args=funct_args,
-        #     kwargs=kwargs,
-        #     types=proven_types,
-        # )
+        test_proven(
+            funct_args=funct_args,
+            kwargs=kwargs,
+            types=proven_types,
+        )
 
         # Args for JL reduction tests
         jl_args = funct_args | {"eps": epsilon}
@@ -404,12 +404,12 @@ if __name__ == '__main__':
         sample_args = funct_args | {"gamma": 0.9} # for nystrom sampling
 
         # COLUMN SAMPLING TEST
-        col_sample(
-            ps=ps, 
-            funct_args=sample_args, 
-            kwargs=kwargs, 
-            types=sample_types
-        )
+        # col_sample(
+        #     ps=ps, 
+        #     funct_args=sample_args, 
+        #     kwargs=kwargs, 
+        #     types=sample_types
+        # )
 
         # SPARSIFICATION TEST
         # sparsification(funct_args=funct_args, kwargs=kwargs)
