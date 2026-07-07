@@ -74,10 +74,10 @@ if __name__ == '__main__':
     gamma = 0.9 #For nystrom sampling
     
     mats = [
+        "bcsstk08",
         "494_bus", # Invalid for mag-based sparsifification
         "bp_0",
         "bcsstk07", 
-        "bcsstk08", 
         "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
         "bcsstm07", 
         "bcspwr06",
