@@ -191,7 +191,7 @@ def overfit_pow_law(xs, ys):
     b_ub = -ln_ys - ln_xs
 
     bounds = [
-        (0.0 , None), # k >= 0
+        (-1 , None), # k >= 0
         (None, None), # ln(a) free
     ]
 
@@ -218,6 +218,6 @@ def overfit_pow_law(xs, ys):
     print(f"n = {len(xs)}")
     print(fr"$\sum_i ||A^{{(i)}}|| \le {util.pow_integral(a=a, k= -k - 1, n=len(xs))}$")
 
-    lbl = fr"$y = {a:,.4f} \cdot x ^{{-{k:.4f} - 1}}$"
+    lbl = fr"$y = {a:,.4f} \cdot x ^{{{-k - 1:.4f} }}$"
     
     return xs, ys, lbl
