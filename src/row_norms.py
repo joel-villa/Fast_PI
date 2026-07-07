@@ -132,32 +132,33 @@ def row_norms_dist(mats, loglog):
         # plotter.add_to_plot(xs, ys, lbl)
 
         # y = bx^m
-        xs, ys, lbl = row_norms.fit_pow_law(xs, ys_star)
-        plot(plotter, xs, ys, lbl, loglog)
+        # xs, ys, lbl = row_norms.fit_pow_law(xs, ys_star)
+        # plot(plotter, xs, ys, lbl, loglog)
 
         # y <= ax^k
-        xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
-        plot(plotter, xs, ys, lbl, loglog)
+        # xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
+        # plot(plotter, xs, ys, lbl, loglog)
 
         plotter.finish()
 
 if __name__ == '__main__':
     mats = [
+        "bcsstk08",
         "Erdos02",
         "California", 
+
+        "494_bus", # Invalid for mag-based sparsifification
+        "Harvard500", 
+
+        "gre_343",
+        "bcsstm07",
+        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
+        "hor_131",
+        "fs_541_1",
+        "bcsstk07", 
+        "bp_0",
         "tomography", 
         "cage7", 
-        "494_bus", # Invalid for mag-based sparsifification
-        "bp_0",
-        "bcsstk07", 
-        "fs_541_1",
-        "hor_131",
-        "bcsstk08", 
-        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        "bcsstm07",
-
-        "Harvard500", 
-        "gre_343",
         "bcspwr06",
         "gre_1107",
         "can_229", 
@@ -167,8 +168,8 @@ if __name__ == '__main__':
         "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
     
-    loglog = True
+    loglog = False
 
-    # row_norms_dist(mats, loglog)
+    row_norms_dist(mats, loglog)
     # histogram(mats, loglog)
-    histogramish(mats, loglog)
+    # histogramish(mats, loglog)
