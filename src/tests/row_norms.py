@@ -9,6 +9,7 @@ Return:
 from scipy.optimize import linprog
 
 import numpy as np
+import math
 
 from ..util import row_norms as util
 
@@ -152,6 +153,158 @@ def fit_pow_law(xs, ys):
     # lbl = fr"$\ln y = m \ln x + \ln {b}$"
     # y_log = m * x_log + ln_b
     # return x_log, y_log, lbl
+
+def overfit_pow_law_v3(xs, ys):
+    """ Finding a line of overfit w/o Linear Programing
+
+    y = ax^k
+    ln(y) = ln(a) + k ln(x)
+    ln(a) = ln(y) - k ln(x)
+
+    Trying to maximize:
+        int_{x=1}^n ax^k dx = 
+            a / (k+1) (n^(k+1) - 1), if k != -1
+            a ln n                   if k == -1
+    
+    Args:
+        xs: numpy array
+            x-values
+        ys: numpy array
+            y-values
+    Return:
+        xs: numpy array
+            x-values unchanged
+        ys: numpy array
+            the y-values of the line of overfit
+        lbl: string
+            string representation of this function
+    """
+    if np.any(ys < 0):
+        raise ValueError("Misuse of overfit_pow_law: y-values should be positive")
+    if np.any(ys == 0):
+        print("Warning: going to reduce length of xs and ys")
+        xs, ys = util.remove_zero_values(xs=xs, ys=ys)
+
+    # The dimension is of importance
+    num_rows = xs.size
+
+    # Power law distribution -> ln y = ln a + k ln x
+    ln_xs = np.log(xs)
+    ln_ys = np.log(ys)
+    
+    # Test values of k
+    ks = np.linspace(-4, 0, 512)
+
+    # Some default settings
+    min_area = np.inf
+    a_best = np.inf
+    k_best = np.inf
+
+    for i, k in enumerate(ks):
+        # the y-intercept of a line w/ slope k, that runs above all the data 
+        ln_a = np.max(ln_ys - k * ln_xs) 
+
+        a = math.exp(ln_a)
+        area = 0
+
+        if abs(k + 1) <= 1e-7: #1e-7 ~ 32-bit machine epsilon
+            # a ln n, if k == -1
+            area = a * math.log(num_rows)
+        else: 
+            # a / (k+1) (n^(k+1) - 1), if k != -1
+            area = a / (k + 1) * (num_rows ** (k + 1) - 1)
+
+        if area < min_area:
+            # Found new best k and a settings
+            min_area = area
+            a_best = a
+            k_best = k
+    
+    ys = util.pow_law_y(xs=xs, coefficient=a_best, exponent= k_best)
+    lbl = fr"$y = {a_best:,.4f} \cdot x ^{{{k_best:.4f} }}$"
+
+    return xs, ys, lbl
+
+def overfit_pow_law_v2(xs, ys):
+    """ Finding a power-law line which overfits the data (designed around API)
+
+    Minimizing: 
+        ln(a) + k = a * e^k
+    Overfitting:
+        -ln(a) - k ln(x) <= -ln(y)
+    x Bounds:
+        0 <= a <= infty ---> -infty <= ln(a) <= infty
+        -infty <= k <= 0
+
+    Args:
+        xs: numpy array
+            x-values
+        ys: numpy array
+            y-values
+    Return:
+        xs: numpy array
+            x-values unchanged
+        ys: numpy array
+            the y-values of the line of overfit
+        lbl: string
+            string representation of this function
+    """
+    if np.any(ys < 0):
+        raise ValueError("Misuse of overfit_pow_law: y-values should be positive")
+    if np.any(ys == 0):
+        print("Warning: going to reduce length of xs and ys")
+        xs, ys = util.remove_zero_values(xs=xs, ys=ys)
+
+    # Power law distribution -> ln y = ln a + k ln x
+    ln_xs = np.log(xs)
+    ln_ys = np.log(ys)
+
+    # Minimize ln(a) + k -> minimizing a * e^k
+    c = [1, 1]
+
+    # The column vectors
+    xT = ln_xs.reshape(-1, 1) # transpose ln_xs
+    ones = np.ones_like(xT) # column of ones
+
+    # The A matrix
+    A_lb = np.hstack((ones, xT)) # For solving ln(y) <= ln(a) + k ln(x)
+    A_ub = -A_lb # For solving -ln(y) >= -ln(a) - k ln(x)
+    print(A_ub[:2])
+
+    # For solving -ln(y) >= -ln(a) - k ln(x)
+    b_ub = -ln_ys
+
+    # Bounding x
+    bounds = [
+        (None, None), # ln(a) in (-infty, infty)
+        (None, 0), # k in (-infty, 0)
+    ]
+
+    optimize_result = linprog(
+        c=c,
+        A_ub=A_ub,
+        b_ub=b_ub,
+        bounds=bounds,
+    )
+
+    if optimize_result.status != 0:
+        # Error occured
+        raise ValueError(f"{optimize_result.message}")
+
+    x = optimize_result.x
+
+    ln_a = x[0]
+    k = x[1]
+
+    a = math.exp(ln_a)
+
+    ys = util.pow_law_y(xs=xs, coefficient=a, exponent= k)
+
+    lbl = fr"$y = {a:,.4f} \cdot x ^{{{k:.4f} }}$"
+
+    print(f"lbl= {lbl}")
+
+    return xs, ys, lbl
 
 def overfit_pow_law(xs, ys):
     """ Finding a power-law line which overfits the data
