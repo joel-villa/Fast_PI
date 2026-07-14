@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from Sparsification_Research.src.Plotter import Plotter
 
 from .tests import row_norms
-from .util.row_norms import remove_zero_values
+from .util.row_norms import remove_zero_values, rm_first_funct_vals, log_size
 
 def plot(plotter, xs, ys, lbl, loglog):
     """ Add the xs, ys, lbl to the plot, if loglog, take log of xs and ys
@@ -92,17 +92,18 @@ def histogramish(mats, loglog):
 
 
         # y <= ax^k
-        # xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
+        # xs, ys, lbl = row_norms.overfit_pow_law_v3(xs, ys_star)
         # plot(plotter, xs, ys, lbl, loglog)
 
         
         plotter.finish()
-def row_norms_dist(mats, loglog):
+def row_norms_dist(mats, loglog, funct):
     """ Plot row vs. row-norms for matrices
     
     Args:
         mats: list of matrix names
         loglog: boolean, whether to use log-log scale
+        funct:  removing the first funct(x) values from the dataset
     Return: NONE
     """
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6)) 
@@ -129,35 +130,47 @@ def row_norms_dist(mats, loglog):
 
         #y = m/x + b
         # xs, ys, lbl = row_norms.fit_x_inverse(xs, ys)
+        # xs, ys = rm_first_funct_vals(xs, ys_star, funct)
         # plotter.add_to_plot(xs, ys, lbl)
 
         # y = bx^m
         # xs, ys, lbl = row_norms.fit_pow_law(xs, ys_star)
+        #xs, ys = rm_first_funct_vals(xs, ys_star, funct)
         # plot(plotter, xs, ys, lbl, loglog)
 
         # y <= ax^k
-        xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
+        x_subset, y_star_subset = rm_first_funct_vals(xs, ys_star, funct)
+        # print(f"x_sub = {x_subset[:5]}, y_sub = {y_star_subset[:5]}")
+        xs, ys, lbl = row_norms.overfit_pow_law_v3(x_subset, y_star_subset)
         plot(plotter, xs, ys, lbl, loglog)
 
         plotter.finish()
 
 if __name__ == '__main__':
     mats = [
+        "barth",
         
         #~x^-0.75
         "bcsstk08", #SYMMETRIC
 
         #~x^-0.3
         "Erdos02",
-        "California", 
-        "494_bus", # Invalid for mag-based sparsifification
         "Harvard500", 
+
+        #0.25
+        "California", 
+
+        #0.2
+        "qc324", # SYMMETRIC
+        "494_bus", # Invalid for mag-based sparsifification
 
         # x^.1
         "nasa1824",
         "bp_0",
         "tomography", 
         "gre_1107",
+        "ex2",
+
 
         #x^0.05
         "bcspwr10",
@@ -177,10 +190,20 @@ if __name__ == '__main__':
         "dwt_193",
         "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
         "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "eris1176",
+        "lshp1561",
+        "nos3",
+        "bcsstk34",
+        "msc00726",
+        "meg4",
+        "G1",
+        "G67",
+
     ]
     
     loglog = True
+    subset = log_size
 
-    row_norms_dist(mats, loglog)
+    row_norms_dist(mats, loglog, subset)
     # histogram(mats, loglog)
     # histogramish(mats, loglog)
