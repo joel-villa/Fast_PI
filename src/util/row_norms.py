@@ -181,13 +181,17 @@ def rm_first_funct_vals(xs, ys, function):
         ys: numpy array of floats
             An array to reduce
         function: a function which takes in an array of floats and returns an 
-        integer
+        integer 
+            if None, return xs and ys unchanged
     Return: 
         xs: numpy array 
             Subset of original xs
         ys: numpy array
             Subset of original ys
     """
+    if function is None:
+        return xs, ys
+    
     n_subset = function(xs)
 
     # Only want the last n - n_subset elements
