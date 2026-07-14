@@ -7,6 +7,7 @@ from scipy.optimize import linprog
 import json 
 
 import numpy as np
+import math
 
 from Sparsification_Research.src.SSGetter import SSGetter
 from ..util.sparse_rows import calc_row_norms
@@ -169,3 +170,37 @@ def remove_zero_values(xs, ys):
     xs = xs[nonzero_indices]
     ys = ys[nonzero_indices]
     return xs, ys
+
+def rm_first_funct_vals(xs, ys, function):
+    """ Remove the first z values from both xs and ys, where z is the output 
+    of function(n), where n is the dimension of xs and ys
+    TODO
+    Args:
+        xs: numpy array of floats
+            An array to reduce
+        ys: numpy array of floats
+            An array to reduce
+        function: a function which takes in an array of floats and returns an 
+        integer
+    Return: 
+        xs: numpy array 
+            Subset of original xs
+        ys: numpy array
+            Subset of original ys
+    """
+    n_subset = function(xs)
+
+    # Only want the last n - n_subset elements
+    xs = xs[n_subset:]
+    ys = ys[n_subset:]
+
+    return xs, ys
+def log_size(xs):
+    """ Returns the ceiling of the log of the size of the xs array
+    
+    Args: 
+        xs: numpy array
+            Dimension of signifigance
+    Return: log(len(xs))
+    """
+    return math.ceil(math.log(xs.size))
