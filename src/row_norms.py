@@ -148,61 +148,72 @@ def row_norms_dist(mats, loglog, funct):
 
 if __name__ == '__main__':
     mats = [
-        "barth",
-        
-        #~x^-0.75
+
+        # -1.2 > k > -1.1
+        "494_bus", # SYMMETRIC
+
+        # -1.1 > k > -1.0
         "bcsstk08", #SYMMETRIC
+        "ex2", #SYMMETRIC
 
-        #~x^-0.3
-        "Erdos02",
-        "Harvard500", 
+        # -1.0 > k > -0.9
+        "bp_0", #NON SYMMETRIC
 
-        #0.25
-        "California", 
-
-        #0.2
-        "qc324", # SYMMETRIC
-        "494_bus", # Invalid for mag-based sparsifification
-
-        # x^.1
-        "nasa1824",
-        "bp_0",
-        "tomography", 
-        "gre_1107",
-        "ex2",
+        # -0.9 > k > -0.8
+        "meg4", #SYMMETRIC
+        "1138_bus",
 
 
-        #x^0.05
-        "bcspwr10",
-        "gre_343",
+        # -0.8 > k > -0.7
         "hor_131",
-        "bcspwr06",
-        "can_229", 
-        "gre_1107",
-
-        #x^0
-        "blckhole",
-        "bcsstm07",
         "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        "fs_541_1",
+        "nasa1824",
         "bcsstk07", 
-        "cage7", 
-        "dwt_193",
-        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
-        "eris1176",
-        "lshp1561",
-        "nos3",
+
+        # -0.7 > k > -0.6
+        "Harvard500",
+        "fs_541_1", 
+
+        # -0.6 > k > -0.5
         "bcsstk34",
         "msc00726",
-        "meg4",
+        "eris1176",
+
+        # -0.5 > k > -0.4
+        "qc324", # SYMMETRIC
+        "Erdos02",
+
+        # -0.4 > k > -0.3
+        "California", 
+        "bcsstm07",
+
+        # -0.3 > k > -0.2
+
+        # -0.2 > k > -0.1
+        "barth",
+        "tomography", 
+        "gre_1107",
+        "bcspwr10",
+        "bcspwr06",
+        "gre_1107",
+        "dwt_193",
+        "gre_343",
+        "cage7", 
+
+
+        # -0.1 > k 
+        "blckhole",
+        "can_229", 
+        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "lshp1561",
+        "nos3",
         "G1",
         "G67",
-
     ]
     
     loglog = True
-    subset = log_size
+    subset = None
 
     row_norms_dist(mats, loglog, subset)
     # histogram(mats, loglog)
