@@ -136,39 +136,50 @@ def row_norms_dist(mats, loglog):
         # plot(plotter, xs, ys, lbl, loglog)
 
         # y <= ax^k
-        # xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
-        # plot(plotter, xs, ys, lbl, loglog)
+        xs, ys, lbl = row_norms.overfit_pow_law(xs, ys_star)
+        plot(plotter, xs, ys, lbl, loglog)
 
         plotter.finish()
 
 if __name__ == '__main__':
     mats = [
-        "bcsstk08",
+        
+        #~x^-0.75
+        "bcsstk08", #SYMMETRIC
+
+        #~x^-0.3
         "Erdos02",
         "California", 
-
         "494_bus", # Invalid for mag-based sparsifification
         "Harvard500", 
 
-        "gre_343",
-        "bcsstm07",
-        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        "hor_131",
-        "fs_541_1",
-        "bcsstk07", 
+        # x^.1
+        "nasa1824",
         "bp_0",
         "tomography", 
-        "cage7", 
+        "gre_1107",
+
+        #x^0.05
+        "bcspwr10",
+        "gre_343",
+        "hor_131",
         "bcspwr06",
-        "gre_1107",
         "can_229", 
-        "dwt_193",
         "gre_1107",
+
+        #x^0
+        "blckhole",
+        "bcsstm07",
+        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
+        "fs_541_1",
+        "bcsstk07", 
+        "cage7", 
+        "dwt_193",
         "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
         "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
     ]
     
-    loglog = False
+    loglog = True
 
     row_norms_dist(mats, loglog)
     # histogram(mats, loglog)
