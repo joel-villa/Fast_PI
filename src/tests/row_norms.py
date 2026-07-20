@@ -193,7 +193,7 @@ def overfit_pow_law_v3(xs, ys):
     ln_ys = np.log(ys)
     
     # Test values of k
-    ks = np.linspace(-4, 0, 512)
+    ks = np.linspace(-8, 0, 1024)
 
     # Some default settings
     min_area = np.inf
