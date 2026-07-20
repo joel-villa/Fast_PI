@@ -97,13 +97,14 @@ def histogramish(mats, loglog):
 
         
         plotter.finish()
-def row_norms_dist(mats, loglog, funct):
+def row_norms_dist(mats, loglog, funct, f_of_y):
     """ Plot row vs. row-norms for matrices
     
     Args:
         mats: list of matrix names
         loglog: boolean, whether to use log-log scale
         funct:  removing the first funct(x) values from the dataset
+        f_of_y: a function to apply to the y-values before plotting & fitting
     Return: NONE
     """
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6)) 
@@ -126,6 +127,11 @@ def row_norms_dist(mats, loglog, funct):
 
         # xs, ys, lbl = row_norms.get_two_norm(mat_name=mat_name)
         xs, ys_star, lbl = row_norms.get_two_norm(mat_name=mat_name, max_norm=True)
+        ys_star = f_of_y(ys_star)
+
+        #RESORT
+        ys_star = np.sort(ys_star)[::-1] #[::-1] -> descending
+
         plot(plotter, xs, ys_star, lbl, loglog)
 
         #y = m/x + b
@@ -214,7 +220,9 @@ if __name__ == '__main__':
     
     loglog = True
     subset = None
+    # subset = log_size
+    f_of_y = lambda y: y ** 3 - y ** 4
 
-    row_norms_dist(mats, loglog, subset)
+    row_norms_dist(mats, loglog, subset, f_of_y=f_of_y)
     # histogram(mats, loglog)
     # histogramish(mats, loglog)
