@@ -1,6 +1,8 @@
 """
 Testing the distribution of matrix row norms of Suite-Sparse Matrix collection
 """
+from collections.abc import Callable
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -9,7 +11,13 @@ from Sparsification_Research.src.Plotter import Plotter
 from .tests import row_norms
 from .util.row_norms import remove_zero_values, rm_first_funct_vals, log_size
 
-def plot(plotter, xs, ys, lbl, loglog):
+def plot(
+        plotter: Plotter, 
+        xs: np.ndarray, 
+        ys: np.ndarray, 
+        lbl: str, 
+        loglog: bool,
+    ) -> None:
     """ Add the xs, ys, lbl to the plot, if loglog, take log of xs and ys
     
     Args:
@@ -29,7 +37,7 @@ def plot(plotter, xs, ys, lbl, loglog):
     else: 
         plotter.add_to_plot(xs, ys, lbl)
 
-def histogram(mats, loglog):
+def histogram(mats:list[str], loglog:bool) -> None:
     """ Plot the histogram of row norms for a given matrix
     
     Args:
@@ -58,7 +66,7 @@ def histogram(mats, loglog):
             plt.ylabel("Number of Rows")
         plt.show()
 
-def histogramish(mats, loglog):
+def histogramish(mats:list[str], loglog:bool) -> None:
     """ Plot something akin to the histogram of row norms for a given matrix
     
     Args:
@@ -97,7 +105,12 @@ def histogramish(mats, loglog):
 
         
         plotter.finish()
-def row_norms_dist(mats, loglog, funct, f_of_y):
+def row_norms_dist(
+        mats: list[str], 
+        loglog: bool, 
+        funct: Callable[[np.ndarray], int], 
+        f_of_y: Callable[[np.ndarray], np.ndarray],
+    ) -> None:
     """ Plot row vs. row-norms for matrices
     
     Args:
