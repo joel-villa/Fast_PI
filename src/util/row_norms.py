@@ -12,7 +12,7 @@ import math
 from Sparsification_Research.src.SSGetter import SSGetter
 from ..util.sparse_rows import calc_row_norms
 
-save_path = "data/two_norms.npz"
+NPZ_PATH = "data/two_norms.npz"
 json_path = "data/pow_law.json"
 
 def save_data(mat_name, ys):
@@ -24,32 +24,47 @@ def save_data(mat_name, ys):
     Return: 
         None
     """
-    data = read_data()
+    data = load_data()
 
     data[mat_name] = ys
 
     # Save the dictionary by unpacking it with **
-    np.savez(save_path, **data)
-    
-def read_data(mat_name=None):
-    """ Read the matrix's two-norm data from data/two_norms.json
-    
-    Args:
-        mat_name: the name of the suite-sparse matrix
-    Return: 
-        None: if DNE in two_norms.json, ys otherwise
+    np.savez(NPZ_PATH, **data)
+
+def read_data():
+    raise NotImplementedError("This function is not yet implemented")
+
+def load_data() -> dict:
+    """Read the data 
+
+    Returns:
+        dict: _description_
     """
     try:
-        with np.load(save_path) as loaded_data:
-            data = dict(loaded_data)
+        with np.load(NPZ_PATH) as loaded_data:
+            return dict(loaded_data)
     except EOFError:
         # Empty file error
-        if mat_name is None:
-            return {}
-        return None 
+        return {}
+    
+def get_norms_from_npz(mat_name:str) -> np.ndarray | None:
+    """ Read the matrix's two-norm data from data/two_norms.npz
+    
+    Args:
+        mat_name: 
+    Return: 
+        None: 
+    
 
-    if mat_name is None:
-        return data
+    Args:
+        mat_name (str): the name of the suite-sparse matrix
+
+    Returns:
+        np.ndarray | None: 
+            np.ndarray: if two norms are tracked in two_norms.npz
+            None: if two norms are not tracked
+    """
+    data = load_data()
 
     # Dictionary lookup, w/ default of None
     return data.get(mat_name)

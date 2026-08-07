@@ -13,7 +13,10 @@ import math
 
 from ..util import row_norms as util
 
-def get_two_norm(mat_name, max_norm):
+def get_two_norm(
+        mat_name:str, 
+        max_norm:bool,
+) -> tuple[np.ndarray, np.ndarray, str]:
     """Attempt to read in the matrix data, if none, compute it, and save it
 
     Args:
@@ -24,7 +27,7 @@ def get_two_norm(mat_name, max_norm):
         ys: sorted array of row magnitudes (2-norms)
         lbl: string representation of this test
     """
-    ys = util.read_data(mat_name=mat_name)
+    ys = util.get_norms_from_npz(mat_name=mat_name)
 
     if ys is None:
         # Matrix data has not been computed, compute them and save
@@ -33,7 +36,7 @@ def get_two_norm(mat_name, max_norm):
     
     rows = ys.shape[0] # The number of rows
 
-    xs = np.arange(start=1, stop=rows+1)
+    xs = np.arange(1, stop=rows+1)
 
     if max_norm:
         # Assume max_i ||A^(i)|| <= 1
