@@ -26,7 +26,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 - Clean up README runnables
 - Write code for calculating $f$ in $\Pr( \left|||\tilde A||^2 - ||A||^2\right| \ge ||A|| \epsilon^2) \le 2 \exp(\ln (n) - \epsilon^2 f)$
-- Convergence vs. Work graph
+- Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
 - Expected amount of rows sampled vs. actual? 
 
 ### Theory
