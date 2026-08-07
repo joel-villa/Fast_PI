@@ -1,8 +1,25 @@
 """A file for generating the expected sampling of a matrix A, given the sampling
 scheme which was proven to be theoretically perfomant"""
 
+import numpy as np
+
 from .util.meta_data import get_n_c_k
 from ..util.constants import THIRTY_TWO_BIT_PRECISION
+
+from ..util.row_norms import get_sorted_row_norms
+
+
+def expected_sampling(matrix:str) -> float:
+    """The expected amount of rows kept in the matrix
+
+    Args:
+        matrix (str): matrix suitesparse name
+
+    Returns:
+        float: expected number of rows sampled
+    """
+
+    return np.sum(get_sorted_row_norms(mat_name=matrix, rescale=True))
 
 def expected_sampling_ub(
     matrix: str,

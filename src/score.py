@@ -16,7 +16,18 @@ from src.tests import score as tst
 from src.tests import score_sample as smpl
 from src.tests import power_lazy as lzy
 
-def test(funct, plotter, num_avg, A, num_iter, kwargs={}, show_more=False):
+from .proven.preprocess import preprocess
+from .proven.expected_sampling import expected_sampling_ub, expected_sampling
+
+def test(
+        funct, 
+        plotter, 
+        num_avg, 
+        A, 
+        num_iter, 
+        kwargs={}, 
+        show_more=False,
+) -> None:
     """Test the given function from src/tests
     
     Args:
@@ -91,8 +102,7 @@ def init(mat_name, seed, tol):
         kwargs: a dictionary containing the initial guess for u, as wall as the 
                 solution u
     """
-    ss_getter = SSGetter(in_csr=False)
-    A = ss_getter.get(mat_name)
+    A, _ = preprocess(mat_name=mat_name)
         
     _, s_star, _ =  svds(A, k=1)
 
@@ -347,9 +357,10 @@ if __name__ == '__main__':
     ) 
     
     mats = [
+        "ex2",
+        "494_bus", # Invalid for mag-based sparsifification
         "gre_343",
         "bcsstk08", 
-        "494_bus", # Invalid for mag-based sparsifification
         "bcsstk07", 
         "bcsstk19", 
         "bcsstm07", 
@@ -386,6 +397,8 @@ if __name__ == '__main__':
         funct_args = funct_args | {"seed": seed}
 
         # The Proven Boy TODO
+        print(f"Expected number of rows kept: {expected_sampling(matrix=mat_name)}")
+        print(f"Upperbound on expected number of rows kept: {expected_sampling_ub(matrix=mat_name)}")
         test_proven(
             funct_args=funct_args,
             kwargs=kwargs,
