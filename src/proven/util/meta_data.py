@@ -64,9 +64,11 @@ def get_matrix_constants(
     data = load_json(save_path=PATH_M_DATA)
 
     if matrix_name not in data:
-        data[matrix_name] = load_and_save_metadata(data, matrix_name)
+        data = load_and_save_metadata(data, matrix_name)
 
-    values = [data[matrix_name].get(constant) for constant in THEORY_CONSTANTS]
+    mat_data = data[matrix_name]
+
+    values = [mat_data.get(constant) for constant in THEORY_CONSTANTS]
     if None in values:
         raise ValueError(f"One or more constants not found for {matrix_name} in matrix_meta_data.json")
     
