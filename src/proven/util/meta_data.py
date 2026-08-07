@@ -3,6 +3,9 @@
 import scipy
 
 from Sparsification_Research.src.SSGetter import SSGetter
+
+from ...util.row_norms import get_sorted_row_norms
+
 from .json_wrapper import load_json, save_json
 from .comp_data import get_metadata
 
@@ -19,16 +22,26 @@ THEORY_CONSTANTS = [
 """What follows is the API for interfacing with the Suite-Sparse Matrix 
 collection"""
 
-def get_A(mat_name: str) -> scipy.sparse:
+def preprocess_A(mat_name: str) -> tuple[scipy.sparse, float]:
     """Get the matrix A 
 
     Args:
-        mat_name (str): Matrix name in the Suite-Sparse collection
-    Returns: 
-        scipy.sparse: The matrix A in sparse format
+        mat_name (str): _description_
+
+    Returns:
+        tuple[scipy.sparse, float]: 
+            scipy.sparse: The matrix A in sparse format
+            float: the factor by which A was scaled
     """
-    ss_getter = SSGetter()
-    return ss_getter.get(mat_name)
+    ssgetter = SSGetter()
+    A = ssgetter.get(mat_name)
+
+    max_row_magnitude = get_sorted_row_norms(mat_name=mat_name)[0]
+
+    # Rescale A
+    A = A / max_row_magnitude
+
+    return A, max_row_magnitude
     
 
 def load_and_save_metadata(
@@ -47,17 +60,20 @@ def load_and_save_metadata(
             kappa: -3k - 1 (always positive)
             op-norm: ||A||_2    
     """
-    A = get_A(mat_name)
-    data = get_metadata(A)
+    A, scale_factor = preprocess_A(mat_name)
 
-    keys = THEORY_CONSTANTS + ["scale_factor"]
+    data_dict = get_metadata(A)
 
-    data_dict = {key: value for key, value in zip(keys, data)}
+    data_dict = data_dict | {"scale_factor": scale_factor}
 
     save_json(data_dict, save_path=PATH_M_DATA)
 
-    return data[:len(THEORY_CONSTANTS)] # Excluding some of the metadata
+    data_list = [data_dict.get(c) for c in THEORY_CONSTANTS]
 
+    try: 
+        return tuple(data_list)
+    except TypeError as e:
+        raise TypeError(f"Messing up data format:{e}\ndata_dict={data_dict}")
 
 """What follows is the API for interfacing with the matrix_meta_data.json"""
 
