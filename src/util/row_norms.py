@@ -10,6 +10,7 @@ import numpy as np
 import math
 
 from Sparsification_Research.src.SSGetter import SSGetter
+from .constants import THIRTY_TWO_BIT_PRECISION
 from ..util.sparse_rows import calc_row_norms
 
 NPZ_PATH = "data/two_norms.npz"
@@ -152,7 +153,7 @@ def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
         c = math.exp(ln_a)
         area = 0
 
-        if abs(k + 1) <= 1e-7: #1e-7 ~ 32-bit machine epsilon
+        if abs(k + 1) <= THIRTY_TWO_BIT_PRECISION: #1e-7 ~ 32-bit machine epsilon
             # a ln n, if k == -1
             area = c * math.log(num_rows)
         else: 
