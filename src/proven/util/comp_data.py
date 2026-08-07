@@ -4,32 +4,10 @@ sparse matrix"""
 import scipy
 from scipy.sparse.linalg import norm
 
-from Sparsification_Research.src.SSGetter import SSGetter
+from ..preprocess import preprocess
 
 from ...util.row_norms import get_sorted_row_norms, get_power_law_coefficients
 
-
-def preprocess(mat_name:str) -> tuple[scipy.sparse, float]:
-    """Get A scaled by a factor of 1/max_i(||a_i||)
-
-    Args:
-        mat_name (str): the name of the suite-spasrse matrix
-
-    Returns:
-        tuple[scipy.sparse, float]: 
-            scipy.sparse: the matrix in sparse format
-            float: the scaling factor
-    """
-    ssgetter = SSGetter()
-    A = ssgetter.get(mat_name)
-    
-    max_row_magnitude = get_sorted_row_norms(mat_name, rescale=False)[0]
-
-    # Rescale A
-    A = A / max_row_magnitude
-
-    return A, max_row_magnitude
-    
 
 def get_c_k(mat_name:str) -> tuple[float, float]:
     """Get the power-law-distribution coefficients corresponding to A's row
