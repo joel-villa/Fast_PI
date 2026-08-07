@@ -31,9 +31,6 @@ def save_data(mat_name, ys):
     # Save the dictionary by unpacking it with **
     np.savez(NPZ_PATH, **data)
 
-def read_data():
-    raise NotImplementedError("This function is not yet implemented")
-
 def load_data() -> dict:
     """Read the data 
 
@@ -90,6 +87,25 @@ def calculate_two_norm(mat_name):
 
     return row_norms
 
+def get_sorted_row_norms(mat_name:str) -> np.ndarray:
+    """Get the row norms of the given matrix, either from data/two_norms.npz or 
+    by calculating them
+
+    Args:
+        mat_name (str): the name of the suite-sparse matrix
+
+    Returns:
+        np.ndarray: sorted array of row magnitudes (2-norms)
+    """
+    ys = get_norms_from_npz(mat_name=mat_name)
+    
+    if ys is None:
+        # Matrix data has not been computed, compute them and save
+        ys = calculate_two_norm(mat_name=mat_name)
+        save_data(mat_name=mat_name, ys=ys)
+
+    return ys
+    
 """ 
 POWER LAW RELATED FUNCTIONS BELOW
 """

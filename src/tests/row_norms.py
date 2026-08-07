@@ -20,19 +20,17 @@ def get_two_norm(
     """Attempt to read in the matrix data, if none, compute it, and save it
 
     Args:
-        mat_name: the name of the suite-sparse matrix
-        max_norm: are we multiplying the matrix by the maximum row-norm?
-    Return:
-        xs: [1, 2, ...]
-        ys: sorted array of row magnitudes (2-norms)
-        lbl: string representation of this test
-    """
-    ys = util.get_norms_from_npz(mat_name=mat_name)
+        mat_name (str): the name of the suite-sparse matrix
+        max_norm (bool): are we multiplying the matrix by the maximum row-norm?
 
-    if ys is None:
-        # Matrix data has not been computed, compute them and save
-        ys = util.calculate_two_norm(mat_name=mat_name)
-        util.save_data(mat_name=mat_name, ys=ys)
+    Returns:
+        tuple[np.ndarray, np.ndarray, str]: 
+            xs: [1, 2, ...]
+            ys: sorted array of row magnitudes (2-norms)
+            lbl: string representation of this test
+    """
+
+    ys = util.get_sorted_row_norms(mat_name=mat_name)
     
     rows = ys.shape[0] # The number of rows
 
