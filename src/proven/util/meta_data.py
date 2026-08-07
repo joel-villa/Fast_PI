@@ -6,6 +6,16 @@ from Sparsification_Research.src.SSGetter import SSGetter
 from .json_wrapper import load_json, save_json
 from .comp_data import get_metadata
 
+PATH_M_DATA = "data/matrix_meta_data.json"
+
+THEORY_CONSTANTS = [ 
+    "n",
+    "c", 
+    "k", 
+    "kappa", 
+    "op-norm",
+]
+
 """What follows is the API for interfacing with the Suite-Sparse Matrix 
 collection"""
 
@@ -21,19 +31,32 @@ def get_A(mat_name: str) -> scipy.sparse:
     return ss_getter.get(mat_name)
     
 
-def load_metadata(
+def load_and_save_metadata(
         mat_name: str,
-) -> dict:
+) -> tuple[int, float, float, float, float]:
     """Load the metadata of significance about the given suite-sparse matrix
 
     Args:
         mat_name (str): the suite sparse matrix
 
     Returns:
-        dict: contains relevant metadata
+        tuple[float, float, float, float, int]: 
+            n: number of rows in A
+            c: y-intercept of power-law distribution
+            k: slope of power-law distribution
+            kappa: -3k - 1 (always positive)
+            op-norm: ||A||_2    
     """
     A = get_A(mat_name)
-    return get_metadata(A)
+    data = get_metadata(A)
+
+    keys = THEORY_CONSTANTS + ["scale_factor"]
+
+    data_dict = {key: value for key, value in zip(keys, data)}
+
+    save_json(data_dict, save_path=PATH_M_DATA)
+
+    return data[:len(THEORY_CONSTANTS)] # Excluding some of the metadata
 
 
 """What follows is the API for interfacing with the matrix_meta_data.json"""
@@ -60,20 +83,12 @@ def get_matrix_constants(
             op-norm: ||A||_2
             
     """
-    data = load_json(save_path="data/matrix_meta_data.json")
+    data = load_json(save_path=PATH_M_DATA)
 
     if matrix_name not in data:
-        data[matrix_name] = load_metadata(matrix_name)
+        data[matrix_name] = load_and_save_metadata(matrix_name)
 
-    constants = [ 
-        "n",
-        "c", 
-        "k", 
-        "kappa", 
-        "op-norm",
-    ]
-
-    values = [data[matrix_name].get(constant) for constant in constants]
+    values = [data[matrix_name].get(constant) for constant in THEORY_CONSTANTS]
 
     if None in values:
         raise ValueError(f"One or more constants not found for {matrix_name} in matrix_meta_data.json")
