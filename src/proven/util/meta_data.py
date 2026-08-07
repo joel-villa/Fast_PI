@@ -10,7 +10,7 @@ THEORY_CONSTANTS = [
     "c", 
     "k", 
     "kappa", 
-    "op-norm",
+    "op_norm",
 ]
 
 """What follows is the API for interfacing with the Suite-Sparse Matrix 
@@ -31,7 +31,7 @@ def load_and_save_metadata(
     """
     matrix_dict = get_metadata(mat_name)
 
-    data = data | matrix_dict
+    data = data | {mat_name:matrix_dict}
 
     save_json(data, save_path=PATH_M_DATA)
 
@@ -67,7 +67,6 @@ def get_matrix_constants(
         data[matrix_name] = load_and_save_metadata(data, matrix_name)
 
     values = [data[matrix_name].get(constant) for constant in THEORY_CONSTANTS]
-
     if None in values:
         raise ValueError(f"One or more constants not found for {matrix_name} in matrix_meta_data.json")
     
@@ -77,4 +76,71 @@ def get_matrix_constants(
 if __name__ == '__main__':
     """Main for testing purposes
     """
+    mats = [
+        # -1.2 > k > -1.1
+        "494_bus", # SYMMETRIC
 
+        # -1.1 > k > -1.0
+        "bcsstk08", #SYMMETRIC
+        "ex2", #SYMMETRIC
+
+        # -1.0 > k > -0.9
+        "bp_0", #NON SYMMETRIC
+
+        # -0.9 > k > -0.8
+        "meg4", #SYMMETRIC
+        "1138_bus",
+
+
+        # -0.8 > k > -0.7
+        "hor_131",
+        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
+        "nasa1824",
+        "bcsstk07", 
+
+        # -0.7 > k > -0.6
+        "Harvard500",
+        "fs_541_1", 
+
+        # -0.6 > k > -0.5
+        "bcsstk34",
+        "msc00726",
+        "eris1176",
+
+        # -0.5 > k > -0.4
+        "qc324", # SYMMETRIC
+        "Erdos02",
+
+        # -0.4 > k > -0.3
+        "California", 
+        "bcsstm07",
+
+        # -0.3 > k > -0.2
+
+        # -0.2 > k > -0.1
+        "barth",
+        "tomography", 
+        "gre_1107",
+        "bcspwr10",
+        "bcspwr06",
+        "gre_1107",
+        "dwt_193",
+        "gre_343",
+        "cage7", 
+
+
+        # -0.1 > k 
+        "blckhole",
+        "can_229", 
+        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
+        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "lshp1561",
+        "nos3",
+        "G1",
+        "G67",
+    ]
+
+    mats = sorted(mats) #Alphabetical order
+
+    for mat in mats:
+        print(f"metadata: {get_matrix_constants(mat)}")
