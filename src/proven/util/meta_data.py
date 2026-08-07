@@ -39,9 +39,9 @@ def load_and_save_metadata(
 
 """What follows is the API for interfacing with the matrix_meta_data.json"""
 
-def get_matrix_constants(
+def get_meta_data(
         matrix_name: str,
-) -> tuple[int, float, float, float, float]:
+) -> dict:
     """Get those constants pertaining to theoretical results, they include:
     NOTE: c, k, and kappa assertain to the power law distribution of the 
     row norms. op-norm is ||A||_2, and n is the number of rows in A.
@@ -53,26 +53,19 @@ def get_matrix_constants(
         ValueError: _description_
 
     Returns:
-        tuple[float, float, float, float, int]: 
-            n: number of rows in A
-            c: y-intercept of power-law distribution
-            k: slope of power-law distribution
-            kappa: -3k - 1 (always positive)
-            op-norm: ||A||_2
-            
+        dict: A dictionary containing all known meta_data pertaining to the 
+        given matrix
     """
     data = load_json(save_path=PATH_M_DATA)
 
     if matrix_name not in data:
         data = load_and_save_metadata(data, matrix_name)
 
-    mat_data = data[matrix_name]
+    return data[matrix_name]
 
-    values = [mat_data.get(constant) for constant in THEORY_CONSTANTS]
-    if None in values:
-        raise ValueError(f"One or more constants not found for {matrix_name} in matrix_meta_data.json")
-    
-    return tuple(values)
+def get_n_c_k(matrix_name:str) -> tuple[int, float, float]:
+    mat_meta_data = get_meta_data(matrix_name)
+    return mat_meta_data['n'], mat_meta_data['c'], mat_meta_data['k']
 
 
 if __name__ == '__main__':
