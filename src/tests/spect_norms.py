@@ -8,41 +8,14 @@ Return:
     lbl: ...
 """
 
-import json
 import numpy as np
 import scipy.sparse.linalg as sla
 
 from Sparsification_Research.src.SSGetter import SSGetter
 
+from ..proven.util.json_wrapper import load_json, save_json
+
 save_path = "data/spect_norms.json"
-
-def load_json(save_path):
-    """ Load the json file at save_path
-    
-    Args: 
-        save_path: path to the json file
-    
-    Return: 
-        data: dictionary of the json file
-    """
-    with open(save_path, 'r') as file:
-        data = json.load(file)
-
-    return data
-
-def save_json(data, save_path):
-    """ Add this data to the dictionary that is currently stored at save_path
-
-    Args:
-        data: dictionary to be added to the json file
-        save_path: path to the json file
-
-    Return: 
-        None
-    """
-    # Saving to a file
-    with open(save_path, 'w') as file:
-        json.dump(data, file, indent=2)
 
 def calculate_2norm(mat_name):
     """ Calculate the spectral norm of the given SS matrix
