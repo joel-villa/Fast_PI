@@ -17,31 +17,25 @@ THEORY_CONSTANTS = [
 collection"""
 
 def load_and_save_metadata(
+        data: dict,
         mat_name: str,
-) -> tuple[int, float, float, float, float]:
+) -> dict:
     """Load the metadata of significance about the given suite-sparse matrix
 
     Args:
+        data (dict): the current dictionary saved under matr_meta_data.json
         mat_name (str): the suite sparse matrix
 
     Returns:
-        tuple[float, float, float, float, int]: 
-            n: number of rows in A
-            c: y-intercept of power-law distribution
-            k: slope of power-law distribution
-            kappa: -3k - 1 (always positive)
-            op-norm: ||A||_2    
+        dict: The updated dictionary saved in the json file
     """
-    data_dict = get_metadata(mat_name)
+    matrix_dict = get_metadata(mat_name)
 
-    save_json(data_dict, save_path=PATH_M_DATA)
+    data = data | matrix_dict
 
-    data_list = [data_dict.get(c) for c in THEORY_CONSTANTS]
+    save_json(data, save_path=PATH_M_DATA)
 
-    try: 
-        return tuple(data_list)
-    except TypeError as e:
-        raise TypeError(f"Messing up data format:{e}\ndata_dict={data_dict}")
+    return data
 
 """What follows is the API for interfacing with the matrix_meta_data.json"""
 
@@ -70,7 +64,7 @@ def get_matrix_constants(
     data = load_json(save_path=PATH_M_DATA)
 
     if matrix_name not in data:
-        data[matrix_name] = load_and_save_metadata(matrix_name)
+        data[matrix_name] = load_and_save_metadata(data, matrix_name)
 
     values = [data[matrix_name].get(constant) for constant in THEORY_CONSTANTS]
 
@@ -78,3 +72,9 @@ def get_matrix_constants(
         raise ValueError(f"One or more constants not found for {matrix_name} in matrix_meta_data.json")
     
     return tuple(values)
+
+
+if __name__ == '__main__':
+    """Main for testing purposes
+    """
+
