@@ -32,7 +32,9 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Theory
 
+- Writeup Proof for $||A|| \ge 1$
 - Prove something about the bounds of $\left|||\tilde A||^2 - ||A||^2\right|$
+- Move over Proof for $\left|||\tilde A||^2 - ||A||^2\right|$, make a clean document of things
 - Main theorem of the form: Let $\tilde x$ be the vector returned by FAST Power-iteration (PI on teh projected matrix. Then... $||Ax|| \ge (1 - \dots) \sigma_1(A)$ with probability of error $\le $ $\dots$. Want dots to be small
 - FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard power-iteration...
 - Bounds on Expected number of rows sampled?

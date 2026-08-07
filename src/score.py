@@ -357,6 +357,7 @@ if __name__ == '__main__':
     ) 
     
     mats = [
+        "dwt_193",
         "ex2",
         "494_bus", # Invalid for mag-based sparsifification
         "gre_343",
