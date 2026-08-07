@@ -30,7 +30,7 @@ def pi_scale_pi_squared_select(A, scale_func, sf_kwargs, seed):
     #Reading the info from A, to determine weights of each row
     A = A.tocsr(copy=False)
 
-    scales = scale_func(A, **sf_kwargs)
+    probabilities = scale_func(A, **sf_kwargs)
 
     # Random Number Generator
     rng = np.random.default_rng(seed=seed)
@@ -39,7 +39,7 @@ def pi_scale_pi_squared_select(A, scale_func, sf_kwargs, seed):
     A_tilde = A.copy()
 
     # The scaling factors, and probabilities of keeping each row
-    probabilities = scales * scales
+    scales = np.sqrt(probabilities) #TODO: cleanup this function, it's important
 
     if (probabilities.max() > 1):
         raise ValueError(f"probabilities.max() = {probabilities.max()} > 1") 
