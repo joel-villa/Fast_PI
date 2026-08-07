@@ -30,16 +30,11 @@ def get_two_norm(
             lbl: string representation of this test
     """
 
-    ys = util.get_sorted_row_norms(mat_name=mat_name)
+    ys = util.get_sorted_row_norms(mat_name=mat_name, rescale=max_norm)
     
     rows = ys.shape[0] # The number of rows
 
     xs = np.arange(1, stop=rows+1)
-
-    if max_norm:
-        # Assume max_i ||A^(i)|| <= 1
-        ys = ys / ys[0]
-    
 
     return xs, ys, mat_name
 

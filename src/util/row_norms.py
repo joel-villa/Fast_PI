@@ -87,7 +87,7 @@ def calculate_two_norm(mat_name):
 
     return row_norms
 
-def get_sorted_row_norms(mat_name:str) -> np.ndarray:
+def get_sorted_row_norms(mat_name:str, rescale: bool=False) -> np.ndarray:
     """Get the row norms of the given matrix, either from data/two_norms.npz or 
     by calculating them
 
@@ -103,6 +103,10 @@ def get_sorted_row_norms(mat_name:str) -> np.ndarray:
         # Matrix data has not been computed, compute them and save
         ys = calculate_two_norm(mat_name=mat_name)
         save_data(mat_name=mat_name, ys=ys)
+
+    if rescale:
+        # divide all row magnitudes by the max (i.e.) the top row magnitude is 1
+        ys = ys / ys[0]
 
     return ys
 
