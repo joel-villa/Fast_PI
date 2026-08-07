@@ -105,7 +105,65 @@ def get_sorted_row_norms(mat_name:str) -> np.ndarray:
         save_data(mat_name=mat_name, ys=ys)
 
     return ys
+
+"""THE WORKING STRATEGY FOR POWER LAW USES BRUTE FORCE SEARCH"""
+
+def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
+    """ Get the power law coefficients of the given row-norm distribution 
+
+    Args:
+        ys (np.ndarray): the row-magnitudes (sorted)
+
+    Returns:
+        tuple[float, float]: 
+            float: c or the y-intercept of a log log plot
+            float: k or the slope of a log log plot
+    """
+    num_rows = ys.size
+    print(f"ys.size: {num_rows} (assuming this is the number of rows)")
+    xs = np.arange(num_rows)
+
+    if np.any(ys < 0):
+        raise ValueError("Misuse of overfit_pow_law: y-values should be positive")
+    if np.any(ys == 0):
+        print("Warning: going to reduce length of xs and ys")
+        xs, ys = remove_zero_values(xs=xs, ys=ys)
+
+    # Power law distribution -> ln y = ln c + k ln x
+    ln_xs = np.log(xs)
+    ln_ys = np.log(ys)
     
+    # Testing 1024 values for k in the range -4 to 0
+    ks = np.linspace(-4, 0, 1024)
+
+    # Some default settings
+    min_area = np.inf
+    c_best = np.inf
+    k_best = np.inf
+
+    for i, k in enumerate(ks):
+        # the y-intercept of a line w/ slope k, that runs above all the data 
+        ln_a = np.max(ln_ys - k * ln_xs) 
+
+        c = math.exp(ln_a)
+        area = 0
+
+        if abs(k + 1) <= 1e-7: #1e-7 ~ 32-bit machine epsilon
+            # a ln n, if k == -1
+            area = c * math.log(num_rows)
+        else: 
+            # a / (k+1) (n^(k+1) - 1), if k != -1
+            area = c / (k + 1) * (num_rows ** (k + 1) - 1)
+
+        if area < min_area:
+            # Found new best k and a settings
+            min_area = area
+            c_best = c
+            k_best = k
+
+    return c_best, k_best
+
+
 """ 
 POWER LAW RELATED FUNCTIONS BELOW
 """

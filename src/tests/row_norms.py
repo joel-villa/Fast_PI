@@ -155,74 +155,29 @@ def fit_pow_law(xs, ys):
     # y_log = m * x_log + ln_b
     # return x_log, y_log, lbl
 
-def overfit_pow_law_v3(xs, ys):
-    """ Finding a line of overfit w/o Linear Programing
+def overfit_pow_law_v3(
+        xs:np.ndarray, 
+        ys:np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, str]:
+    """Finding a line of overfit w/o Linear Programing TODO: move some logic into util.row_norms.py
 
-    y = ax^k
-    ln(y) = ln(a) + k ln(x)
-    ln(a) = ln(y) - k ln(x)
-
-    Trying to maximize:
-        int_{x=1}^n ax^k dx = 
-            a / (k+1) (n^(k+1) - 1), if k != -1
-            a ln n                   if k == -1
-    
     Args:
-        xs: numpy array
-            x-values
-        ys: numpy array
-            y-values
-    Return:
-        xs: numpy array
-            x-values unchanged
-        ys: numpy array
-            the y-values of the line of overfit
-        lbl: string
-            string representation of this function
+        xs (np.ndarray): [1, 2, ...]
+        ys (np.ndarray): row-norms
+
+    Raises:
+        ValueError: Ensuring row-norms are positive
+
+    Returns:
+        tuple[np.ndarray, np.ndarray, str]:
+            np.ndarray: x-values unchanged
+            np.ndarray: the y-values of the line of overfit
+            str:string representation of this function              
     """
-    if np.any(ys < 0):
-        raise ValueError("Misuse of overfit_pow_law: y-values should be positive")
-    if np.any(ys == 0):
-        print("Warning: going to reduce length of xs and ys")
-        xs, ys = util.remove_zero_values(xs=xs, ys=ys)
-
-    # The dimension is of importance
-    num_rows = xs.size
-
-    # Power law distribution -> ln y = ln a + k ln x
-    ln_xs = np.log(xs)
-    ln_ys = np.log(ys)
+    c, k = util.get_power_law_coefficients(ys=ys)
     
-    # Test values of k
-    ks = np.linspace(-8, 0, 1024)
-
-    # Some default settings
-    min_area = np.inf
-    a_best = np.inf
-    k_best = np.inf
-
-    for i, k in enumerate(ks):
-        # the y-intercept of a line w/ slope k, that runs above all the data 
-        ln_a = np.max(ln_ys - k * ln_xs) 
-
-        a = math.exp(ln_a)
-        area = 0
-
-        if abs(k + 1) <= 1e-7: #1e-7 ~ 32-bit machine epsilon
-            # a ln n, if k == -1
-            area = a * math.log(num_rows)
-        else: 
-            # a / (k+1) (n^(k+1) - 1), if k != -1
-            area = a / (k + 1) * (num_rows ** (k + 1) - 1)
-
-        if area < min_area:
-            # Found new best k and a settings
-            min_area = area
-            a_best = a
-            k_best = k
-    
-    ys = util.pow_law_y(xs=xs, coefficient=a_best, exponent= k_best)
-    lbl = fr"$y = {a_best:,.4f} \cdot x ^{{{k_best:.4f} }}$"
+    ys = util.pow_law_y(xs=xs, coefficient=c, exponent= k)
+    lbl = fr"$y = {c:,.4f} \cdot x ^{{{k:.4f} }}$"
 
     return xs, ys, lbl
 
