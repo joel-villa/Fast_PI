@@ -69,6 +69,7 @@ def pi_scale_pi_squared_select(A, scale_func, sf_kwargs, seed):
     A_tilde.eliminate_zeros()
 
     print(f"{scale_func.__name__} kept_rows: {kept_rows}, new zeros: {A.nnz - A_tilde.nnz}")
+    #TODO: print expected number of rows kept
 
     return A_tilde
 
