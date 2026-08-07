@@ -234,7 +234,8 @@ if __name__ == '__main__':
     loglog = True
     subset = None
     # subset = log_size
-    f_of_y = lambda y: y ** 3 - y ** 4
+    # f_of_y = lambda y: y ** 3 - y ** 4
+    f_of_y = lambda y: y
 
     row_norms_dist(mats, loglog, subset, f_of_y=f_of_y)
     # histogram(mats, loglog)
