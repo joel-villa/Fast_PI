@@ -1,11 +1,5 @@
 """A file for getting the metadata of thoeretical significance"""
 
-import scipy
-
-from Sparsification_Research.src.SSGetter import SSGetter
-
-from ...util.row_norms import get_sorted_row_norms
-
 from .json_wrapper import load_json, save_json
 from .comp_data import get_metadata
 
@@ -21,28 +15,6 @@ THEORY_CONSTANTS = [
 
 """What follows is the API for interfacing with the Suite-Sparse Matrix 
 collection"""
-
-def preprocess_A(mat_name: str) -> tuple[scipy.sparse, float]:
-    """Get the matrix A 
-
-    Args:
-        mat_name (str): _description_
-
-    Returns:
-        tuple[scipy.sparse, float]: 
-            scipy.sparse: The matrix A in sparse format
-            float: the factor by which A was scaled
-    """
-    ssgetter = SSGetter()
-    A = ssgetter.get(mat_name)
-
-    max_row_magnitude = get_sorted_row_norms(mat_name=mat_name)[0]
-
-    # Rescale A
-    A = A / max_row_magnitude
-
-    return A, max_row_magnitude
-    
 
 def load_and_save_metadata(
         mat_name: str,
@@ -60,11 +32,7 @@ def load_and_save_metadata(
             kappa: -3k - 1 (always positive)
             op-norm: ||A||_2    
     """
-    A, scale_factor = preprocess_A(mat_name)
-
-    data_dict = get_metadata(A)
-
-    data_dict = data_dict | {"scale_factor": scale_factor}
+    data_dict = get_metadata(mat_name)
 
     save_json(data_dict, save_path=PATH_M_DATA)
 

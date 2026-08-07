@@ -4,20 +4,49 @@ sparse matrix"""
 import scipy
 from scipy.sparse.linalg import norm
 
+from Sparsification_Research.src.SSGetter import SSGetter
 
-def get_c_k(A:scipy.sparse) -> tuple[float, float]:
+from ...util.row_norms import get_sorted_row_norms, get_power_law_coefficients
+
+
+def preprocess(mat_name:str) -> tuple[scipy.sparse, float]:
+    """Get A scaled by a factor of 1/max_i(||a_i||)
+
+    Args:
+        mat_name (str): the name of the suite-spasrse matrix
+
+    Returns:
+        tuple[scipy.sparse, float]: 
+            scipy.sparse: the matrix in sparse format
+            float: the scaling factor
+    """
+    ssgetter = SSGetter()
+    A = ssgetter.get(mat_name)
+    
+    max_row_magnitude = get_sorted_row_norms(mat_name, rescale=False)[0]
+
+    # Rescale A
+    A = A / max_row_magnitude
+
+    return A, max_row_magnitude
+    
+
+def get_c_k(mat_name:str) -> tuple[float, float]:
     """Get the power-law-distribution coefficients corresponding to A's row
     magnitude distribution
 
     Args:
-        A (scipy.sparse): The matrix under question
+        mat_name (str): The matrix under question
 
     Returns:
         tuple[float, float]: 
             c: y-intercept of power-law distribution
             k: slope of power-law distribution
     """
-    raise NotImplementedError("get_c_k is not yet implemented")
+    row_norms = get_sorted_row_norms(mat_name=mat_name, rescale=True)
+
+    return get_power_law_coefficients(ys=row_norms)
+    
 
 def get_kappa(k:float) -> float:
     """Get kappa from k 
@@ -42,23 +71,25 @@ def get_op_norm(A:scipy.sparse) -> float:
     return norm(A, ord=2)
 
 def get_metadata(
-        A:scipy.sparse
+        mat_name: str,
 ) -> dict[str, int | float]:
     """Get the metadata of theoretical signficance for the provided matrix
 
     Args:
+        mat_name (str): the matrix name (suite-sparse)
         A (scipy.sparse): matrix under question
 
     Returns:
-        dict: 
+        dict[str, int | float]: 
             "n": number of rows in A
             "c": y-intercept of power-law distribution
             "k": slope of power-law distribution
             "kappa": -3k - 1 (always positive)
             "op-norm": ||A||_2
     """
+    A, scale_factor = preprocess(mat_name)
     n = A.shape[0]
-    c, k = get_c_k(A)
+    c, k = get_c_k(mat_name)
     kappa = get_kappa(k)
     op_norm = get_op_norm(A)
 
@@ -68,4 +99,5 @@ def get_metadata(
         "k": k,
         "kappa": kappa,
         "op_norm": op_norm,
+        "scale_factor": scale_factor,
     }
