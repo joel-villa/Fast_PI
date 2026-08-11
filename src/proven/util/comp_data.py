@@ -98,12 +98,13 @@ def get_var_proxy(A:scipy.sparse) -> float:
         scalar_factor = norm_i * (1 - norm_i) 
         outer_prod = row_i.T @ row_i
 
-        if (outer_prod.shape[0] <= 1):
-            raise ValueError(f"YOU FUCKED IT (TODO: delete this)")
-
         sum_mat += scalar_factor * outer_prod
 
     var_proxy = np.linalg.norm(sum_mat, ord=2)
+
+    if var_proxy > 0.25:
+        # something went wrong: x-x^2 <= 0.25
+        raise ValueError("Uh-oh")
 
     return float(var_proxy)
 
