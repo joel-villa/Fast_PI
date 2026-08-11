@@ -27,4 +27,6 @@ def preprocess(mat_name:str) -> tuple[scipy.sparse, float]:
     # Rescale A
     A = A / max_row_magnitude
 
+    A.eliminate_zeros()
+
     return A, max_row_magnitude
