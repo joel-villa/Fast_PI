@@ -1,17 +1,13 @@
 """A file for getting the metadata of thoeretical significance"""
 
+import scipy
+
+from collections.abc import Callable
+
 from .json_wrapper import load_json, save_json
-from .comp_data import get_metadata
+from . import comp_data as cd
 
-PATH_M_DATA = "data/matrix_meta_data.json"
-
-THEORY_CONSTANTS = [ 
-    "n",
-    "c", 
-    "k", 
-    "kappa", 
-    "op_norm",
-]
+PATH_M_DATA:str = "data/matrix_meta_data.json"
 
 """What follows is the API for interfacing with the Suite-Sparse Matrix 
 collection"""
@@ -29,9 +25,48 @@ def load_and_save_metadata(
     Returns:
         dict: The updated dictionary saved in the json file
     """
-    matrix_dict = get_metadata(mat_name)
+    matrix_dict = cd.get_metadata(mat_name)
 
     data = data | {mat_name:matrix_dict}
+
+    save_json(data, save_path=PATH_M_DATA)
+
+    return data
+
+def compute_and_save_metadatum(
+        mat_name:str,
+        data:dict, 
+        data_type:str, 
+        
+) -> dict:
+    """Compute and save a singular metadatum
+
+    Args:
+        mat_name (str): The suitesparse matrix name
+        data (dict): The current dictionary stored in the .json
+        data_type (str): The type of data missing
+
+    Raises:
+        NotImplementedError: Did not implement all metadata options
+
+    Returns:
+        dict: the new dictionary stored in the .json
+    """
+    funct:Callable[[scipy.sparse], float] | None = None
+
+    match data_type:
+        case cd.VAR_STRING:
+            funct = cd.get_var_proxy
+        case _:
+            raise NotImplementedError(f"Implement for metadata type: {data_type}")
+
+    A, max_row_mag = cd.preprocess(mat_name)
+    datum = funct(A)
+
+    # Update dictionaries
+    matrix_dict = data[mat_name]
+    matrix_dict = matrix_dict | {data_type:datum} #Add new metadata
+    data[mat_name] = matrix_dict
 
     save_json(data, save_path=PATH_M_DATA)
 
@@ -61,7 +96,16 @@ def get_meta_data(
     if matrix_name not in data:
         data = load_and_save_metadata(data, matrix_name)
 
-    return data[matrix_name]
+    matrix_dict = data[matrix_name]
+    missing_data = cd.META_DATA - matrix_dict.keys() # What keys are missing?
+
+    for missing_datum in missing_data:
+        # compute and save the missing meta datum
+        data = compute_and_save_metadatum(matrix_name, data, missing_datum)
+
+    matrix_dict = data[matrix_name]
+
+    return matrix_dict
 
 def get_n_c_k(matrix_name:str) -> tuple[int, float, float]:
     """Get the specified constants
@@ -73,7 +117,12 @@ def get_n_c_k(matrix_name:str) -> tuple[int, float, float]:
         tuple[int, float, float]: [n, c, k]
     """
     mat_meta_data = get_meta_data(matrix_name)
-    return mat_meta_data['n'], mat_meta_data['c'], mat_meta_data['k']
+    constants = (
+        mat_meta_data[cd.N_STRING], 
+        mat_meta_data[cd.C_STRING], 
+        mat_meta_data[cd.K_STRING],
+    )
+    return constants
 
 def get_n_c_kappa_norm(matrix_name:str) -> tuple[int, float, float, float]:
     """Get the specified constants
@@ -86,10 +135,10 @@ def get_n_c_kappa_norm(matrix_name:str) -> tuple[int, float, float, float]:
     """
     mat_meta_data = get_meta_data(matrix_name)
     constants = (
-        mat_meta_data['n'], 
-        mat_meta_data['c'], 
-        mat_meta_data['kappa'], 
-        mat_meta_data['op_norm'],
+        mat_meta_data[cd.N_STRING], 
+        mat_meta_data[cd.C_STRING], 
+        mat_meta_data[cd.KAPPA_STRING], 
+        mat_meta_data[cd.NORM_STRING],
     )
     return constants
 
@@ -101,7 +150,7 @@ if __name__ == '__main__':
         # -1.2 > k > -1.1
         "494_bus", # SYMMETRIC
 
-        # -1.1 > k > -1.0
+        -1.1 > k > -1.0
         "bcsstk08", #SYMMETRIC
         "ex2", #SYMMETRIC
 
@@ -164,4 +213,4 @@ if __name__ == '__main__':
     mats = sorted(mats) #Alphabetical order
 
     for mat in mats:
-        print(f"metadata: {get_matrix_constants(mat)}")
+        print(f"metadata: {get_meta_data(mat)}")
