@@ -64,8 +64,34 @@ def get_meta_data(
     return data[matrix_name]
 
 def get_n_c_k(matrix_name:str) -> tuple[int, float, float]:
+    """Get the specified constants
+
+    Args:
+        matrix_name (str): the suite-sparse matrix
+
+    Returns:
+        tuple[int, float, float]: [n, c, k]
+    """
     mat_meta_data = get_meta_data(matrix_name)
     return mat_meta_data['n'], mat_meta_data['c'], mat_meta_data['k']
+
+def get_n_c_kappa_norm(matrix_name:str) -> tuple[int, float, float, float]:
+    """Get the specified constants
+
+    Args:
+        matrix_name (str): suite-sparse name
+
+    Returns:
+        tuple[int, float, float, float]: [n, c, kappa, op_norm]
+    """
+    mat_meta_data = get_meta_data(matrix_name)
+    constants = (
+        mat_meta_data['n'], 
+        mat_meta_data['c'], 
+        mat_meta_data['kappa'], 
+        mat_meta_data['op_norm'],
+    )
+    return constants
 
 
 if __name__ == '__main__':
