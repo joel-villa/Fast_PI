@@ -18,6 +18,7 @@ from src.tests import power_lazy as lzy
 
 from .proven.preprocess import preprocess
 from .proven.expected_sampling import expected_sampling_ub, expected_sampling
+from .proven.expectation_bounds import get_expectation_bounds
 
 def test(
         funct, 
@@ -400,6 +401,13 @@ if __name__ == '__main__':
         # The Proven Boy TODO
         print(f"Expected number of rows kept: {expected_sampling(matrix=mat_name)}")
         print(f"Upperbound on expected number of rows kept: {expected_sampling_ub(matrix=mat_name)}")
+        try:
+            print(get_expectation_bounds(mat_name=mat_name, epsilon=0.01)[2])
+        except Exception as e:
+            print(f"skipping error: {e}")
+            plotter.finish()
+            continue
+
         test_proven(
             funct_args=funct_args,
             kwargs=kwargs,
