@@ -4,7 +4,7 @@ An approach to speeding up Power Iteration via row sampling based on row-magnitu
 
 ## To load Sparsification_Research Repository Run
 ```(linux)
-git submodule update --init --recursiv
+git submodule update --init --recursive
 ```
 
 ## To update Sparsification_Research Directory
