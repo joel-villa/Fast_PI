@@ -3,7 +3,8 @@ bounds of the sampling scheme"""
 
 from math import log, exp #base e
 
-from .util.meta_data import get_n_c_kappa_norm
+from .util.meta_data import get_n_c_kappa_norm_var
+from .util.BoundsType import BoundsType
 
 def param_check(
        params:list,
@@ -61,7 +62,7 @@ def f_of_eps_n(
 
     return numerator / denominator
 
-def prob_of_success(
+def prob_of_success_power_law(
         A_norm: float,
         c: float,
         epsilon: float,
@@ -77,6 +78,7 @@ def prob_of_success(
         kappa (float): 3k - 1, where k is the power of the power-law row-norm 
         distribution
         n (int): Number of rows of A
+        bounds_type: the type of bounds
 
     Returns:
         float: The probability that ||\tilde A|| is in plus or minus epsilon
@@ -89,6 +91,7 @@ def prob_of_success(
         kappa=kappa,
         n=n
     )
+    print(f"log(n) = {log(n)}, (epsilon ** 2) * f_val = {(epsilon ** 2) * f_val}")
     exponent = log(n) - ((epsilon ** 2) * f_val)
 
     probability = 1 - 2 * exp(exponent)
@@ -100,6 +103,66 @@ def prob_of_success(
     #     probability = 0
 
     return probability
+
+def prob_of_success_strict(
+        A_norm:float,
+        epsilon:float,
+        n:int,
+        var_proxy:float,
+) -> float:
+    """The probability that ||~A||^2 is in (1 plus/minus epsilon)||A||^2, given
+    the variance proxy: ||sum_i (||a_i|| - ||a_i||^2) a_i^Ta_i||
+
+    Args:
+        A_norm (float): The operator norm of the matrix
+        epsilon (float): Some amount of allowed error
+        n (int): The number of rows in A
+        var_proxy (float): The matrix bernstein's variance proxy
+
+    Returns:
+        float: The probability that ||~A||^2 is within some epsilon of ||A||
+    """
+    numerator = 3 * (A_norm ** 4)
+    denominator = (2 * (A_norm ** 2)) + ((6 * var_proxy) / (epsilon ** 2))
+    fraction = numerator / denominator
+    print(f"log(n) = {log(n)}, (epsilon ** 2) * fraction = {(epsilon ** 2) * fraction}")
+    exponent = log(n) - ((epsilon ** 2) * fraction)
+
+    probability = 1 - 2 * exp(exponent)
+
+    if probability > 1:
+        raise ValueError(f"Invalid probability of success: {probability}")
+
+    return probability
+
+def prob_of_success( #TODO
+        A_norm: float,
+        c: float,
+        epsilon: float,
+        kappa:float,
+        n: int,
+        var_proxy:float,
+        bounds_type: BoundsType,
+) -> float:
+    match bounds_type:
+        case BoundsType.POWER_TYPE:
+            return prob_of_success_power_law(
+                A_norm=A_norm,
+                c=c,
+                epsilon=epsilon,
+                kappa=kappa,
+                n=n,
+            )
+        case BoundsType.TIGHT_TYPE:
+            return prob_of_success_strict(
+                A_norm=A_norm,
+                epsilon=epsilon,
+                n=n,
+                var_proxy=var_proxy, #TODO
+            )
+        case _:
+            raise NotImplementedError()
+
 
 def error_bounds(A_norm:float, epsilon:float) -> tuple[float, float]:
     """With prob_of_success()...
@@ -123,6 +186,8 @@ def prob_in_bounds(
         epsilon: float,
         kappa:float,
         n: int,
+        var_proxy:float,
+        bounds_type: BoundsType,
 ) -> tuple[float, tuple[float, float], str]:
     """The probability that ||~A||^2 is in some bounds
 
@@ -133,6 +198,7 @@ def prob_in_bounds(
         kappa (float): 3k - 1, where k is the power of the power-law row-norm 
         distribution
         n (int): Number of rows of A
+        bounds_type: The type of bounds
 
     Returns:
         tuple[float, tuple[float, float], str]: [
@@ -147,7 +213,9 @@ def prob_in_bounds(
         c=c,
         epsilon=epsilon,
         kappa=kappa,
-        n=n
+        n=n,
+        var_proxy=var_proxy,
+        bounds_type=bounds_type,
     )
     lb, ub = error_bounds(A_norm=A_norm, epsilon=epsilon)
 
@@ -160,6 +228,7 @@ def prob_in_bounds(
 def get_expectation_bounds(
         mat_name: str,
         epsilon: float,
+        bounds_type: BoundsType,
 ) -> tuple[float, tuple[float, float], str]:
     """Get the string defining the proability of success and the bounds
 
@@ -174,11 +243,13 @@ def get_expectation_bounds(
         str: string representation of info
         ]
     """
-    n, c, kappa, op_norm = get_n_c_kappa_norm(mat_name)
+    n, c, kappa, op_norm, var_proxy = get_n_c_kappa_norm_var(mat_name)
     return prob_in_bounds(
         A_norm=op_norm, 
         c=c, 
         epsilon=epsilon,
         kappa=kappa,
         n=n,
+        var_proxy=var_proxy,
+        bounds_type=bounds_type,
     )
