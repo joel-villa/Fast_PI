@@ -6,5 +6,5 @@ class BoundsType(Enum):
     Args:
         Enum (_type_): BoundsType inherates methods from teh Enum class
     """
-    POWER_TYPE = 0
-    TIGHT_TYPE = 1
+    POWER = 0
+    STRICT = 1
