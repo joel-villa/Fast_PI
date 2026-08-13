@@ -124,26 +124,53 @@ def get_n_c_k(matrix_name:str) -> tuple[int, float, float]:
     )
     return constants
 
-def get_n_c_kappa_norm_var(
+def get_power_consts(
         matrix_name:str
-) -> tuple[int, float, float, float, float]:
+) -> tuple[float, float]:
     """Get the specified constants
 
     Args:
         matrix_name (str): suite-sparse name
 
     Returns:
-        tuple[int, float, float, float]: [n, c, kappa, op_norm]
+        tuple[float, float]: [c, kappa]
     """
     mat_meta_data = get_meta_data(matrix_name)
     constants = (
-        mat_meta_data[cd.N_STRING], 
         mat_meta_data[cd.C_STRING], 
         mat_meta_data[cd.KAPPA_STRING], 
-        mat_meta_data[cd.NORM_STRING],
-        mat_meta_data[cd.VAR_STRING]
     )
     return constants
+
+def get_n_norm(
+        matrix_name:str,
+) -> tuple[int, float]:
+    """Get n and the operator norm of the matrix
+
+    Args:
+        matrix_name (str): suite sparse matrix name
+
+    Returns:
+        tuple[float, float]: [n, op_norm]
+    """
+    constants = (
+        get_meta_data(matrix_name)[cd.N_STRING], 
+        get_meta_data(matrix_name)[cd.NORM_STRING],
+    )
+    return constants
+
+def get_var_proxy(
+        matrix_name:str
+) -> float:
+    """Get the variance proxy of the given matrix
+
+    Args:
+        matrix_name (str): SuiteSparse matrix name
+
+    Returns:
+        float: ||sum_i(||a_i|| - ||a_i||^2)a_i^Ta_i||
+    """
+    return get_meta_data(matrix_name)[cd.VAR_STRING]
 
 
 if __name__ == '__main__':
