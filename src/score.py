@@ -19,6 +19,7 @@ from src.tests import power_lazy as lzy
 from .proven.preprocess import preprocess
 from .proven.expected_sampling import expected_sampling_ub, expected_sampling
 from .proven.expectation_bounds import get_expectation_bounds
+from .proven.util.BoundsType import BoundsType
 
 def test(
         funct, 
@@ -402,7 +403,16 @@ if __name__ == '__main__':
         print(f"Expected number of rows kept: {expected_sampling(matrix=mat_name)}")
         print(f"Upperbound on expected number of rows kept: {expected_sampling_ub(matrix=mat_name)}")
         try:
-            print(get_expectation_bounds(mat_name=mat_name, epsilon=0.01)[2])
+            print(get_expectation_bounds(
+                            mat_name=mat_name, 
+                            epsilon=0.01,
+                            bounds_type=BoundsType.POWER_TYPE,
+                        )[2])
+            print(get_expectation_bounds(
+                mat_name=mat_name, 
+                epsilon=0.01,
+                bounds_type=BoundsType.TIGHT_TYPE,
+            )[2])
         except Exception as e:
             print(f"skipping error: {e}")
             plotter.finish()
