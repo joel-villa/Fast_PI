@@ -406,12 +406,12 @@ if __name__ == '__main__':
             print(get_expectation_bounds(
                             mat_name=mat_name, 
                             epsilon=0.01,
-                            bounds_type=BoundsType.POWER_TYPE,
+                            bounds_type=BoundsType.POWER,
                         )[2])
             print(get_expectation_bounds(
                 mat_name=mat_name, 
                 epsilon=0.01,
-                bounds_type=BoundsType.TIGHT_TYPE,
+                bounds_type=BoundsType.STRICT,
             )[2])
         except Exception as e:
             print(f"skipping error: {e}")
