@@ -1,6 +1,10 @@
 from enum import Enum
 
-# Define the Enum using class syntax
 class BoundsType(Enum):
+    """The types of bounds allowed
+
+    Args:
+        Enum (_type_): BoundsType inherates methods from teh Enum class
+    """
     POWER_TYPE = 0
     TIGHT_TYPE = 1
