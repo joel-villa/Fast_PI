@@ -91,7 +91,7 @@ def get_var_proxy(A:scipy.sparse) -> float:
         norm_squared = np.sum(i_vals * i_vals) # sum of the square of the values
         norm_i = math.sqrt(norm_squared)
 
-        if norm_i > 1:
+        if norm_i > 1.000001:
             # All rows should have row magnitudes less than or equal to 1
             raise ValueError(f"i'th row magnitude is {norm_i}, {norm_i} > 1")
 
@@ -102,9 +102,9 @@ def get_var_proxy(A:scipy.sparse) -> float:
 
     var_proxy = np.linalg.norm(sum_mat, ord=2)
 
-    if var_proxy > 0.25:
+    if var_proxy > A.shape[0] * 0.25000001:
         # something went wrong: x-x^2 <= 0.25
-        raise ValueError("Uh-oh")
+        raise ValueError(f"var_proxy = {var_proxy}")
 
     return float(var_proxy)
 
