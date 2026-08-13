@@ -124,7 +124,9 @@ def get_n_c_k(matrix_name:str) -> tuple[int, float, float]:
     )
     return constants
 
-def get_n_c_kappa_norm(matrix_name:str) -> tuple[int, float, float, float]:
+def get_n_c_kappa_norm_var(
+        matrix_name:str
+) -> tuple[int, float, float, float, float]:
     """Get the specified constants
 
     Args:
@@ -139,6 +141,7 @@ def get_n_c_kappa_norm(matrix_name:str) -> tuple[int, float, float, float]:
         mat_meta_data[cd.C_STRING], 
         mat_meta_data[cd.KAPPA_STRING], 
         mat_meta_data[cd.NORM_STRING],
+        mat_meta_data[cd.VAR_STRING]
     )
     return constants
 
@@ -147,70 +150,36 @@ if __name__ == '__main__':
     """Main for testing purposes
     """
     mats = [
-        # -1.2 > k > -1.1
-        "494_bus", # SYMMETRIC
-
-        -1.1 > k > -1.0
-        "bcsstk08", #SYMMETRIC
-        "ex2", #SYMMETRIC
-
-        # -1.0 > k > -0.9
-        "bp_0", #NON SYMMETRIC
-
-        # -0.9 > k > -0.8
-        "meg4", #SYMMETRIC
         "1138_bus",
-
-
-        # -0.8 > k > -0.7
-        "hor_131",
-        "bcsstk19", #TODO: this has odd behavior w/ proven tests (not starting at zero)
-        "nasa1824",
-        "bcsstk07", 
-
-        # -0.7 > k > -0.6
+        "494_bus",
         "Harvard500",
-        "fs_541_1", 
-
-        # -0.6 > k > -0.5
-        "bcsstk34",
-        "msc00726",
-        "eris1176",
-
-        # -0.5 > k > -0.4
-        "qc324", # SYMMETRIC
-        "Erdos02",
-
-        # -0.4 > k > -0.3
-        "California", 
-        "bcsstm07",
-
-        # -0.3 > k > -0.2
-
-        # -0.2 > k > -0.1
-        "barth",
-        "tomography", 
-        "gre_1107",
-        "bcspwr10",
         "bcspwr06",
-        "gre_1107",
-        "dwt_193",
-        "gre_343",
-        "cage7", 
-
-
-        # -0.1 > k 
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
         "blckhole",
-        "can_229", 
-        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "bp_0",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "impcol_d",
         "lshp1561",
+        "msc00726",
+        "nasa1824",
         "nos3",
-        "G1",
-        "G67",
+        "tomography",
     ]
 
     mats = sorted(mats) #Alphabetical order
 
     for mat in mats:
+        print(mat)
         print(f"metadata: {get_meta_data(mat)}")
