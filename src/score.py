@@ -4,6 +4,11 @@ top-eigenvector approximation, with some score
 
 Where work is number of scalar mults and "score" is closeness of singular value
 """
+import scipy
+
+import numpy as np
+
+from collections.abc import Callable
 
 from scipy.linalg import norm # 2-norm by default
 from scipy.sparse.linalg import svds
@@ -18,17 +23,17 @@ from src.tests import power_lazy as lzy
 
 from .proven.preprocess import preprocess
 from .proven.expected_sampling import expected_sampling_ub, expected_sampling
-from .proven.expectation_bounds import get_expectation_bounds
+from .proven.expectation_bounds import get_expectation_bounds, get_epsilon_bounds
 from .proven.util.BoundsType import BoundsType
 
-def test(
-        funct, 
-        plotter, 
-        num_avg, 
-        A, 
-        num_iter, 
-        kwargs={}, 
-        show_more=False,
+def test_avg(
+        funct:Callable[...,tuple[np.ndarray, np.ndarray, str]], 
+        plotter:Plotter, 
+        num_avg:int, 
+        A:scipy.sparse, 
+        num_iter:int, 
+        kwargs:dict={}, 
+        show_more:bool=False,
 ) -> None:
     """Test the given function from src/tests
     
@@ -61,7 +66,7 @@ def test(
 
         xs_temp, ys_i[i], label = funct(A=A, max_iter=num_iter, **kwargs)
 
-        curr_iter = np.trim_zeros(xs_temp).shape[0]
+        curr_iter = np.trim_zeros(xs_temp, trim='b').shape[0]
 
         if (not show_more) and (min_iter > curr_iter):
             # Smaller x value, store this one for consistent averaging
@@ -91,6 +96,47 @@ def test(
     # xs = xs + 1e-2
 
     plotter.add_to_plot(xs, ys, label=label)
+
+def test(
+        funct:Callable[...,tuple[np.ndarray, np.ndarray, str]], 
+        plotter:Plotter, 
+        num_tests:int, 
+        A:scipy.sparse, 
+        num_iter:int, 
+        kwargs:dict={}, 
+        show_more:bool=False,
+) -> None:
+    """Test the given function from src/tests
+    
+    Args:
+        funct: a fucntion which takes a matrix, some x vals, and a seed, and 
+               returns xs and ys to be plotted
+        plotter: a Plotter() object
+        num_tests: How many times to run this test? Plotting each instance
+        A: a CSR sparse matrix
+        num_iter: how many iterations?
+        seed: for randomized reproducability
+        kwargs: input for funct
+    Return: 
+        The number of iterations ran (important for tests which terminate after
+        converged)
+    """
+    ys = np.zeros(num_iter)
+    xs = np.zeros(num_iter)
+
+    label = ""
+
+    for i in range(num_tests):
+        if "seed" in kwargs:
+            # If seed in kwargs, update it for variable tests to average
+            kwargs["seed"] = kwargs["seed"] * (i + 1) + i * 3
+
+        xs, ys, label = funct(A=A, max_iter=num_iter, **kwargs)
+
+        xs = np.trim_zeros(xs, trim='b')
+        ys = ys[:xs.shape[0]]
+
+        plotter.add_to_plot(xs, ys, label=label)
 
 def init(mat_name, seed, tol):
     """ Get intial information for tests
@@ -139,7 +185,7 @@ def jl_reduction(funct_args, kwargs, ps):
     for p in ps:
         for type in types:
             p_args = funct_args | {"type": type, "p": p}
-            test(funct=tst.jl_percent,
+            test_avg(funct=tst.jl_percent,
                  kwargs=p_args,
                  **kwargs)
 
@@ -156,7 +202,7 @@ def jl_lazy(funct_args, ps, kwargs):
     """
     for p in ps:
         p_args = funct_args | {"p": p}
-        test(funct=lzy.lazy_percent,
+        test_avg(funct=lzy.lazy_percent,
             kwargs=p_args,
             **kwargs)
         
@@ -188,7 +234,7 @@ def col_sample(ps, funct_args, kwargs, types):
             #              **kwargs)
             # else:
             p_args = funct_args | {"p": p, "type": type}
-            test(funct=smpl.col_sample_p,
+            test_avg(funct=smpl.col_sample_p,
                  kwargs=p_args,
                  **kwargs)
             
@@ -217,7 +263,7 @@ def sparsification(funct_args, kwargs):
     for p in ps:
         for type in types:
             p_args = funct_args | {"p": p, "type": type}
-            test(
+            test_avg(
                 funct=tst.percent_sparse,
                 kwargs=p_args,
                 **kwargs,
@@ -275,7 +321,7 @@ def col_sample_dec(funct_args, kwargs, types):
                         "swap_tol": swap_tol,
                         "type": type,
                     }
-                    test(funct=smpl.col_sample_dec_p,
+                    test_avg(funct=smpl.col_sample_dec_p,
                          kwargs=test_args,
                          **kwargs)
                 
@@ -283,7 +329,7 @@ def sample_lazy_combo(ps, types, funct_args, kwargs):
     for p in ps: 
         for type in types:
             p_args = funct_args | {"p": p, "type": type}
-            test(funct=lzy.sample_lazy,
+            test_avg(funct=lzy.sample_lazy,
                  kwargs=p_args,
                  **kwargs)
 
@@ -294,7 +340,7 @@ def sparse_jl_combo(funct_args, kwargs): #TODO: make this better? is there a way
         "p_jl": 97,
         "type_jl": "Simple",
     }
-    test(
+    test_avg(
                 funct=tst.sparse_jl_combo,
                 kwargs=funct_args,
                 **kwargs,
@@ -330,7 +376,7 @@ def test_proven(funct_args, kwargs, types):
 if __name__ == '__main__':
     seed = 10
     max_iter = 128
-    num_avg = 5
+    num_avg = 7
     ps = (1, 50, 99)
     jl_ps = (97, 50, None)
     tol = 1e-5
@@ -359,17 +405,32 @@ if __name__ == '__main__':
     ) 
     
     mats = [
-        "dwt_193",
-        "ex2",
-        "494_bus", # Invalid for mag-based sparsifification
-        "gre_343",
-        "bcsstk08", 
-        "bcsstk07", 
-        "bcsstk19", 
-        "bcsstm07", 
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
         "bcspwr06",
-        "impcol_d", # NOT POSITIVE DEFINITE, doesn't work with nystrom sampling
-        # "bibd_13_6", # RECTANGULAR: Doesn't work with Nystrom
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "bp_0",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "impcol_d",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
     ]
 
     plotter = Plotter(save_fig=False, show_fig=True, fig_size=(12, 6))
@@ -389,7 +450,7 @@ if __name__ == '__main__':
                   }
         
         # BASELINE TEST
-        test(funct=tst.baseline,
+        test_avg(funct=tst.baseline,
              num_avg=1,
              kwargs=funct_args,
              **kwargs,
@@ -403,16 +464,22 @@ if __name__ == '__main__':
         print(f"Expected number of rows kept: {expected_sampling(matrix=mat_name)}")
         print(f"Upperbound on expected number of rows kept: {expected_sampling_ub(matrix=mat_name)}")
         try:
-            print(get_expectation_bounds(
-                            mat_name=mat_name, 
-                            epsilon=0.01,
-                            bounds_type=BoundsType.POWER,
-                        )[2])
-            print(get_expectation_bounds(
-                mat_name=mat_name, 
-                epsilon=0.01,
-                bounds_type=BoundsType.STRICT,
-            )[2])
+            delta = 0.9
+            epsilon = 0.1
+
+            for bounds_type in [BoundsType.POWER, BoundsType.STRICT]:
+                print(f"{bounds_type} INFO")
+                print(get_expectation_bounds(
+                                mat_name=mat_name, 
+                                epsilon=epsilon,
+                                bounds_type=bounds_type,
+                            )[2])
+                print(get_epsilon_bounds(
+                    mat_name=mat_name,
+                    delta=delta,
+                    bounds_type=bounds_type,
+                )[2])
+
         except Exception as e:
             print(f"skipping error: {e}")
             plotter.finish()
