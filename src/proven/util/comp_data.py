@@ -6,7 +6,7 @@ import math
 import numpy as np
 
 import scipy
-from scipy.sparse.linalg import norm
+from scipy.sparse.linalg import norm, eigs
 
 from ..preprocess import preprocess
 
@@ -70,8 +70,8 @@ def get_op_norm(A:scipy.sparse) -> float:
     """
     return norm(A, ord=2)
 
-def get_var_proxy(A:scipy.sparse) -> float:
-    """The variance proxy from Matrix Bernstein's
+def get_eps_net_var_proxy(A:scipy.sparse) -> float:
+    """The variance proxy from Matrix Bernstein's + Epsilon net approach
 
     Args:
         A (scipy.sparse): The matrix in question
@@ -108,7 +108,26 @@ def get_var_proxy(A:scipy.sparse) -> float:
 
     return float(var_proxy)
 
-        
+def get_lambda_v(A:scipy.sparse) -> tuple[np.ndarray, float]:
+    """Get the top eigenvector eigenvalue pair of the matrix A
+
+    Args:
+        A (scipy.sparse): The matrix in question
+
+    Returns:
+        tuple[np.ndarray, float]: [v, lambda], s.t. A * v = lambda * v, and 
+        lambda is the largest eigenvalue in absolute value (i.e. the solution to 
+        power iteration)
+    """
+    w, v = eigs(
+        A=A,
+        k=1, # only require top eigenvalue
+        which='LM', #Largest magnitude
+    )
+
+    print(w, v)
+
+    return w, v
 
 def get_metadata(
         mat_name: str,
@@ -134,7 +153,9 @@ def get_metadata(
     c, k = get_c_k(mat_name)
     kappa = get_kappa(k)
     op_norm = get_op_norm(A)
-    var_proxy = get_var_proxy(A)
+    var_proxy = get_eps_net_var_proxy(A)
+
+    value, vector = get_lambda_v(A) #TODO: test this bad boy!
 
     return {
         N_STRING: n,
