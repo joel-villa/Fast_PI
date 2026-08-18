@@ -29,6 +29,7 @@ META_DATA:set[str] = {
     NORM_STRING,
     VAR_STRING,
     SCALE_STRING,
+    LAMBDA_STRING,
 }
 
 
