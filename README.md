@@ -24,15 +24,15 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
+- compute new metadata (eig-info) for all matrices in question
+- CODE: delta given epsilon, epsilon given delta stuffs
 - Clean up README runnables
-- Write code for calculating $f$ in $\Pr( \left|||\tilde A||^2 - ||A||^2\right| \ge ||A|| \epsilon^2) \le 2 \exp(\ln (n) - \epsilon^2 f)$
 - Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
-- Change spect_nroms.py to interfacing w/ matrix_meta_data.json when implemented
 - Make code strongly typed and redo doc comments
+- Move two_norm.npz handling into proven/util/npz_wrapper.py
 
 ### Theory
 
-- Writeup Proof for $||A|| \ge 1$
 - Main theorem of the form: Let $\tilde x$ be the vector returned by FAST Power-iteration (PI on teh projected matrix. Then... $||Ax|| \ge (1 - \dots) \sigma_1(A)$ with probability of error $\le $ $\dots$. Want dots to be small
 - FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard power-iteration...
 - Bounds on Expected number of rows sampled?
