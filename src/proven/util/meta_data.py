@@ -2,9 +2,12 @@
 
 import scipy
 
+import numpy as np
+
 from collections.abc import Callable
 
 from .json_wrapper import load_json, save_json
+from .eig_vect import get_top_eig
 from . import comp_data as cd
 
 PATH_M_DATA:str = "data/matrix_meta_data.json"
@@ -36,8 +39,7 @@ def load_and_save_metadata(
 def compute_and_save_metadatum(
         mat_name:str,
         data:dict, 
-        data_type:str, 
-        
+        data_type:str,        
 ) -> dict:
     """Compute and save a singular metadatum
 
@@ -55,8 +57,12 @@ def compute_and_save_metadatum(
     funct:Callable[[scipy.sparse], float] | None = None
 
     match data_type:
+        # Get only the datum of interest
         case cd.VAR_STRING:
-            funct = cd.get_var_proxy
+            funct = cd.get_eps_net_var_proxy
+        case cd.LAMBDA_STRING:
+            # Get only the top eigenvalue of the matrix 'A'
+            funct = lambda A: cd.get_lambda_v(A)[0] 
         case _:
             raise NotImplementedError(f"Implement for metadata type: {data_type}")
 
@@ -171,6 +177,19 @@ def get_var_proxy(
         float: ||sum_i(||a_i|| - ||a_i||^2)a_i^Ta_i||
     """
     return get_meta_data(matrix_name)[cd.VAR_STRING]
+
+def get_eig_info(
+    mat_name:str,
+) -> tuple[float, np.ndarray]:
+    """Get the top eigenvalue and eigenvector of the matrix
+
+    Args:
+        mat_name (str): SS matrix
+
+    Returns:
+        tuple[float, np.ndarray]: [eigenvalue, eigenvector]
+    """
+    return get_meta_data(mat_name)[cd.LAMBDA_STRING], get_top_eig(mat_name)
 
 
 if __name__ == '__main__':
