@@ -19,6 +19,7 @@ KAPPA_STRING:str = "kappa"
 NORM_STRING:str = "op_norm"
 VAR_STRING:str = "var_proxy"
 SCALE_STRING:str = "scale_factor"
+LAMBDA_STRING:str = "lambda"
 
 META_DATA:set[str] = { 
     N_STRING,
@@ -108,26 +109,37 @@ def get_eps_net_var_proxy(A:scipy.sparse) -> float:
 
     return float(var_proxy)
 
-def get_lambda_v(A:scipy.sparse) -> tuple[np.ndarray, float]:
+def get_lambda_v(A:scipy.sparse) -> tuple[float, np.ndarray]:
     """Get the top eigenvector eigenvalue pair of the matrix A
 
     Args:
         A (scipy.sparse): The matrix in question
 
     Returns:
-        tuple[np.ndarray, float]: [v, lambda], s.t. A * v = lambda * v, and 
-        lambda is the largest eigenvalue in absolute value (i.e. the solution to 
-        power iteration)
+        tuple[float, np.ndarray]: [top lambda value, top eigenvector], s.t. 
+        A * v = lambda * v, and lambda is the largest eigenvalue in absolute 
+        value (i.e. the solution to power iteration)
     """
-    w, v = eigs(
+    top_value, top_vector = eigs(
         A=A,
         k=1, # only require top eigenvalue
         which='LM', #Largest magnitude
     )
 
-    print(w, v)
+    return top_value[0], top_vector.flatten()
 
-    return w, v
+def get_eig_vect(mat_name:str) -> np.ndarray:
+    """Get the top eigenvector of the given SS matrix
+
+    Args:
+        mat_name (str): Suite Sparse Matrix name
+
+    Returns:
+        np.ndarray: The top eigenvector
+    """
+    A, _ = preprocess(mat_name)
+    _, eig_vect = get_lambda_v(A)
+    return eig_vect
 
 def get_metadata(
         mat_name: str,
@@ -155,7 +167,7 @@ def get_metadata(
     op_norm = get_op_norm(A)
     var_proxy = get_eps_net_var_proxy(A)
 
-    value, vector = get_lambda_v(A) #TODO: test this bad boy!
+    eig_val, eig_vect = get_lambda_v(A) #TODO: test this bad boy!
 
     return {
         N_STRING: n,
@@ -165,4 +177,43 @@ def get_metadata(
         NORM_STRING: op_norm,
         VAR_STRING: var_proxy,
         SCALE_STRING: scale_factor,
+        LAMBDA_STRING: eig_val,
     }
+
+if __name__ == '__main__':
+    """Main for testing purposes
+    """
+    mats = [
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
+        "bcspwr06",
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "bp_0",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "impcol_d",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
+    ]
+
+    mats = sorted(mats) #Alphabetical order
+
+    for mat in mats:
+        print(mat)
+        get_metadata(mat)
