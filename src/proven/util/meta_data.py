@@ -192,7 +192,7 @@ def get_eig_info(
     """
     return get_meta_data(mat_name)[cd.LAMBDA_STRING], get_top_eig(mat_name)
 
-def get_norm_mags(
+def get_row_norms(
         mat_name:str,
 ) -> np.ndarray:
     """An array of the row magnitudes of the matrix
@@ -240,5 +240,5 @@ if __name__ == '__main__':
 
     for mat in mats:
         print(mat)
-        val, vect = get_eig_info(mat)
-        print(f"val:{val}, vect: {vect[:5]}")
+        vect = get_row_norms(mat)
+        print(f"vect: {vect[:5]}")
