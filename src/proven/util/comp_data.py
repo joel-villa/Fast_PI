@@ -124,10 +124,23 @@ def get_lambda_v(A:scipy.sparse) -> tuple[float, np.ndarray]:
     top_value, top_vector = eigs(
         A=A,
         k=1, # only require top eigenvalue
-        which='LM', #Largest magnitude
+        which='LM', #Largest real part
     )
 
-    return top_value[0], top_vector.flatten()
+    # Make dimensions nice
+    top_value = top_value[0]
+    top_vector = top_vector[:, 0]
+
+    """Ensure that it is not erroneous to convert to real parts only, raise
+    Assertion Error otherwise"""
+    assert np.allclose(top_value.imag, 0)
+    assert np.allclose(top_vector.imag, 0)
+
+    # Get real part
+    top_value = top_value.real
+    top_vector = top_vector.real
+
+    return top_value, top_vector
 
 def get_eig_vect(mat_name:str) -> np.ndarray:
     """Get the top eigenvector of the given SS matrix
@@ -195,7 +208,6 @@ if __name__ == '__main__':
         "bcsstk34",
         "bcsstm07",
         "blckhole",
-        "bp_0",
         "cage7",
         "can_229",
         "dwt_193",
@@ -205,7 +217,6 @@ if __name__ == '__main__':
         "gre_1107",
         "gre_343",
         "hor_131",
-        "impcol_d",
         "lshp1561",
         "msc00726",
         "nasa1824",
