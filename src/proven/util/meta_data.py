@@ -8,6 +8,7 @@ from collections.abc import Callable
 
 from .json_wrapper import load_json, save_json
 from .eig_vect import get_top_eig
+from .row_mags import get_row_mags
 from . import comp_data as cd
 
 PATH_M_DATA:str = "data/matrix_meta_data.json"
@@ -191,6 +192,19 @@ def get_eig_info(
     """
     return get_meta_data(mat_name)[cd.LAMBDA_STRING], get_top_eig(mat_name)
 
+def get_norm_mags(
+        mat_name:str,
+) -> np.ndarray:
+    """An array of the row magnitudes of the matrix
+
+    Args:
+        mat_name (str): Matrix in question
+
+    Returns:
+        np.ndarray: An array of row magnitudes (all less than 1)
+          EX: [0.001, 0.25, 0.1, ...]
+    """
+    return get_row_mags(mat_name)
 
 if __name__ == '__main__':
     """Main for testing purposes

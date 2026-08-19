@@ -11,6 +11,8 @@ from scipy.sparse.linalg import norm, eigs
 from ..preprocess import preprocess
 
 from ...util.row_norms import get_sorted_row_norms, get_power_law_coefficients
+from ...util.sparse_rows import calc_row_norms
+
 
 N_STRING:str = "n"
 C_STRING:str = "c"
@@ -154,6 +156,19 @@ def get_eig_vect(mat_name:str) -> np.ndarray:
     A, _ = preprocess(mat_name)
     _, eig_vect = get_lambda_v(A)
     return eig_vect
+
+def comp_row_mags(mat_name:str) -> np.ndarray:
+    """Compute the row magnitudes of the matrix in question
+
+    Args:
+        mat_name (str): Suite Sparse matrix name
+
+    Returns:
+        np.ndarray: In order array of row two-norms
+    """
+    A, _ = preprocess(mat_name)
+    row_mags = calc_row_norms(A, ord=2) # 2-norm
+    return row_mags
 
 def get_metadata(
         mat_name: str,
