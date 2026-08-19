@@ -206,7 +206,6 @@ if __name__ == '__main__':
         "bcsstk34",
         "bcsstm07",
         "blckhole",
-        "bp_0",
         "cage7",
         "can_229",
         "dwt_193",
@@ -216,7 +215,6 @@ if __name__ == '__main__':
         "gre_1107",
         "gre_343",
         "hor_131",
-        "impcol_d",
         "lshp1561",
         "msc00726",
         "nasa1824",
@@ -228,4 +226,5 @@ if __name__ == '__main__':
 
     for mat in mats:
         print(mat)
-        print(f"metadata: {get_meta_data(mat)}")
+        val, vect = get_eig_info(mat)
+        print(f"val:{val}, vect: {vect[:5]}")
