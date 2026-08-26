@@ -1,0 +1,107 @@
+\section{Attempting Averaging}
+
+Let $N \in \mathbb{Z}^+$ be some ammount of re-sampling done.
+
+For all $i \in [N]$, let $\tilde A_i$ be the $i$'th random row-sampling of $A$, note that the $\tilde A_i$'s are independent and identically distributed. Further, for all $i \in [N]$, and all $j \in [n]$, let  
+$X_{ij} = \begin{cases}
+    1, &\text{w.p. } ||a_j||\\
+    0, & \text{w.p. } 1 - ||a_j||
+\end{cases}$.  
+
+Let $w^T A^TAw = \lambda_{\max}(A^TA) = \lambda_1^2$, where $\lambda_1$ is the largest (in absolute value) eigenvalue of $A$. NOTE: $||Aw||^2 = w^T A^TAw$.
+
+Let $\tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w = \lambda_{\max}(\sum_{i=1}^N \tilde A^T_i\tilde A_i) = \tilde \lambda_1^2$. NOTE: $\sum_{i=1}^N ||\tilde A_i \tilde w||^2 = \tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w $.
+
+\begin{lemma}
+\label{||tilde A_i x||^2 = sum_j=1^n fracX_ij||a_j||langle a_j, xrangle ^2}
+    For all $x \in \mathbb{R}^{n}$, and for all $i \in [N]$, $||\tilde A_i x||^2 = \sum_{j=1}^n \frac{X_{ij}}{||a_j||}\langle a_j, x\rangle ^2$
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        ||\tilde A_ix||^2 &= (\tilde A_ix)^T(\tilde A_ix)\\
+        &= x^TA^TD_i^2Ax\\
+        &= \sum_{j=1}^n \frac{X_{ij}}{||a_j||}x^TA^T\textbf{E}_{jj}\textbf{E}_{jj}Ax\\
+        &= \sum_{j=1}^n \frac{X_{ij}}{||a_j||}x^Ta_j^Ta_jx\\
+        &= \sum_{j=1}^n \frac{X_{ij}}{||a_j||}(a_jx)^2 & (a_jx)^T = (a_jx) \text{, since } a_jx \in \mathbb{R}\\
+        &= \sum_{j=1}^n \frac{X_{ij}}{||a_j||}\langle a_j, x\rangle ^2\\
+    \end{align*}
+\end{proof}
+
+
+\begin{lemma}
+\label{frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2) = sum_i=1^Nsum_j=1^n(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle^2N}
+    For any unit vector $x$, $\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2) = \sum_{i=1}^N\sum_{j=1}^n(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle^2}{N}$
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2) &= \frac{1}{N}\sum_{i=1}^N\sum_{j=1}^n\frac{X_{ij}}{||a_j||}\langle a_j, x\rangle^2 - \frac{1}{N}\sum_{i=1}^N\sum_{j=1}^n\langle a_j, x\rangle^2 & \textbf{Lemma ~\ref{||tilde A_i x||^2 = sum_j=1^n fracX_ij||a_j||langle a_j, xrangle ^2}}\\
+         &= \sum_{i=1}^N\sum_{j=1}^n(\frac{X_{ij}}{||a_j||} - 1)\frac{\langle a_j, x\rangle^2}{N} \\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+\label{|(fracX_ij||a_j|| - 1)fraclangle a_j, xrangle ^2N| le frac1N}
+    For any unit vector $x$, for all $j \in [N]$, and all $i \in [n]$, $|(\frac{X_{ij}}{||a_j||} - 1)\frac{\langle a_j, x\rangle ^2}{N}| \le \frac{1}{N}$
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        |(\frac{X_{ij}}{||a_j||} - 1)\frac{\langle a_j, x\rangle ^2}{N}| &\le \frac{1}{N} | (\frac{X_{ij}}{||a_j||} - 1) ||a_j||^2 ||x||^2 | &\text{Cauchy Schwarz}  \\
+        &= \frac{1}{N} | (\frac{X_{ij}}{||a_j||} - 1) ||a_j||^2 | &||x|| = 1\\
+        &= \frac{1}{N} | X_{ij}||a_j|| - ||a_j||^2 | &\\
+        &=\begin{cases} 
+               (||a_j|| - ||a_j||^2)\frac{1}{N}& \text{when } X_{ij} = 1\\
+               \frac{||a_j||^2}{N} & \text{when } X_{ij} = 0
+           \end{cases}\\
+        &\le \begin{cases} 
+               \frac{1}{4N} & \text{when } X_{ij} = 1\\
+               \frac{1}{N} & \text{when } X_{ij} = 0
+           \end{cases} & ||a_j|| \in [0, 1]\\
+        &\le  \frac{1}{N} \\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+\label{sum_i=1^N sum_j=1^n mathbbE[(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle ^2N^2] = sum_i=1^N sum_j=1^n(frac1||a_j|| - 1)fraclangle a_j, xrangle ^4N^2}
+    $\sum_{i=1}^N \sum_{j=1}^n \mathbb{E}[\{(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle ^2}{N}\}^2] = \sum_{i=1}^N \sum_{j=1}^n(\frac{1}{||a_j||} - 1)\frac{\langle a_j, x\rangle ^4}{N^2}$
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \sum_{i=1}^N \sum_{j=1}^n \mathbb{E}[\{(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle ^2}{N}\}^2] &= \sum_{i=1}^N \sum_{j=1}^n \mathbb{E}[\frac{X_{ij}}{||a_j||^2} - 2\frac{X_{ij}}{||a_j||}+ 1]  \frac{\langle a_j, x\rangle ^4}{N^2}\\
+        &= \sum_{i=1}^N \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \frac{\langle a_j, x\rangle ^4}{N^2} & \text{Linearity}\\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+\label{Pr(|frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2)| ge t) le 2 expleft(- fracNt^2/2S + 3/tright), where S = sum_j=1^n (frac1||a_j|| - 1)  langle a_j, xrangle ^4}
+    For a fixed unit vector $x$, for all $t > 0$, $\Pr(|\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2)| \ge t) \le 2 \exp\left(- \frac{Nt^2/2}{S + 3/t}\right)$, where $S = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, x\rangle ^4$
+\end{lemma}
+
+The first line in the following proof follows from Bernstein's Inequality for Bounded Distributions (Theorem 2.9.5 in Vershyn's HDP), and Lemmas ~\ref{frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2) = sum_i=1^Nsum_j=1^n(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle^2N}, \ref{|(fracX_ij||a_j|| - 1)fraclangle a_j, xrangle ^2N| le frac1N}, and \ref{sum_i=1^N sum_j=1^n mathbbE[(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle ^2N^2] = sum_i=1^N sum_j=1^n(frac1||a_j|| - 1)fraclangle a_j, xrangle ^4N^2}.
+
+\begin{proof}
+    \begin{align*}
+        \Pr(|\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2)| \ge t) &\le 2 \exp\left(- \frac{t^2/2}{\frac{t}{3N} + \sum_{i=1}^N \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \frac{\langle a_j, x\rangle^4}{N^2}}\right)\\
+        &= 2 \exp\left(- \frac{Nt^2/2}{3/t + \sum_{i=1}^N \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \frac{\langle a_j, x\rangle ^4}{N}}\right)\\
+        &= 2 \exp\left(- \frac{Nt^2/2}{3/t + \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, x\rangle ^4}\right)\\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+    For all $t > 0$ $\Pr(E_1 \cup E_2) \le \dots$ , where $E_1$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \ge t$, and $E_2$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \ge t$
+\end{lemma}
+
+\begin{proof}
+    Let, 
+    \begin{align*}
+        S_1 &= \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4\\
+        S_2 &= \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4\\
+    \end{align*}
+    \begin{align*}
+        \Pr(E_1 \cup E_2) &\le \Pr (E_1) + \Pr(E_2) & \text{Union Bounds}\\
+        &\le + \Pr(E_2) + & 
+    \end{align*}
+\end{proof}
