@@ -31,7 +31,7 @@ Let $\tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w = \lambda_{\max}(
 
 \begin{lemma}
 \label{frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2) = sum_i=1^Nsum_j=1^n(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle^2N}
-    For any unit vector $x$, $\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2) = \sum_{i=1}^N\sum_{j=1}^n(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle^2}{N}$
+    For any unit vector $x$, and all $N > 0$, $\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2) = \sum_{i=1}^N\sum_{j=1}^n(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle^2}{N}$
 \end{lemma}
 
 \begin{proof}
@@ -65,7 +65,7 @@ Let $\tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w = \lambda_{\max}(
 
 \begin{lemma}
 \label{sum_i=1^N sum_j=1^n mathbbE[(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle ^2N^2] = sum_i=1^N sum_j=1^n(frac1||a_j|| - 1)fraclangle a_j, xrangle ^4N^2}
-    $\sum_{i=1}^N \sum_{j=1}^n \mathbb{E}[\{(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle ^2}{N}\}^2] = \sum_{i=1}^N \sum_{j=1}^n(\frac{1}{||a_j||} - 1)\frac{\langle a_j, x\rangle ^4}{N^2}$
+    For all $N > 0$, $\sum_{i=1}^N \sum_{j=1}^n \mathbb{E}[\{(\frac{X_{ij}}{||a_j||} - 1) \frac{\langle a_j, x\rangle ^2}{N}\}^2] = \sum_{i=1}^N \sum_{j=1}^n(\frac{1}{||a_j||} - 1)\frac{\langle a_j, x\rangle ^4}{N^2}$
 \end{lemma}
 
 \begin{proof}
@@ -76,8 +76,8 @@ Let $\tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w = \lambda_{\max}(
 \end{proof}
 
 \begin{lemma}
-\label{Pr(|frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2)| ge t) le 2 expleft(- fracNt^2/2S + 3/tright), where S = sum_j=1^n (frac1||a_j|| - 1)  langle a_j, xrangle ^4}
-    For a fixed unit vector $x$, for all $t > 0$, $\Pr(|\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2)| \ge t) \le 2 \exp\left(- \frac{Nt^2/2}{S + 3/t}\right)$, where $S = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, x\rangle ^4$
+\label{Pr(|frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2)| ge t) le 2 expleft(- fracNt^2/2S + 3/tright)}
+    For a fixed unit vector $x$, for all $N > 0$, and all $t > 0$, $\Pr(|\frac{1}{N}\sum_{i=1}^N(||\tilde A_ix||^2 - ||Ax||^2)| \ge t) \le 2 \exp\left(- \frac{Nt^2/2}{S + 3/t}\right)$, where $S = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, x\rangle ^4$
 \end{lemma}
 
 The first line in the following proof follows from Bernstein's Inequality for Bounded Distributions (Theorem 2.9.5 in Vershyn's HDP), and Lemmas ~\ref{frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2) = sum_i=1^Nsum_j=1^n(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle^2N}, \ref{|(fracX_ij||a_j|| - 1)fraclangle a_j, xrangle ^2N| le frac1N}, and \ref{sum_i=1^N sum_j=1^n mathbbE[(fracX_ij||a_j|| - 1) fraclangle a_j, xrangle ^2N^2] = sum_i=1^N sum_j=1^n(frac1||a_j|| - 1)fraclangle a_j, xrangle ^4N^2}.
@@ -91,17 +91,36 @@ The first line in the following proof follows from Bernstein's Inequality for Bo
 \end{proof}
 
 \begin{lemma}
-    For all $t > 0$ $\Pr(E_1 \cup E_2) \le \dots$ , where $E_1$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \ge t$, and $E_2$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \ge t$
+\label{Pr(E_1 cup E_2) le 2 expleft(- fracNt^2/2S_1 + 3/tright)+ 2 expleft(- fracNt^2/2S_2 + 3/tright)}
+    For all $N > 0$, and all $t > 0$, $\Pr(E_1 \cup E_2) \le 2 \exp\left(- \frac{Nt^2/2}{S_1 + 3/t}\right)+ 2 \exp\left(- \frac{Nt^2/2}{S_2 + 3/t}\right)$ , where $E_1$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \ge t$, $E_2$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \ge t$, $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$
+\end{lemma}
+
+NOTE: If $S_1 = O(1)$ and $S_2 = O(1)$, then for all $t>0$, and all $N > 0$, $\Pr(E_1 \cup E_2) \le O(e^{-Nt})$ 
+
+\begin{proof}
+    \begin{align*}
+        \Pr(E_1 \cup E_2) &\le \Pr (E_1) + \Pr(E_2) & \text{Union Bounds}\\
+        &\le 2 \exp\left(- \frac{Nt^2/2}{S_1 + 3/t}\right)+ 2 \exp\left(- \frac{Nt^2/2}{S_2 + 3/t}\right) & \textbf{Lemma~\ref{Pr(|frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2)| ge t) le 2 expleft(- fracNt^2/2S + 3/tright)}}
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+    For all $N > 0$, and all $t > 0$, with probability at least $1 - 2 \exp\left(- \frac{Nt^2/2}{S_1 + 3/t}\right) - 2 \exp\left(- \frac{Nt^2/2}{S_2 + 3/t}\right)$, $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \le t$ AND $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \le t$, where $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$
 \end{lemma}
 
 \begin{proof}
-    Let, 
+    Follows directly from Lemma~\ref{Pr(E_1 cup E_2) le 2 expleft(- fracNt^2/2S_1 + 3/tright)+ 2 expleft(- fracNt^2/2S_2 + 3/tright)}
+\end{proof}
+
+\begin{lemma}
+    For any unit vector $x,$, for all $N > 0$, and all $\epsilon > 0$, if $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i x||^2 - ||A x||^2)| \le ||Ax||^2 \epsilon^2$, then $\frac{1}{N} \sum_{i=1}^N ||\tilde A_ix||^2 \in (1 \pm \epsilon^2)||Ax||^2$, 
+\end{lemma}
+
+\begin{proof}
     \begin{align*}
-        S_1 &= \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4\\
-        S_2 &= \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4\\
-    \end{align*}
-    \begin{align*}
-        \Pr(E_1 \cup E_2) &\le \Pr (E_1) + \Pr(E_2) & \text{Union Bounds}\\
-        &\le + \Pr(E_2) + & 
+        |\frac{1}{N}\sum_{i=1}^N(||\tilde A_i x||^2 - ||A x||^2)| &\le ||Ax||^2 \epsilon^2 & \text{Assumption}\\
+        - ||Ax||^2 \epsilon^2\le - ||A x||^2 + \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\le ||Ax||^2 \epsilon^2 & \\
+        ||A x||^2 - ||Ax||^2 \epsilon^2 \le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\le ||A x||^2 + ||Ax||^2 \epsilon^2 & \\
+        \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\in (1 \pm \epsilon^2)||A x||^2 & \\
     \end{align*}
 \end{proof}
