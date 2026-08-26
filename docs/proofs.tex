@@ -10,7 +10,7 @@ $X_{ij} = \begin{cases}
 
 Let $w^T A^TAw = \lambda_{\max}(A^TA) = \lambda_1^2$, where $\lambda_1$ is the largest (in absolute value) eigenvalue of $A$. NOTE: $||Aw||^2 = w^T A^TAw$.
 
-Let $\tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w = \lambda_{\max}(\sum_{i=1}^N \tilde A^T_i\tilde A_i) = \tilde \lambda_1^2$. NOTE: $\sum_{i=1}^N ||\tilde A_i \tilde w||^2 = \tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w $.
+Let $\tilde w^T (\frac{1}{N}\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w = \lambda_{\max}(\sum_{i=1}^N \tilde A^T_i\tilde A_i) = \tilde \lambda_1^2$. NOTE: $\sum_{i=1}^N ||\tilde A_i \tilde w||^2 = \tilde w^T (\sum_{i=1}^N \tilde A^T_i\tilde A_i) \tilde w $.
 
 \begin{lemma}
 \label{||tilde A_i x||^2 = sum_j=1^n fracX_ij||a_j||langle a_j, xrangle ^2}
@@ -122,5 +122,46 @@ NOTE: If $S_1 = O(1)$ and $S_2 = O(1)$, then for all $t>0$, and all $N > 0$, $\P
         - ||Ax||^2 \epsilon^2\le - ||A x||^2 + \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\le ||Ax||^2 \epsilon^2 & \\
         ||A x||^2 - ||Ax||^2 \epsilon^2 \le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\le ||A x||^2 + ||Ax||^2 \epsilon^2 & \\
         \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\in (1 \pm \epsilon^2)||A x||^2 & \\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+\label{(1- epsilon^2)||Aw||^2 le frac1N sum_i=1^N |||tilde A_i tilde w||^2}
+    If $\frac{1}{N} \sum_{i=1}^N ||\tilde A_iw||^2 \in (1 \pm \epsilon^2)||Aw||^2$, then $(1- \epsilon^2)||Aw||^2 \le \frac{1}{N} \sum_{i=1}^N |||\tilde A_i \tilde w||^2$
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        (1 - \epsilon^2)||Aw||^2 &\le \frac{1}{N} \sum_{i=1}^N ||\tilde A_iw||^2 & \text{Assumption}\\
+        &= w^T (\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i) w & \\
+        &\le  \tilde w^T (\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i) \tilde w & \tilde w^T (\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i) \tilde w = \lambda_{\max}(\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i)\\
+        &= \frac{1}{N} \sum_{i=1}^N |||\tilde A_i \tilde w||^2 & \\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+\label{frac1N sum_i=1^N |||tilde A_i tilde w||^2 le (1 + epsilon^2)||Aw||^2}
+    If $\frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 \in (1 \pm \epsilon^2)||A\tilde w||^2$, then $\frac{1}{N} \sum_{i=1}^N |||\tilde A_i \tilde w||^2 \le (1 + \epsilon^2)||Aw||^2$
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+        \frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 &\le (1 + \epsilon^2)||A\tilde w||^2 & \text{Assumption}\\
+        &= (1 + \epsilon^2) \tilde w^T A^TA \tilde w & \\
+        &\le (1 + \epsilon^2) w^T A^TA w & w^TA^TAw = \lambda_{\max}(A^TA)\\
+        &= (1 + \epsilon^2) ||Aw||^2 & \\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+    If $\frac{1}{N} \sum_{i=1}^N ||\tilde A_iw||^2 \in (1 \pm \epsilon^2)||Aw||^2$ and $\frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 \in (1 \pm \epsilon^2)||A\tilde w||^2$, then $\sqrt{\tilde w^T (\frac{1}{N}\sum_{i=1}^N \tilde A_i^T \tilde A_i) \tilde w} \in (1 \pm \epsilon) \lambda_1$
+\end{lemma}
+
+\begin{proof}
+The first line follows by Assumption and Lemmas~\ref{(1- epsilon^2)||Aw||^2 le frac1N sum_i=1^N |||tilde A_i tilde w||^2} and \ref{frac1N sum_i=1^N |||tilde A_i tilde w||^2 le (1 + epsilon^2)||Aw||^2}
+    \begin{align*}
+        (1 - \epsilon^2)||Aw||^2 \le \frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 &\le (1 + \epsilon^2)||Aw||^2\\
+        \tilde w^T(\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i)\tilde w &\in (1 \pm \epsilon^2)\lambda_1^2\\
+        \sqrt{\tilde w^T(\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i)\tilde w} &\in (1 \pm \epsilon)\lambda_1 & \epsilon \in [0, 1]\\
     \end{align*}
 \end{proof}
