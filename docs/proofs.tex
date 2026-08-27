@@ -91,8 +91,8 @@ The first line in the following proof follows from Bernstein's Inequality for Bo
 \end{proof}
 
 \begin{lemma}
-\label{Pr(E_1 cup E_2) le 2 expleft(- fracNt^2/2S_1 + 3/tright)+ 2 expleft(- fracNt^2/2S_2 + 3/tright)}
-    For all $N > 0$, and all $t > 0$, $\Pr(E_1 \cup E_2) \le 2 \exp\left(- \frac{Nt^2/2}{S_1 + 3/t}\right)+ 2 \exp\left(- \frac{Nt^2/2}{S_2 + 3/t}\right)$ , where $E_1$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \ge t$, $E_2$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \ge t$, $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$
+\label{Pr(E_1 cup E_2) le 2 expleft(- fracNt_1^2/2S_1 + 3/t_1right)+ 2 expleft(- fracNt_2^2/2S_2 + 3/t_2right)}
+    For all $N, t_1, t_2 > 0$, $\Pr(E_1 \cup E_2) \le 2 \exp\left(- \frac{Nt_1^2/2}{S_1 + 3/t_1}\right)+ 2 \exp\left(- \frac{Nt_2^2/2}{S_2 + 3/t_2}\right)$ , where $E_1$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \ge t_1$, $E_2$ is $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \ge t_2$, $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$
 \end{lemma}
 
 NOTE: If $S_1 = O(1)$ and $S_2 = O(1)$, then for all $t>0$, and all $N > 0$, $\Pr(E_1 \cup E_2) \le O(e^{-Nt})$ 
@@ -100,68 +100,94 @@ NOTE: If $S_1 = O(1)$ and $S_2 = O(1)$, then for all $t>0$, and all $N > 0$, $\P
 \begin{proof}
     \begin{align*}
         \Pr(E_1 \cup E_2) &\le \Pr (E_1) + \Pr(E_2) & \text{Union Bounds}\\
-        &\le 2 \exp\left(- \frac{Nt^2/2}{S_1 + 3/t}\right)+ 2 \exp\left(- \frac{Nt^2/2}{S_2 + 3/t}\right) & \textbf{Lemma~\ref{Pr(|frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2)| ge t) le 2 expleft(- fracNt^2/2S + 3/tright)}}
+        &\le 2 \exp\left(- \frac{Nt_1^2/2}{S_1 + 3/t_1}\right)+ 2 \exp\left(- \frac{Nt_2^2/2}{S_2 + 3/t_2}\right) & \textbf{Lemma~\ref{Pr(|frac1Nsum_i=1^N(||tilde A_ix||^2 - ||Ax||^2)| ge t) le 2 expleft(- fracNt^2/2S + 3/tright)}}
     \end{align*}
 \end{proof}
 
 \begin{lemma}
-    For all $N > 0$, and all $t > 0$, with probability at least $1 - 2 \exp\left(- \frac{Nt^2/2}{S_1 + 3/t}\right) - 2 \exp\left(- \frac{Nt^2/2}{S_2 + 3/t}\right)$, $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \le t$ AND $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \le t$, where $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$
+\label{|frac1Nsum_i=1^N(||tilde A_i w||^2 - ||A w||^2)| le t_1 AND |frac1Nsum_i=1^N(||tilde A_i tilde w||^2 - ||A tilde w||^2)| le t_2}
+    For all $N, t_1, t_2 > 0$, with probability at least $1 - 2 \exp\left(- \frac{Nt_1^2/2}{S_1 + 3/t_1}\right) - 2 \exp\left(- \frac{Nt_2^2/2}{S_2 + 3/t_2}\right)$, $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \le t_1$ AND $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \le t_2$, where $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$
 \end{lemma}
 
 \begin{proof}
-    Follows directly from Lemma~\ref{Pr(E_1 cup E_2) le 2 expleft(- fracNt^2/2S_1 + 3/tright)+ 2 expleft(- fracNt^2/2S_2 + 3/tright)}
+    Follows directly from Lemma~\ref{Pr(E_1 cup E_2) le 2 expleft(- fracNt_1^2/2S_1 + 3/t_1right)+ 2 expleft(- fracNt_2^2/2S_2 + 3/t_2right)}
 \end{proof}
 
 \begin{lemma}
-    For any unit vector $x,$, for all $N > 0$, and all $\epsilon > 0$, if $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i x||^2 - ||A x||^2)| \le ||Ax||^2 \epsilon^2$, then $\frac{1}{N} \sum_{i=1}^N ||\tilde A_ix||^2 \in (1 \pm \epsilon^2)||Ax||^2$, 
-\end{lemma}
-
-\begin{proof}
-    \begin{align*}
-        |\frac{1}{N}\sum_{i=1}^N(||\tilde A_i x||^2 - ||A x||^2)| &\le ||Ax||^2 \epsilon^2 & \text{Assumption}\\
-        - ||Ax||^2 \epsilon^2\le - ||A x||^2 + \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\le ||Ax||^2 \epsilon^2 & \\
-        ||A x||^2 - ||Ax||^2 \epsilon^2 \le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\le ||A x||^2 + ||Ax||^2 \epsilon^2 & \\
-        \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  &\in (1 \pm \epsilon^2)||A x||^2 & \\
-    \end{align*}
-\end{proof}
-
-\begin{lemma}
-\label{(1- epsilon^2)||Aw||^2 le frac1N sum_i=1^N |||tilde A_i tilde w||^2}
-    If $\frac{1}{N} \sum_{i=1}^N ||\tilde A_iw||^2 \in (1 \pm \epsilon^2)||Aw||^2$, then $(1- \epsilon^2)||Aw||^2 \le \frac{1}{N} \sum_{i=1}^N |||\tilde A_i \tilde w||^2$
+\label{||Ax||^2 in (1 pm epsilon^2)frac1Nsum_i=1^N||tilde A_i x||^2}
+    For any unit vector $x$, for all $N, \epsilon > 0$, if $|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i x||^2 - ||A x||^2)| \le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2$, then $||Ax||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2$, 
 \end{lemma}
 
 \begin{proof}
     \begin{align*}
-        (1 - \epsilon^2)||Aw||^2 &\le \frac{1}{N} \sum_{i=1}^N ||\tilde A_iw||^2 & \text{Assumption}\\
-        &= w^T (\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i) w & \\
-        &\le  \tilde w^T (\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i) \tilde w & \tilde w^T (\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i) \tilde w = \lambda_{\max}(\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i)\\
-        &= \frac{1}{N} \sum_{i=1}^N |||\tilde A_i \tilde w||^2 & \\
+        |\frac{1}{N}\sum_{i=1}^N(||\tilde A_i x||^2 - ||A x||^2)| &\le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2 & \text{Assumption}\\
+        - \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2\le - ||A x||^2 + \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2 &\le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2 \epsilon^2 & \\
+        - \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2\le ||A x||^2 - \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2 &\le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2 & \\
+        \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2 - \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2\le ||A x||^2 &\le \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2 + \frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2  \epsilon^2 & \\
+        ||A x||^2 &\in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i x||^2 & \\
     \end{align*}
 \end{proof}
 
 \begin{lemma}
-\label{frac1N sum_i=1^N |||tilde A_i tilde w||^2 le (1 + epsilon^2)||Aw||^2}
-    If $\frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 \in (1 \pm \epsilon^2)||A\tilde w||^2$, then $\frac{1}{N} \sum_{i=1}^N |||\tilde A_i \tilde w||^2 \le (1 + \epsilon^2)||Aw||^2$
+\label{||Atilde w||^2 le ||Aw||^2 le (1 + epsilon^2)frac1Nsum_i=1^N||tilde A_i w||^2}
+    If $||Aw||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2$, then $||A\tilde w||^2 \le ||Aw||^2 \le (1 + \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2$
 \end{lemma}
 
 \begin{proof}
     \begin{align*}
-        \frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 &\le (1 + \epsilon^2)||A\tilde w||^2 & \text{Assumption}\\
-        &= (1 + \epsilon^2) \tilde w^T A^TA \tilde w & \\
-        &\le (1 + \epsilon^2) w^T A^TA w & w^TA^TAw = \lambda_{\max}(A^TA)\\
-        &= (1 + \epsilon^2) ||Aw||^2 & \\
+        ||A\tilde w||^2 &\le ||Aw||^2\\
+        &\le (1 + \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2 & \text{Assumption}\\
     \end{align*}
 \end{proof}
 
 \begin{lemma}
-    If $\frac{1}{N} \sum_{i=1}^N ||\tilde A_iw||^2 \in (1 \pm \epsilon^2)||Aw||^2$ and $\frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 \in (1 \pm \epsilon^2)||A\tilde w||^2$, then $\sqrt{\tilde w^T (\frac{1}{N}\sum_{i=1}^N \tilde A_i^T \tilde A_i) \tilde w} \in (1 \pm \epsilon) \lambda_1$
+\label{(1 - epsilon^2)frac1Nsum_i=1^N||tilde A_i w||^2 le ||Atilde w||^2 le ||A w||^2}
+    If $||A\tilde w||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i \tilde w||^2$, then $(1 - \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2 \le ||A\tilde w||^2 \le ||A w||^2$
 \end{lemma}
 
 \begin{proof}
-The first line follows by Assumption and Lemmas~\ref{(1- epsilon^2)||Aw||^2 le frac1N sum_i=1^N |||tilde A_i tilde w||^2} and \ref{frac1N sum_i=1^N |||tilde A_i tilde w||^2 le (1 + epsilon^2)||Aw||^2}
     \begin{align*}
-        (1 - \epsilon^2)||Aw||^2 \le \frac{1}{N} \sum_{i=1}^N ||\tilde A_i\tilde w||^2 &\le (1 + \epsilon^2)||Aw||^2\\
-        \tilde w^T(\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i)\tilde w &\in (1 \pm \epsilon^2)\lambda_1^2\\
-        \sqrt{\tilde w^T(\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i)\tilde w} &\in (1 \pm \epsilon)\lambda_1 & \epsilon \in [0, 1]\\
+        (1 - \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2 & \le (1 - \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i \tilde w||^2\\
+        &\le ||A\tilde w||^2 & \text{Assumption}\\
+        &\le ||Aw||^2 &\\
     \end{align*}
 \end{proof}
+
+\begin{lemma}
+\label{||Aw||^2 = ||Atilde w||^2}
+    If $||Aw||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2$ and $||A\tilde w||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i \tilde w||^2$, then $||Aw||^2 = ||A\tilde w||^2$
+\end{lemma}
+
+\begin{proof}
+    The following two statements hold due to the assumption, and Lemmas ~\ref{||Atilde w||^2 le ||Aw||^2 le (1 + epsilon^2)frac1Nsum_i=1^N||tilde A_i w||^2} and \ref{(1 - epsilon^2)frac1Nsum_i=1^N||tilde A_i w||^2 le ||Atilde w||^2 le ||A w||^2}
+    \begin{align}
+        (1 - \epsilon^2)\frac{1}{N}||\tilde A_i w||^2 \le ||Aw||^2&\le (1 + \epsilon^2)\frac{1}{N}||\tilde A_i w||^2 \\
+        (1 - \epsilon^2)\frac{1}{N}||\tilde A_i w||^2 \le ||A\tilde w||^2 &\le (1 + \epsilon^2)\frac{1}{N}||\tilde A_i w||^2
+    \end{align}
+    When we subtract the two inequalities from each-other we get\dots
+    \begin{align*}
+        0 \le ||Aw||^2 &- ||A\tilde w||^2 \le 0\\
+        ||Aw||^2 &= ||A\tilde w||^2\\
+    \end{align*}
+\end{proof}
+
+\begin{lemma}
+    For all $N > 0$, and all $\epsilon > 0$, with probability at least $1 - 2 \exp\left(- \frac{Nt_1^2/2}{S_1 + 3/t_1}\right) - 2 \exp\left(- \frac{Nt_2^2/2}{S_2 + 3/t_2}\right)$, $||Aw||^2 = ||A \tilde w||^2$, where $S_1 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, w\rangle ^4$, and $S_2 = \sum_{j=1}^n (\frac{1}{||a_j||} - 1)  \langle a_j, \tilde w\rangle ^4$, $t_1 = \frac{\epsilon^2}{N}\sum_{i=1}^N||\tilde A_iw||$ and $t_2 = \frac{\epsilon^2}{N}\sum_{i=1}^N||\tilde A_i \tilde w||$
+\end{lemma}
+
+\begin{proof}
+    By Lemma~\ref{|frac1Nsum_i=1^N(||tilde A_i w||^2 - ||A w||^2)| le t_1 AND |frac1Nsum_i=1^N(||tilde A_i tilde w||^2 - ||A tilde w||^2)| le t_2}, with probability at least 
+    \[1 - 2 \exp\left(- \frac{Nt_1^2/2}{S_1 + 3/t_1}\right) - 2 \exp\left(- \frac{Nt_2^2/2}{S_2 + 3/t_2}\right)\] the following holds:
+    \[|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \le t_1 \text{ AND }|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \le t_2\]
+
+    Let $t_1 = \frac{\epsilon^2}{N}\sum_{i=1}^N||\tilde A_iw||$ and $t_2 = \frac{\epsilon^2}{N}\sum_{i=1}^N||\tilde A_i \tilde w||$. Then,
+    \[|\frac{1}{N}\sum_{i=1}^N(||\tilde A_i w||^2 - ||A w||^2)| \le \frac{\epsilon^2}{N}\sum_{i=1}^N||\tilde A_iw|| \text{ AND } |\frac{1}{N}\sum_{i=1}^N(||\tilde A_i \tilde w||^2 - ||A \tilde w||^2)| \le \frac{\epsilon^2}{N}\sum_{i=1}^N||\tilde A_i\tilde w||\]
+
+    By Lemma~\ref{||Ax||^2 in (1 pm epsilon^2)frac1Nsum_i=1^N||tilde A_i x||^2},
+    \[||Aw||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i w||^2 \text{ AND } ||A\tilde w||^2 \in (1 \pm \epsilon^2)\frac{1}{N}\sum_{i=1}^N||\tilde A_i \tilde w||^2\]
+
+    Finally, by Lemma~\ref{||Aw||^2 = ||Atilde w||^2}
+    \[||Aw||^2 = ||A \tilde w||^2\]
+\end{proof}
+
+TODO: (1) AI check, (2) $\delta = 1 - 2 \exp(\dots) - 2 \exp(\dots)$, where $\delta = f(\epsilon)
