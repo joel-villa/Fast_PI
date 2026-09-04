@@ -24,7 +24,8 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
-- compute new metadata (eig-info) for all matrices in question
+- Code new sampling scheme
+- N vs. error plot
 - CODE: delta given epsilon, epsilon given delta stuffs
 - Clean up README runnables
 - Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
