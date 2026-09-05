@@ -1,6 +1,6 @@
 # FAST_PI
 
-An approach to speeding up Power Iteration via row sampling based on row-magnitudes
+An approach to speeding up Power Iteration via row sampling based on row-magnitudes. For the theoretical results see the docs/ directory.
 
 ## To load Sparsification_Research Repository Run
 ```(linux)
