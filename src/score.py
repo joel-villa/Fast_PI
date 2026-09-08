@@ -23,7 +23,8 @@ from src.tests import power_lazy as lzy
 
 from .proven.preprocess import preprocess
 from .proven.expected_sampling import expected_sampling_ub, expected_sampling
-from .proven.expectation_bounds import get_expectation_bounds, get_epsilon_bounds
+from .proven.expectation_bounds import get_expectation_bounds
+from .proven.bernstein_bounds import get_epsilon_bounds
 from .proven.util.BoundsType import BoundsType
 
 def test_avg(
@@ -463,27 +464,45 @@ if __name__ == '__main__':
         # The Proven Boy TODO
         print(f"Expected number of rows kept: {expected_sampling(matrix=mat_name)}")
         print(f"Upperbound on expected number of rows kept: {expected_sampling_ub(matrix=mat_name)}")
-        try:
-            delta = 0.9
-            epsilon = 0.1
 
-            for bounds_type in [BoundsType.POWER, BoundsType.STRICT]:
-                print(f"{bounds_type} INFO")
-                print(get_expectation_bounds(
-                                mat_name=mat_name, 
-                                epsilon=epsilon,
-                                bounds_type=bounds_type,
-                            )[2])
-                print(get_epsilon_bounds(
-                    mat_name=mat_name,
-                    delta=delta,
-                    bounds_type=bounds_type,
-                )[2])
+        delta = 0.9
+        epsilon = 0.1
+        # for bounds_type in [BoundsType.POWER, BoundsType.STRICT]:
+        for bounds_type in [BoundsType.STRICT,]:
+            print(f"{bounds_type} INFO")
+            print(get_expectation_bounds(
+                            mat_name=mat_name, 
+                            epsilon=epsilon,
+                            bounds_type=bounds_type,
+                        )[2])
+            print(get_epsilon_bounds(
+                mat_name=mat_name,
+                delta=delta,
+                bounds_type=bounds_type,
+            )[2])
 
-        except Exception as e:
-            print(f"skipping error: {e}")
-            plotter.finish()
-            continue
+        # try:
+        #     delta = 0.9
+        #     epsilon = 0.1
+
+        #     # for bounds_type in [BoundsType.POWER, BoundsType.STRICT]:
+        #     for bounds_type in [BoundsType.STRICT,]:
+        #         print(f"{bounds_type} INFO")
+        #         print(get_expectation_bounds(
+        #                         mat_name=mat_name, 
+        #                         epsilon=epsilon,
+        #                         bounds_type=bounds_type,
+        #                     )[2])
+        #         print(get_epsilon_bounds(
+        #             mat_name=mat_name,
+        #             delta=delta,
+        #             bounds_type=bounds_type,
+        #         )[2])
+
+        # except Exception as e:
+        #     print(f"skipping error: {e}")
+        #     plotter.finish()
+        #     continue
 
         test_proven(
             funct_args=funct_args,

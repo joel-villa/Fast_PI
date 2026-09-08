@@ -17,9 +17,13 @@ import numpy as np
 # Exponentiation and logging is e-based
 from math import log, sqrt
 
+from .util.meta_data import get_eig_info, get_row_norms
 from .util.BoundsType import BoundsType
+from .util.comp_data import preprocess #TODO: delete, this is for testing
+from ..util.proven import get_A_tilde #TODO: delete ^
+from numpy.linalg import norm #TODO: delete ^
 
-def epsilon(
+def get_epsilon(
         delta: float,
         var_proxy:float,
         lambda_max:float,
@@ -35,22 +39,21 @@ def epsilon(
         float: epsilon corresponding with the provided values
     """
     log_term = log((1 - delta) / 2)
+    print(f"L: {log_term}")
 
     numerator = - log_term + sqrt(log_term * (log_term - 18 * var_proxy))
     denominator = 3 * lambda_max * lambda_max
 
     return sqrt(numerator / denominator)
 
-def strict_variance(
-        A:scipy.sparse,
+def get_strict_variance(
         value_top:float,
-        vector_top:float,
+        vector_top:np.ndarray,
         row_mags:np.ndarray,
 ) -> float:
     """The most strict variance proxy: a summation
 
     Args:
-        A (scipy.sparse): The matrix in question
         value_top (float): The top eigenvalue of A
         vector_top (float): The top eigenvector of A
         row_mags (np.ndaray): The two norm of all the rows of A
@@ -58,9 +61,21 @@ def strict_variance(
     Returns:
         float: The variance proxy
     """
-    raise NotImplementedError()
+    """ TODO: working with potentially really small numbers here, ensure that 
+    zero rounding is kept to a minimum"""
 
-def var_proxy(
+    assert np.any(row_mags != 0) #Uh-oh, division by zero #TODO is this correct logic? 
+
+    vector_top_4 = vector_top ** 4
+    value_top_4 = value_top ** 4
+
+    inv_row_mags = 1 / row_mags
+    values = (inv_row_mags - 1) * value_top_4
+    values = values * vector_top_4 # Element wise multiplication
+
+    return np.sum(values)
+
+def get_var_proxy(
         mat_name:str,
         bounds_type: BoundsType,
 ) -> float:
@@ -75,13 +90,19 @@ def var_proxy(
     """
     match bounds_type:
         case BoundsType.STRICT:
-            raise NotImplementedError()
+            value_top, vector_top = get_eig_info(mat_name)
+            row_mags = get_row_norms(mat_name)
+            return get_strict_variance(
+                value_top=value_top,
+                vector_top=vector_top,
+                row_mags=row_mags,
+            )
         case _:
             raise NotImplementedError(f"Unexpected type: {bounds_type}")
 
-def epsilon_bounds(
+def get_epsilon_bounds(
         mat_name:str,
-        prob_success: float,
+        delta: float,
         bounds_type: BoundsType,
 ) -> tuple[float, tuple[float, float], str]:
     """Get the bernstein based epsilon bounds for the matrix
@@ -98,18 +119,79 @@ def epsilon_bounds(
         str: string representation of info
         ]
     """
-    raise NotImplementedError()
-    # n, _ = get_n_norm(mat_name)
+    lambda_max = get_eig_info(mat_name)[0]
+
+    print(f"lambda: {lambda_max}")
+        
+    var_proxy = get_var_proxy(
+        mat_name=mat_name,
+        bounds_type=bounds_type,
+    )
+
+    print(f"S: {var_proxy}")
+
+    epsilon = get_epsilon(
+        delta=delta,
+        var_proxy=var_proxy,
+        lambda_max=lambda_max
+    )
+
+    print(f"epsilon: {epsilon}")
+
+    ub = (1 + epsilon) * lambda_max
+    lb = (1 - epsilon) * lambda_max
+
+    str_rep = f"w.p. at least {delta}, ||~Av|| falls in [{lb}, {ub}]"
     
-    # var_proxy = var_from_type(
-    #     bounds_type=bounds_type,
-    #     mat_name=mat_name,
-    #     n=n,
-    # )
-    
-    # return valid_epsilon(
-    #     delta=delta,
-    #     n=n,
-    #     A_norm=op_norm, 
-    #     var_proxy=var_proxy,
-    # )
+    return epsilon, (lb, ub), str_rep
+
+
+if __name__ == '__main__':
+    """Main for testing purposes
+    """
+    mats = [
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
+        "bcspwr06",
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
+    ]
+
+    mats = sorted(mats) #Alphabetical order
+    for mat in mats:
+        print(mat)
+        print(f"get_epsilon_bounds(): {get_epsilon_bounds(mat, 0.9, BoundsType.STRICT)[2]}")
+
+        A, _ = preprocess(mat)
+        v = get_eig_info(mat)[1]
+        A_tilde = get_A_tilde(
+            A=A, 
+            gen_type="two-norm",
+            sf_kwargs={'power':1},
+            seed=7,
+        )
+
+        A_tilde_v = A_tilde @ v
+        print(f"shapes... A:{A.shape}, v:{v.shape}, ~Av:{A_tilde_v.shape}")
+
+        print(f"||~Av||: {norm(A_tilde_v)}")
+        print("\n\n")
