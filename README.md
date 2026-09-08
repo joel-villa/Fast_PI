@@ -24,6 +24,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
+- Continue working int fast_pi.py, and test with implemented main when done
 - Code new sampling scheme
 - N vs. error plot
 - CODE: delta given epsilon, epsilon given delta stuffs
