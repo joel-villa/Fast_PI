@@ -195,7 +195,8 @@ def get_eig_info(
 def get_row_norms(
         mat_name:str,
 ) -> np.ndarray:
-    """An array of the row magnitudes of the matrix
+    """An array of the row magnitudes of the processed matrix (scaled so max 
+    row norm is 1)
 
     Args:
         mat_name (str): Matrix in question
