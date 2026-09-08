@@ -21,11 +21,11 @@ from src.tests import score as tst
 from src.tests import score_sample as smpl
 from src.tests import power_lazy as lzy
 
-from .proven.preprocess import preprocess
-from .proven.expected_sampling import expected_sampling_ub, expected_sampling
-from .proven.expectation_bounds import get_expectation_bounds
-from .proven.bernstein_bounds import get_epsilon_bounds
-from .proven.util.BoundsType import BoundsType
+from .bounds.preprocess import preprocess
+from .bounds.expected_sampling import expected_sampling_ub, expected_sampling
+from .bounds.expectation_bounds import get_expectation_bounds
+from .bounds.bernstein_bounds import get_epsilon_bounds
+from .bounds.util.BoundsType import BoundsType
 
 def test_avg(
         funct:Callable[...,tuple[np.ndarray, np.ndarray, str]], 
@@ -458,7 +458,7 @@ if __name__ == '__main__':
              )
         
         # Arguments for randomized tests
-        kwargs = kwargs | {"num_avg" : num_avg} 
+        kwargs = kwargs | {"num_tests" : num_avg} 
         funct_args = funct_args | {"seed": seed}
 
         # The Proven Boy TODO
