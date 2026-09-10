@@ -24,6 +24,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
+- min and max N for theoretical results to exist
 - Continue working int fast_pi.py, and test with implemented main when done
 - Code new sampling scheme
 - N vs. error plot
