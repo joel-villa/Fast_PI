@@ -25,11 +25,11 @@ LAMBDA_STRING:str = "lambda"
 
 META_DATA:set[str] = { 
     N_STRING,
-    C_STRING, 
-    K_STRING, 
-    KAPPA_STRING, 
+    # C_STRING, 
+    # K_STRING, 
+    # KAPPA_STRING, 
     NORM_STRING,
-    VAR_STRING,
+    # VAR_STRING,
     SCALE_STRING,
     LAMBDA_STRING,
 }
