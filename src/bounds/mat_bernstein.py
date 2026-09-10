@@ -7,6 +7,30 @@ With probability at least 1 - exp(ln(2n) - N * ||Aw||^2 * epsilon^2 / 4):
 import numpy as np
 from .util.meta_data import get_n_norm
 
+def get_min_epsilon(
+        n: int,
+        N: int,
+        lambda_max: float,
+) -> float | None:
+    """Get the minimum valid epsilon, s.t. an epsilon bound exists
+
+    Args:
+        n (int): number of rows in the matrix
+        N (int): number of samples of ~A
+        lambda_max (float): ||Aw||
+
+    Returns:
+        float | None: if a minimum exists return it, if this minimum is larger 
+        than one, return None
+    """
+    sqrt_term = np.sqrt(np.log(2 * n) / N)
+    epsilon_min = (2 / lambda_max) * sqrt_term
+
+    if epsilon_min > 1:
+        return None
+    else:
+        return epsilon_min
+
 def delta_from_epsilon(
         n: int, 
         N: int, 
@@ -36,7 +60,7 @@ def delta_from_epsilon(
     lambda_sq = lambda_max ** 2
     val_b = (1/4) * N * lambda_sq * epsilon_sq
 
-    assert val_b > val_a, f"np.log(2 * n) = {val_a},    (1/4) * N * lambda_sq * epsilon_sq = {val_b}"
+    # assert val_b > val_a, f"np.log(2 * n) = {val_a},    (1/4) * N * lambda_sq * epsilon_sq = {val_b}"
 
     delta = 1 - np.exp(val_a - val_b)
 
@@ -93,6 +117,27 @@ def get_n_and_norm(mat_name:str) -> tuple[int, float]:
     # assert mat_name is hermetian #TODO
 
     return get_n_norm(matrix_name=mat_name)
+
+def mat_min_epsilon(
+        mat_name:str,
+        N: int
+) -> float | None:
+    """Get the minimum epsilon of the given matrix
+
+    Args:
+        mat_name (str): Suite Sparse matrix name
+        N (int): Number of samples of ~A
+
+    Returns:
+        float | None: if minimum epsilon <= 1, that minimum epsilon, else None
+    """
+    n, op_norm = get_n_and_norm(mat_name=mat_name)
+
+    return get_min_epsilon(
+        n=n,
+        N=N,
+        lambda_max=op_norm,
+    )
 
 def get_mat_delta(
         mat_name: str,
@@ -178,36 +223,36 @@ if __name__ == '__main__':
     ]
 
     mats = sorted(mats) #Alphabetical order
-    Ns = [10, 100, 1000, 10000]
-    eps = [0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
-    delts = [0.5, 0.75, 0.875, 0.9375, 0.96875, 0.984375, 0.9921875]
+    COUNT = 5
+
     for mat in mats:
         print(mat)
+        num_rows, _ = get_n_and_norm(mat_name=mat)
+
+        Ns = np.linspace(
+            start=np.ceil(np.log(num_rows)), 
+            stop=num_rows // 2, 
+            num=COUNT,
+        )
 
         for N in Ns:
-            # print(f"Epsilon tests for N={N}")
-            # for epsilon in eps:
-            #     try:
-            #         delta=get_mat_delta(
-            #             mat_name=mat,
-            #             N=N,
-            #             epsilon=epsilon,
-            #         )
-            #         print(f"With probability at least {delta}, "
-            #               fr"$||A \tilde w|| \in [(1 - {epsilon}) ||Aw||, ||Aw||]$")
-            #     except Exception as e:
-            #          print(f"skipping N={N}, epsilon={epsilon}, error: {e}")
-                
+            print(f"N={N}")
+            min_epsilon = mat_min_epsilon(
+                mat_name=mat,
+                N=N,
+            )
 
-            print(f"Delta tests for N={N}")
-            for delta in delts:
-                try:
-                    epsilon=get_mat_epsilon(
+            if min_epsilon is None or min_epsilon > 0.75:
+                print(f"skipping N={N}, min epsilon > 0.75")
+            else:
+                print(f"min_epsilon={min_epsilon}")
+                epsilons = np.linspace(start=min_epsilon + 0.00001, stop=0.75, num=COUNT)
+
+                for epsilon in epsilons:
+                    delta = get_mat_delta(
                         mat_name=mat,
                         N=N,
-                        delta=delta,
+                        epsilon=epsilon,
                     )
                     print(f"With probability at least {delta}, "
                           fr"$||A \tilde w|| \in [(1 - {epsilon}) ||Aw||, ||Aw||]$")
-                except Exception as e:
-                    print(f"skipping N={N}, delta={delta}, error: {e}")
