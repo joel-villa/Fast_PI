@@ -3,6 +3,8 @@ For Power Iteration helper functions
 """
 
 import numpy as np
+
+import scipy
 from scipy.linalg import norm # 2-norm by default
 from scipy.sparse import issparse
 
@@ -190,50 +192,32 @@ def count_mults_lazy(v0, A, P, maxiter=10):
     return scalar_mults
 
 
-# def topsing(v0, A, maxiter=10, tolerance=1e-07):
-#     """
-#     v0      - an initial guess for the top right eigenvector (m-dimensional)
-#     A       - A matrix (nxm) s.t. n is less than or equal to m (for relative 
-#               efficiency)
-#     maxiter - how many iterations of power? 
-#             - maxiter = -1 -> run until tolerance met
+def power_iteration(
+        A:scipy.sparse,
+        v0:np.ndarray,
+        num_iter:int,
+) -> tuple[float, np.ndarray]:
+    """Do power iteration
 
-#     RETURN: u - top left eigenvector approximation (n-dimensional)
-#             s - singular value (akin to eigenvalue)
-#             v - top right eigenvector approximation (m-dimensional)
-#     Adapted from section "4.4.2. Computing the top singular vector", found here:
-#     https://mmids-textbook.github.io/chap04_svd/04_power/roch-mmids-svd-power.html
+    Args:
+        A (scipy.sparse): The matrix
+        v0 (np.ndarray): The current guess for the top eigenvector
+        num_iter (int): The number of iterations
 
-#     For convergence checking, used this resource:
-#     https://www.geeksforgeeks.org/python/power-method-determine-largest-eigenvalue-and-eigenvector-in-python/ 
-#     """
-#     x = v0.copy()
-#     B = A.T @ A 
+    Returns:
+        tuple[float, np.ndarray]: 
+        float: the top eigenvalue
+        np.ndarray: the top eigenvector
+    """
+    lam = 0
+    x = np.zeros_like(v0)
+    for i in range(num_iter):
+        # Compute Ax
+        y = A @ v0
 
-#     # Normalize initial vector (good practice)
-#     x = x / np.linalg.norm(x)
+        # Normalize to get next eigenvector approximation
+        x = y / np.linalg.norm(y)
 
-#     # top singular value is None for first iteration
-#     s_prev = None
-
-#     # Initialize v and s
-#     v = None
-#     s = None
-
-#     for _ in range(maxiter):
-#         x = B @ x
-
-#         # compute top left 
-#         v = x / norm(x)
-
-#         # top singular value
-#         s = norm(A @ v)
-
-#         # Check convergence
-#         if s_prev is not None and abs(s - s_prev) < tolerance:
-#             # print(i)
-#             break
-#         s_prev = s
-
-#     u = A @ v / s
-#     return u, s, v
+        # Compute eigenvalue using Rayleigh quotient
+        lam = (x.T @ (A @ x)).item()
+    return lam, x
