@@ -4,7 +4,8 @@ row-magnitudes"""
 import scipy
 import numpy as np
 
-from ..util.sparse_rows import calc_row_norms
+from ...util.sparse_rows import calc_row_norms
+from ...util.constants import THIRTY_TWO_BIT_PRECISION
 
 
 def get_next_diagonal_sampler(
@@ -24,8 +25,14 @@ def get_next_diagonal_sampler(
     """
 
     # Ensure row norms are valid
-    assert np.all(row_norms <= 1)
-    assert np.all(row_norms >= 0)
+    assert np.all(row_norms <= 1 + THIRTY_TWO_BIT_PRECISION), f"max row norm: {np.max(row_norms)}"
+    assert np.all(row_norms >= 0 - THIRTY_TWO_BIT_PRECISION), f"min row norm: {np.min(row_norms)}"
+
+    idx_too_large = [idx for idx, val in enumerate(row_norms) if val > 1]
+    idx_too_small = [idx for idx, val in enumerate(row_norms) if val < 0]
+
+    row_norms[idx_too_large] = 1
+    row_norms[idx_too_small] = 0
 
     binomial_vals = rng.binomial(n=1, p=row_norms)
     scaled_vals = binomial_vals / np.sqrt(row_norms)
@@ -55,7 +62,7 @@ def get_next_A_tilde(
         ord=2,
     )
     diag_vect = get_next_diagonal_sampler(
-        row_norms=row_norms,
+        row_norms=np.asarray(row_norms),
         rng=rng
     )
     diag_mat = np.diag(diag_vect)
