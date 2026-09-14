@@ -10,6 +10,8 @@ from ..bounds.preprocess import preprocess
 from ..bounds.util.comp_data import get_lambda_v
 from ..bounds.mat_bernstein import get_mat_delta, get_mat_epsilon
 
+from .util.approx import get_next_A_tilde
+
 def plain_pi(
         A: scipy.sparse,
 ) -> tuple[float, np.ndarray]:
