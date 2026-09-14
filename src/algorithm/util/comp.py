@@ -3,9 +3,11 @@
 import scipy
 import numpy as np
 
+from ...util.power import power_iteration # power iteration
+
 def test_A_tilde(
         A_tilde: scipy.sparse,
-        u_0: np.ndarray,
+        v0: np.ndarray,
         max_iter: int,
         tol: float
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -13,7 +15,7 @@ def test_A_tilde(
 
     Args:
         A_tilde (scipy.sparse): The approximation matrix in question
-        u_0 (np.ndarray): Some original guess for the top eigenvector
+        v0 (np.ndarray): Some original guess for the top eigenvector
         max_iter (int): The maximum number of iterations to run power iteration
         tol (float): The ammount of allowable error
 
@@ -25,7 +27,23 @@ def test_A_tilde(
         np.ndarray: the top eigenvector approximation at every iteration 
         (num_iterxn)
     """
-    pass
+    v=v0
+    iter = 0
+    scores = np.zeros(shape=(max_iter,))
+    vects = np.zeros(shape=(max_iter,v0.shape[0]))
+    
+    while iter < max_iter:
+        lam, v = power_iteration(
+            A = A_tilde,
+            v0=v,
+            num_iter=1,
+        )
+        scores[iter] = lam
+        vects[iter] = v
+        iter += 1
+    scores = scores[0:iter]
+    vects = vects[0:iter]
+    return scores, vects
 
 def power_work(
         matrix: scipy.sparse,
@@ -42,8 +60,10 @@ def power_work(
         np.ndarray: A linearly increasing one-dimensional array of length 
         num_iter
     """
-
-    pass
+    nnzs = A.nnz
+    iterations = np.arange(0, num_iter)
+    total_work = iterations * nnzs # Doing SpMv multiplication per iteration
+    return total_work
 
 if __name__ == '__main__':
     """Yeahhh
@@ -87,7 +107,7 @@ if __name__ == '__main__':
         A_tilde = get_next_A_tilde(A, rng=rng)
         top_lambdas, top_vs = test_A_tilde(
             A_tilde=A_tilde,
-            u_0=rand_vect,
+            v0=rand_vect,
             max_iter=20,
             tol=1/128,
         )
