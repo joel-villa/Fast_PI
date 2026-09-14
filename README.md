@@ -39,6 +39,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 - min delta for theoretical results to exist
 - Relate $w_i$'s to $v$ in some cool manner
+  - Saia's advice: weighted average
 - Take advantage of eigen-gap? Other routes forward?
 - Change $w$ to $v$, more sensible
 - FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard power-iteration...
