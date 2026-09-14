@@ -7,19 +7,25 @@ The idea: turn those ROWS with low 2-norm to zero with higher probability
 
 import numpy as np
 
+import scipy
 from scipy.sparse.linalg import norm
 
 from . import subset as util
 
-def calc_row_norms(A, ord):
-    """ Calculate the row norms of a matrix
+def calc_row_norms(
+        A:scipy.sparse, 
+        ord:int | str,
+) -> np.ndarray:
+    """Calculate the row norms of a matrix
+    
+    Args:
+        A (scipy.sparse): the matrix (scipy.sparse format)
+        ord (int | str): what order of norm (1, 2, inf, 'fro', ...)
 
-    Args: 
-        A: the matrix (scipy.sparse format)
-        ord: what order of norm (1, 2, inf, 'fro', ...)
-    Return: norm of all the rows of A
+    Returns:
+        np.ndarray: norm of all the rows of A
     """
-    return norm(A, ord=ord, axis=1)
+    return np.asarray(norm(A, ord=ord, axis=1))
 
 def two_norm(A, d, seed):
     """ A selection which involves keeping and scaling the i'th row 
