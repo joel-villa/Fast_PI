@@ -24,11 +24,12 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
-- min and max N for theoretical results to exist
-- Continue working int fast_pi.py, and test with implemented main when done
-- Code new sampling scheme
+- Score vs. Work Graph
+    - Total &/or Max Work
+- Weighted Averaging of eigenvectors
+- compute $\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i^T A$ prior to power 
+  iteration (this is what I definitely have thoeretical results for)
 - N vs. error plot
-- CODE: delta given epsilon, epsilon given delta stuffs
 - Clean up README runnables
 - Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
 - Make code strongly typed and redo doc comments
@@ -36,9 +37,9 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Theory
 
+- min delta for theoretical results to exist
+- Relate $w_i$'s to $v$ in some cool manner
 - Take advantage of eigen-gap? Other routes forward?
-- Theory for proof that $w$ is what is returned by power-iteration (requires matrix symmetry) and $\tilde w$ is what is returned by fast power iteration
 - Change $w$ to $v$, more sensible
-- Main theorem of the form: Let $\tilde x$ be the vector returned by FAST Power-iteration (PI on teh projected matrix. Then... $||Ax|| \ge (1 - \dots) \sigma_1(A)$ with probability of error $\le $ $\dots$. Want dots to be small
 - FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard power-iteration...
 - Bounds on Expected number of rows sampled?
