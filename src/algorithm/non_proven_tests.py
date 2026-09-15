@@ -6,7 +6,7 @@ import numpy as np
 
 from .util.approx import get_next_A_tilde
 from ..util.power import power
-from .util.comp import init_test, rel_error, power_work
+from .util import comp as comp
 
 def baseline(
         A: scipy.sparse,
@@ -30,26 +30,26 @@ def baseline(
         str: the string representation of this test
     """
     v=v0
-    scores, _, iter = init_test(
+    scores, _, iter = comp.init_test(
         A=A,
         v0=v0,
         max_iter=max_iter,
     )
-    for iter in range(max_iter):
+    for iter in range(1, max_iter):
         lam, v = power(
             A = A,
             v0=v,
             num_iter=1,
         )
         scores[iter] = lam
-        if (rel_error(scores[iter], scores[iter - 1]) < tol):
+        if (comp.rel_error(scores[iter], scores[iter - 1]) < tol):
             iter += 1
             break
         iter += 1
 
     scores = scores[0:iter]
-    work = power_work(matrix=A, num_iter=iter)
-    lbl = f"baseline power"
+    work = comp.power_work(matrix=A, num_iter=iter)
+    lbl = "baseline"
     return work, scores, lbl
 
 def test_averaging(
@@ -86,8 +86,51 @@ def test_averaging(
     #TODO: THIS BOY
     rng = np.random.default_rng(seed=seed)
 
+    avg_vs = np.zeros(shape=(max_iter, A.shape[0]))
+    all_work = np.zeros(shape=(max_iter, ))
+    act_max_iter = 0
+
     for i in range(num_samples):
         A_tilde = get_next_A_tilde(A, rng=rng)
+        _, vects, num_iter = comp.test_A_tilde(
+            A_tilde=A_tilde,
+            v0=v0,
+            max_iter=max_iter,
+            tol=tol,
+        )
+        assert avg_vs.shape == vects.shape, f"avg_vs.shape = {avg_vs.shape} != {vects.shape} = vects.shape" #TODO can delete this after testing
+        avg_vs = comp.online_avg(
+            old_avg=avg_vs,
+            new_val=vects,
+            new_total=i + 1,
+        )
+        work = np.zeros_like(all_work)
+        work[0:num_iter] = comp.power_work(
+            matrix=A_tilde,
+            num_iter=num_iter,
+        )
+        work[num_iter:] = work[num_iter - 1]
+
+        if act_max_iter < num_iter:
+            # New maximum!
+            act_max_iter = num_iter
+
+        if is_max:
+            # Get the maximum work per index
+            all_work = np.maximum(all_work, work)
+        else:
+            # Sum the work!
+            all_work += work
+    all_work = all_work[0:act_max_iter]
+    avg_vs = avg_vs[0:act_max_iter]
+    scores = np.asarray([comp.rayleigh_quotient(v, A) for v in avg_vs])
+    lbl = f"avg ({num_samples} trials)"
+
+    # Check work is increasing:
+    assert (np.diff(all_work) >= 0).all(), f"np.diff(all_work): {all_work}"
+
+    return all_work, scores, lbl
+
 
 if __name__ == '__main__':
     """Yeahhh
@@ -130,13 +173,14 @@ if __name__ == '__main__':
         A, _ = preprocess(mat_name=mat)
         rng = np.random.default_rng(seed=5334)
         rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
+        print(f"ray_quot = {comp.rayleigh_quotient(rand_vect, A)}")
         xs, ys, lbl = baseline(
             A=A,
             v0=rand_vect,
             max_iter=max_iter,
             tol=tol,
         )
-        plt.plot(xs,ys, lbl)
+        plt.plot(xs,ys, label=lbl)
 
         for N in [1, 2, 4, 8, 16]:
             xs, ys, lbl = test_averaging(
@@ -148,6 +192,7 @@ if __name__ == '__main__':
                 num_samples=N,
                 is_max=True,
             )
-            plt.plot(xs, ys, lbl)
+            plt.plot(xs, ys, label=lbl)
 
+        plt.legend()
         plt.show()
