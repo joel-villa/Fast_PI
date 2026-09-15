@@ -3,7 +3,50 @@
 import scipy
 import numpy as np
 
-from ...util.power import power_iteration # power iteration
+from ...util.power import power, rayleigh_quotient
+def rel_error(
+        approx: float,
+        true: float,
+) -> float:
+    """Get the relative error between the two values
+
+    Args:
+        approx (float): The approximate value
+        true (float): The true value
+
+    Returns:
+        float: The relative error
+    """
+    rel_error = abs(approx - true) / abs(true)
+    # print(f"approx - true / approx = {abs(approx - true)} / {abs(true)} = {rel_error}")
+    return rel_error
+
+def init_test(
+        A:scipy.sparse,
+        v0:np.ndarray,
+        max_iter:int,
+) -> tuple[np.ndarray, np.ndarray, int]:
+    """Initialize this power iteration test
+
+    Args:
+        A (scipy.sparse): The matrix in question
+        v0 (np.ndarray): The initial guess for the eigenvector
+        max_iter (int): the maximum number of iterations
+
+    Returns:
+        tuple[np.ndarray, np.ndarray, int]: 
+        np.ndarray: the array which will hold the top eigenvalues
+        np.ndarray: the array which will hold the top eigenvectors
+        int: the initial number of iterations
+    """
+    scores = np.zeros(shape=(max_iter,))
+    vects = np.zeros(shape=(max_iter,v0.shape[0]))
+
+    scores[0] = rayleigh_quotient(x=v0, A=A_tilde)
+    vects[0] = v0
+    iter = 1
+
+    return scores, vects, iter
 
 def test_A_tilde(
         A_tilde: scipy.sparse,
@@ -28,19 +71,25 @@ def test_A_tilde(
         (num_iterxn)
     """
     v=v0
-    iter = 0
-    scores = np.zeros(shape=(max_iter,))
-    vects = np.zeros(shape=(max_iter,v0.shape[0]))
+    scores, vects, iter = init_test(
+        A=A_tilde,
+        v0=v0,
+        max_iter=max_iter,
+    )
     
     while iter < max_iter:
-        lam, v = power_iteration(
+        lam, v = power(
             A = A_tilde,
             v0=v,
             num_iter=1,
         )
         scores[iter] = lam
         vects[iter] = v
+        if (rel_error(scores[iter], scores[iter - 1]) < tol):
+            iter += 1
+            break
         iter += 1
+        
     scores = scores[0:iter]
     vects = vects[0:iter]
     return scores, vects
@@ -115,5 +164,5 @@ if __name__ == '__main__':
             matrix=A,
             num_iter=top_lambdas.shape[0],
         )
-
-        print(f"top_lambdas: {top_lambdas[0:15]}\ntop_vs: {top_vs[0:15]}\nwork: {work[0:15]}")
+        print(f"num_iter: {top_lambdas.shape[0]}")
+        print(f"top_lambdas: {top_lambdas[-7:]}\ntop_vs: {top_vs[-7:]}\nwork: {work[-7:]}")
