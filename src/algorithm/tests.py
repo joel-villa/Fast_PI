@@ -4,29 +4,78 @@
 import scipy
 import numpy as np
 
+from .util.approx import get_next_A_tilde
+from ..util.power import power
+from .util.comp import init_test, rel_error, power_work
+
+def baseline(
+        A: scipy.sparse,
+        v0: np.ndarray,
+        # lam_star: float, #TODO: is this needed?
+        max_iter: int,
+        tol: float,
+) -> tuple [np.ndarray, np.ndarray, str]:
+    """Run the default power iteration on this matrix
+
+    Args:
+        A: the original matrix
+        v0: initial guess for top eigenvector
+        max_iter: maximum number of iterations to do power iteration
+        tol (float): how much precision before terminating power
+
+    Returns:
+        tuple [np.ndarray, np.ndarray, str]: 
+        np.ndarray: the x-values (the ammount of work done),
+        np.ndarray: the y-values (the score of the vector),
+        str: the string representation of this test
+    """
+    v=v0
+    scores, _, iter = init_test(
+        A=A,
+        v0=v0,
+        max_iter=max_iter,
+    )
+    for iter in range(max_iter):
+        lam, v = power(
+            A = A,
+            v0=v,
+            num_iter=1,
+        )
+        scores[iter] = lam
+        if (rel_error(scores[iter], scores[iter - 1]) < tol):
+            iter += 1
+            break
+        iter += 1
+
+    scores = scores[0:iter]
+    work = power_work(matrix=A, num_iter=iter)
+    lbl = f"baseline power"
+    return work, scores, lbl
+
 def test_averaging(
         A:scipy.sparse,
-        u_0:np.ndarray,
-        s_star:float,
+        v0:np.ndarray,
+        # lam_star:float,
         max_iter:int,
         seed:int,
         tol:float,
         num_samples:int,
+        is_max: bool,
 ) -> tuple[np.ndarray, np.ndarray, str]:
     """Test an averaging approach, generate N, approximations of A, use them 
     to independently get N seperate approximations for v_star, average them, 
     hopefully getting better results
 
     Args:
-        A: the original matrix
-        u_0: initial guess for top left eigenvector
-        s_star: actual top singular value
-        max_iter: maximum number of iterations to do power iteration
-        tol: how much tolerance (for stopping condition of power iteration)
-        seed: for repeatable randomness (scikit does not have repeatable 
+        A (scipy.sparse): the original matrix
+        v0 (np.ndarray): initial guess for top eigenvector
+        max_iter (max_iter): maximum number of iterations to do power iteration
+        seed (int): for repeatable randomness (scikit does not have repeatable 
               randomness)
         tol (float): how much precision before terminating power
         num_samples (int): How many approximations of A?
+        is_max (bool): If True then get the maximum work done by any given 
+        parallel power iteration, else get the total work across all
 
     Returns:
         tuple[np.ndarray, np.ndarray, str]: 
@@ -34,7 +83,71 @@ def test_averaging(
         np.ndarray: the y-values (the score of the vector),
         str: the string representation of this test
     """
+    #TODO: THIS BOY
     rng = np.random.default_rng(seed=seed)
 
-    # for i in range(num_samples):
-        
+    for i in range(num_samples):
+        A_tilde = get_next_A_tilde(A, rng=rng)
+
+if __name__ == '__main__':
+    """Yeahhh
+    """
+    from ..bounds.preprocess import preprocess
+    import matplotlib.pyplot as plt
+
+    mats = [
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
+        "bcspwr06",
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
+    ]
+
+    mats = sorted(mats) #Alphabetical order
+    max_iter = 30
+    tol=1/64
+    for mat in mats:
+        print(mat)
+        A, _ = preprocess(mat_name=mat)
+        rng = np.random.default_rng(seed=5334)
+        rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
+        xs, ys, lbl = baseline(
+            A=A,
+            v0=rand_vect,
+            max_iter=max_iter,
+            tol=tol,
+        )
+        plt.plot(xs,ys, lbl)
+
+        for N in [1, 2, 4, 8, 16]:
+            xs, ys, lbl = test_averaging(
+                A=A,
+                v0=rand_vect,
+                max_iter=max_iter,
+                seed=7,
+                tol=tol,
+                num_samples=N,
+                is_max=True,
+            )
+            plt.plot(xs, ys, lbl)
+
+        plt.show()
