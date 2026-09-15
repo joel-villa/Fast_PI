@@ -29,6 +29,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 - Weighted Averaging of eigenvectors
 - compute $\frac{1}{N} \sum_{i=1}^N \tilde A_i^T \tilde A_i^T A$ prior to power 
   iteration (this is what I definitely have thoeretical results for)
+- New parrallelizable idea: $\tilde A^T \tilde A = \sum_{j=1}^n \frac{a_j^Ta_j}{N||a_j||} \cdot Binom(N, ||a_j||)$
 - N vs. error plot
 - Clean up README runnables
 - Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
@@ -37,6 +38,7 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Theory
 
+- ~A^T~A = ? => ~A = ?
 - min delta for theoretical results to exist
 - Relate $w_i$'s to $v$ in some cool manner
   - Saia's advice: weighted average
