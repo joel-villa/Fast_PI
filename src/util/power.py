@@ -191,8 +191,22 @@ def count_mults_lazy(v0, A, P, maxiter=10):
 
     return scalar_mults
 
+def rayleigh_quotient(
+        x:np.ndarray,
+        A:scipy.sparse,
+) -> float:
+    """Get the rayleigh quotient (score) of the given array-matrix combo
 
-def power_iteration(
+    Args:
+        x (np.ndarray): array in question
+        A (scipy.sparse): matrix in question
+
+    Returns:
+        float: The Rayleigh quotient
+    """
+    return (x.T @ (A @ x)).item()
+
+def power(
         A:scipy.sparse,
         v0:np.ndarray,
         num_iter:int,
@@ -219,5 +233,5 @@ def power_iteration(
         x = y / np.linalg.norm(y)
 
         # Compute eigenvalue using Rayleigh quotient
-        lam = (x.T @ (A @ x)).item()
+        lam = rayleigh_quotient(x, A)
     return lam, x
