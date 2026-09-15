@@ -11,6 +11,7 @@ from ..bounds.util.comp_data import get_lambda_v
 from ..bounds.mat_bernstein import get_mat_delta, get_mat_epsilon
 
 from .util.approx import get_next_A_tilde
+from .util.comp import rel_error
 
 def plain_pi(
         A: scipy.sparse,
@@ -174,22 +175,6 @@ def probable_fast_pi(
         num_approximations,
         epsilon,
     )
-    
-
-def rel_error(
-        approx: float,
-        true: float,
-) -> float:
-    """Get the relative error between the two values
-
-    Args:
-        approx (float): The approximate value
-        true (float): The true value
-
-    Returns:
-        float: The relative error
-    """
-    return abs(approx - true) / abs(true)
 
 if __name__ == '__main__':
     """Main for testing purposes
