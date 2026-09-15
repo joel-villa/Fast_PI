@@ -21,6 +21,24 @@ def rel_error(
     # print(f"approx - true / approx = {abs(approx - true)} / {abs(true)} = {rel_error}")
     return rel_error
 
+def online_avg(
+        old_avg:np.ndarray,
+        new_val:np.ndarray,
+        new_total:int,
+) -> np.ndarray:
+    """Generate the new average given the old + the new + the new total count
+
+    Args:
+        old_avg (scipy.sparse): The current average
+        new_val (scipy.sparse): The value which is updating the average
+        new_total (int): The grand total ammount
+
+    Returns:
+        scipy.sparse: The new average
+    """
+
+    return old_avg + ((new_val - old_avg) / new_total)
+
 def init_test(
         A:scipy.sparse,
         v0:np.ndarray,
@@ -42,7 +60,7 @@ def init_test(
     scores = np.zeros(shape=(max_iter,))
     vects = np.zeros(shape=(max_iter,v0.shape[0]))
 
-    scores[0] = rayleigh_quotient(x=v0, A=A_tilde)
+    scores[0] = rayleigh_quotient(x=v0, A=A)
     vects[0] = v0
     iter = 1
 
@@ -53,7 +71,7 @@ def test_A_tilde(
         v0: np.ndarray,
         max_iter: int,
         tol: float
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, int]:
     """Get the approximate spectral information at every iteration
 
     Args:
@@ -63,12 +81,12 @@ def test_A_tilde(
         tol (float): The ammount of allowable error
 
     Returns:
-        tuple[np.ndarray, np.ndarray]: 
+        tuple[np.ndarray, np.ndarray, int]: 
         np.ndarray: the score of the top eigenvector approximation at every 
-        iteration (note that this is a 1xnum_iter array, where num_iter is the 
-        number of iterations until Power terminates)
+        iteration (note that this is a 1xmax_iter array)
         np.ndarray: the top eigenvector approximation at every iteration 
-        (num_iterxn)
+        (max_iterxn)
+        int: number of iterations
     """
     v=v0
     scores, vects, iter = init_test(
@@ -89,10 +107,9 @@ def test_A_tilde(
             iter += 1
             break
         iter += 1
-        
-    scores = scores[0:iter]
-    vects = vects[0:iter]
-    return scores, vects
+    scores[iter:] = scores[iter - 1]    
+    vects[iter:] = vects[iter - 1]    
+    return scores, vects, iter
 
 def power_work(
         matrix: scipy.sparse,
@@ -109,7 +126,7 @@ def power_work(
         np.ndarray: A linearly increasing one-dimensional array of length 
         num_iter
     """
-    nnzs = A.nnz
+    nnzs = matrix.nnz
     iterations = np.arange(0, num_iter)
     total_work = iterations * nnzs # Doing SpMv multiplication per iteration
     return total_work
@@ -154,12 +171,13 @@ if __name__ == '__main__':
         rng = np.random.default_rng(seed=5334)
         rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
         A_tilde = get_next_A_tilde(A, rng=rng)
-        top_lambdas, top_vs = test_A_tilde(
+        top_lambdas, top_vs, iter = test_A_tilde(
             A_tilde=A_tilde,
             v0=rand_vect,
             max_iter=20,
             tol=1/128,
         )
+        top_vs = top_vs[0:iter]
         work = power_work(
             matrix=A,
             num_iter=top_lambdas.shape[0],
