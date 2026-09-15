@@ -2,6 +2,7 @@
 row-magnitudes"""
 
 import scipy
+from scipy.sparse import diags
 import numpy as np
 
 from ...util.sparse_rows import calc_row_norms
@@ -65,6 +66,6 @@ def get_next_A_tilde(
         row_norms=np.asarray(row_norms),
         rng=rng
     )
-    diag_mat = np.diag(diag_vect)
+    diag_mat = diags(diag_vect)
 
     return diag_mat @ A
