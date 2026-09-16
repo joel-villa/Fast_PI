@@ -4,9 +4,9 @@ import scipy
 import numpy as np
 
 from .util import comp as comp
-from .util.approx import get_next_A_tilde
-from .util.work import power_work
-from ..util.power import power
+from .util.approx import get_next_A_tilde, naive_A_tilde_sq, get_A_tilde_sq
+from .util.work import power_work, work_naive_pessimistic, work_fast
+from ..util.power import power, rayleigh_quotient
 
 
 def baseline(
@@ -35,7 +35,7 @@ def baseline(
         v0=v0,
         max_iter=max_iter,
     )
-    for iter in range(1, max_iter):
+    while iter < max_iter:
         lam, v = power(
             A = A,
             v0=v,
@@ -59,8 +59,9 @@ def naive_test(
         tol: float,
         num_trials:int,
         seed:int,
+        is_distributed:bool
 ) -> tuple [np.ndarray, np.ndarray, str]:
-    """Run the non-parallelizable approach, return results
+    """Run the less-parallelizable approach, return results
 
     Args:
         A (scipy.sparse.sparray): Matrix in question
@@ -69,13 +70,55 @@ def naive_test(
         tol (float): Tolerance of power iteration
         num_trials (int): Number of things to average
         seed (int): For repeatable randomization
-
+        is_distributed (bool): Changes ammount of work that goes into computing 
+        an approximation for A^TA
+        
     Returns:
         tuple [np.ndarray, np.ndarray, str]: 
         np.ndarray: work per iteration
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
+    rng = np.random.default_rng(seed=seed)
+    A_sq = A.transpose() @ A
+    tilde_A_sq = naive_A_tilde_sq(
+        A=A, 
+        num_trials=num_trials,
+        rng=rng,
+    )
+    init_work = work_naive_pessimistic(
+        A=A,
+        num_tirals=num_trials,
+        is_distributed=is_distributed
+    )
+    scores, _, i = comp.init_test(
+        A=A,
+        v0=v0,
+        max_iter=max_iter,
+    )
+    v=v0
+
+    while i < max_iter:
+        _, v = power(
+            A=tilde_A_sq,
+            v0=v,
+            num_iter=1,
+        )
+        scores[i] = rayleigh_quotient( # Score of approximation based on actual
+            x=v,
+            A=A_sq,
+        )
+        if (comp.rel_error(scores[i], scores[i - 1]) < tol): #TODO: this was copied and pasted, bad coding practice, maybe add a helper function for rel error check
+            i += 1
+            break
+        i += 1
+
+    scores = scores[0:i]
+    work = power_work(matrix=A, num_iter=i)
+    work += init_work
+    lbl = f"naive (distributed={is_distributed}), {num_trials} trials" 
+    return work, scores, lbl #TODO: untested
+
 
 def distributable_test(
         A: scipy.sparse.sparray,
@@ -104,4 +147,5 @@ def distributable_test(
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
+    #TODO: implement this + main
     pass
