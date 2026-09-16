@@ -1,0 +1,123 @@
+Starting approximation tests...
+N = 8
+num_avg = 16
+1138_bus
+ACTUAL operator norm: 4.481232978513383
+naive operator norm: 4.548764479838849
+distributable operator norm: 4.5593230531183355
+
+494_bus
+ACTUAL operator norm: 2.1486271963358194
+naive operator norm: 2.190713571084125
+distributable operator norm: 2.1830101964719564
+
+Harvard500
+ACTUAL operator norm: 3.3472529877651302
+naive operator norm: 3.3564410323135685
+distributable operator norm: 3.3079786838236176
+
+bcspwr06
+ACTUAL operator norm: 17.515504543354844
+naive operator norm: 17.90369613385607
+distributable operator norm: 17.865064115816786
+
+bcsstk07
+ACTUAL operator norm: 8.208559185386388
+naive operator norm: 8.250691169425952
+distributable operator norm: 8.22989715769998
+
+bcsstk08
+ACTUAL operator norm: 1.075963417421134
+naive operator norm: 1.0826199679717528
+distributable operator norm: 1.088344682289828
+
+bcsstk19
+ACTUAL operator norm: 5.67704257078374
+naive operator norm: 5.716756723000557
+distributable operator norm: 5.753306113317648
+
+bcsstk34
+ACTUAL operator norm: 14.909645288212644
+naive operator norm: 14.920036269501656
+distributable operator norm: 14.89690793166032
+
+bcsstm07
+ACTUAL operator norm: 9.553269059419167
+naive operator norm: 9.684275487752432
+distributable operator norm: 9.670767275858147
+
+blckhole
+ACTUAL operator norm: 30.730929045507207
+naive operator norm: 31.13468132981086
+distributable operator norm: 31.1098235699954
+
+cage7
+ACTUAL operator norm: 11.664918104725968
+naive operator norm: 11.823275788592314
+distributable operator norm: 11.817453452911842
+
+can_229
+ACTUAL operator norm: 19.289295556782864
+naive operator norm: 19.298351543887787
+distributable operator norm: 19.355485146572455
+
+dwt_193
+ACTUAL operator norm: 26.65393446045484
+naive operator norm: 26.664734257504417
+distributable operator norm: 26.58442903887542
+
+eris1176
+ACTUAL operator norm: 78.34959420670837
+naive operator norm: 78.4921775605892
+distributable operator norm: 78.5230703121697
+
+ex2
+ACTUAL operator norm: 2.5586599924215276
+naive operator norm: 2.6052612336427106
+distributable operator norm: 2.526847065475751
+
+fs_541_1
+ACTUAL operator norm: 4.566528157055314
+naive operator norm: 4.536568765893171
+distributable operator norm: 4.539852462243009
+
+gre_1107
+ACTUAL operator norm: 12.09176428894534
+naive operator norm: 12.456472468656946
+distributable operator norm: 12.500672789953338
+
+gre_343
+ACTUAL operator norm: 9.726847909160188
+naive operator norm: 9.946547778600255
+distributable operator norm: 9.943585111729915
+
+hor_131
+ACTUAL operator norm: 8.069266002771348
+naive operator norm: 8.138415718262296
+distributable operator norm: 8.144217981032739
+
+lshp1561
+ACTUAL operator norm: 73.14690278990012
+naive operator norm: 73.17268393110956
+distributable operator norm: 73.1560664627075
+
+msc00726
+ACTUAL operator norm: 16.071693581615495
+naive operator norm: 16.13625181167872
+distributable operator norm: 16.08273166515131
+
+nasa1824
+ACTUAL operator norm: 4.741222602519589
+naive operator norm: 4.775145225938048
+distributable operator norm: 4.732049580938269
+
+nos3
+ACTUAL operator norm: 32.424279903716304
+naive operator norm: 32.49248487194855
+distributable operator norm: 32.49123338062359
+
+tomography
+ACTUAL operator norm: 6.386798352414135
+naive operator norm: 6.552839722667969
+distributable operator norm: 6.544525347394234
+
