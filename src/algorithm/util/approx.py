@@ -54,6 +54,49 @@ def get_diag_mat(
     )
     return diags(diag_array)
 
+def round_row_norms(
+        row_norms:np.ndarray,
+) -> np.ndarray:
+    """Check that the row_norms are not errorneous, if they have slight 
+    rounding error, round them to one or zero where appropriate
+
+    Args:
+        row_norms (np.ndarray): Array of the row magnitudes of some scaled 
+        matrix, s.t. its maximum row magnitude is one
+
+    Returns:
+        np.ndarray: The row_norms which should be used
+    """
+    # Ensure row norms are valid
+    assert np.all(row_norms <= 1 + THIRTY_TWO_BIT_PRECISION), f"max row norm: {np.max(row_norms)}"
+    assert np.all(row_norms >= 0 - THIRTY_TWO_BIT_PRECISION), f"min row norm: {np.min(row_norms)}"
+
+    idx_too_large = [idx for idx, val in enumerate(row_norms) if val > 1]
+    idx_too_small = [idx for idx, val in enumerate(row_norms) if val < 0]
+
+    row_norms[idx_too_large] = 1
+    row_norms[idx_too_small] = 0
+    
+    return row_norms
+
+def get_row_norms(
+        A:scipy.sparse.sparray,
+) -> np.ndarray:
+    """Get the row_norms of the given matrix
+
+    Args:
+        A (scipy.sparse.sparray): The matrix
+
+    Returns:
+        np.ndarray: The row magnitudes of every row in Af
+    """
+    row_norms = calc_row_norms(
+            A=A,
+            ord=2,
+        )
+    row_norms = round_row_norms(row_norms=row_norms)
+    return row_norms
+    
 def get_next_A_tilde(
         A: scipy.sparse.sparray,
         rng: np.random.Generator,
@@ -67,10 +110,7 @@ def get_next_A_tilde(
     Returns:
         scipy.sparse.sparray: The row-reduced version of A
     """
-    row_norms = calc_row_norms(
-        A=A,
-        ord=2,
-    )
+    row_norms = get_row_norms(A)
     diag_mat = get_diag_mat(
         row_norms=row_norms,
         rng=rng,
@@ -92,20 +132,7 @@ def init_A_tilde_sq(
         np.ndarray: the row_norms of A
     """
     zeros = scipy.sparse.csr_array(A.shape) # zeros sparse array
-    row_norms = calc_row_norms(
-        A=A,
-        ord=2,
-    )
-
-    # Ensure row norms are valid
-    assert np.all(row_norms <= 1 + THIRTY_TWO_BIT_PRECISION), f"max row norm: {np.max(row_norms)}"
-    assert np.all(row_norms >= 0 - THIRTY_TWO_BIT_PRECISION), f"min row norm: {np.min(row_norms)}"
-
-    idx_too_large = [idx for idx, val in enumerate(row_norms) if val > 1]
-    idx_too_small = [idx for idx, val in enumerate(row_norms) if val < 0]
-
-    row_norms[idx_too_large] = 1
-    row_norms[idx_too_small] = 0
+    row_norms = get_row_norms(A)
 
     return zeros, row_norms
 
