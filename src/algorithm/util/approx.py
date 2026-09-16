@@ -43,20 +43,36 @@ def get_next_diagonal_sampler(
     # print(f"scaled_vals: {scaled_vals[0:10]}")
     assert np.all((scaled_vals >= 1) | (scaled_vals == 0)) #TODO: can be deleted after testing once
     return scaled_vals
-    
+
+
+def get_diag_mat(
+        row_norms: np.ndarray,
+        rng: np.random.Generator,
+) -> scipy.sparse.sparray:
+    """Get an independent copy of the random diagonal matrix which serves the 
+    purpose of matrix sampling
+
+    Args:
+        row_norms (np.ndarray): The norms of the rows of the matrix to sample
+        rng (np.random.Generator): A random number generator
+
+    Returns:
+        scipy.sparse.sparray: The random diagonal sampling matrix
+    """
+    pass
 
 def get_next_A_tilde(
-        A: scipy.sparse,
+        A: scipy.sparse.sparray,
         rng: np.random.Generator,
-) -> scipy.sparse:
+) -> scipy.sparse.sparray:
     """Generate the next reduced version of A
 
     Args:
-        A (scipy.sparse): The original matrix
+        A (scipy.sparse.sparray): The original matrix
         rng (np.random.Generator): the random number generator
 
     Returns:
-        scipy.sparse: The row-reduced version of A
+        scipy.sparse.sparray: The row-reduced version of A
     """
     row_norms = calc_row_norms(
         A=A,
@@ -71,35 +87,35 @@ def get_next_A_tilde(
     return diag_mat @ A
 
 def naive_A_tilde_sq(
-        A:scipy.sparse,
+        A:scipy.sparse.sparray,
         num_trials:int,
         rng:np.random.Generator,
-) -> scipy.sparse:
+) -> scipy.sparse.sparray:
     """Generate ~A^TA in a naive (non-paralellizable) way
 
     Args:
-        A (scipy.sparse): Some matrix to approximate A^TA of
+        A (scipy.sparse.sparray): Some matrix to approximate A^TA of
         num_trials (int): The number of approximations of A^TA to generate
         rng (np.random.Generator): For repeatable randomization
 
     Returns:
-        scipy.sparse: The approximation of A^TA
+        scipy.sparse.sparray: The approximation of A^TA
     """
-    pass
+    
 
 def get_A_tilde_sq(
-        A:scipy.sparse,
+        A:scipy.sparse.sparray,
         num_trials:int,
         rng:np.random.Generator,
-) -> scipy.sparse:
+) -> scipy.sparse.sparray:
     """Generate ~A^TA in a (hopefully) more parallelizable way
 
     Args:
-        A (scipy.sparse): Some matrix to approximate A^TA of
+        A (scipy.sparse.sparray): Some matrix to approximate A^TA of
         num_trials (int): The number of approximations of A^TA to generate
         rng (np.random.Generator): For repeatable randomization
 
     Returns:
-        scipy.sparse: The approximation of A^TA
+        scipy.sparse.sparray: The approximation of A^TA
     """
     pass

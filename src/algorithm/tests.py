@@ -9,7 +9,7 @@ from .util import comp as comp
 
 
 def baseline(
-        A: scipy.sparse.coo_array,
+        A: scipy.sparse.sparray,
         v0: np.ndarray,
         max_iter: int,
         tol: float,
@@ -52,7 +52,7 @@ def baseline(
     return work, scores, lbl
 
 def naive_test(
-        A: scipy.sparse.coo_array,
+        A: scipy.sparse.sparray,
         v0: np.ndarray,
         max_iter: int,
         tol: float,
@@ -62,7 +62,7 @@ def naive_test(
     """Run the non-parallelizable approach, return results
 
     Args:
-        A (scipy.sparse.coo_array): Matrix in question
+        A (scipy.sparse.sparray): Matrix in question
         v0 (np.ndarray): Initial guess for top eigenvector
         max_iter (int): Max number of iterations for power
         tol (float): Tolerance of power iteration
@@ -77,7 +77,7 @@ def naive_test(
     """
 
 def distributable_test(
-        A: scipy.sparse.coo_array,
+        A: scipy.sparse.sparray,
         v0: np.ndarray,
         max_iter: int,
         tol: float,
@@ -88,7 +88,7 @@ def distributable_test(
     """Run the parallelizable approach, return results
 
     Args:
-        A (scipy.sparse.coo_array): Matrix in question
+        A (scipy.sparse.sparray): Matrix in question
         v0 (np.ndarray): Initial guess for top eigenvector
         max_iter (int): Max number of iterations for power
         tol (float): Tolerance of power iteration

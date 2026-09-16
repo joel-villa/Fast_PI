@@ -3,14 +3,14 @@ A^TA"""
 import scipy
 
 def work_naive(
-    A:scipy.sparse.coo_array,
+    A:scipy.sparse.sparray,
     num_tirals:int,
 ) -> int:
     """Calculate ammount of work (scalar mults) involved in computing this 
     average in a naive way
 
     Args:
-        A (scipy.sparse.coo_array): The matrix to approximate
+        A (scipy.sparse.sparray): The matrix to approximate
         num_tirals (int): The ammount of approximations to average over
 
     Returns:
@@ -19,7 +19,7 @@ def work_naive(
     pass
 
 def work_fast(
-        A:scipy.sparse.coo_array,
+        A:scipy.sparse.sparray,
         num_trials:int,
         is_distributed:bool,
 ) -> int:
@@ -27,7 +27,7 @@ def work_fast(
     of an averaged approximation of A^TA
 
     Args:
-        A (scipy.sparse.coo_array): The matrix in question
+        A (scipy.sparse.sparray): The matrix in question
         num_trials (int): The ammount of trials to average over
         is_distributed (bool): True -> taking minimum, False -> summing up work 
         per row
