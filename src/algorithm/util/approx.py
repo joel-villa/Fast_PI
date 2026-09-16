@@ -69,3 +69,37 @@ def get_next_A_tilde(
     diag_mat = diags(diag_vect)
 
     return diag_mat @ A
+
+def naive_A_tilde_sq(
+        A:scipy.sparse,
+        num_trials:int,
+        rng:np.random.Generator,
+) -> scipy.sparse:
+    """Generate ~A^TA in a naive (non-paralellizable) way
+
+    Args:
+        A (scipy.sparse): Some matrix to approximate A^TA of
+        num_trials (int): The number of approximations of A^TA to generate
+        rng (np.random.Generator): For repeatable randomization
+
+    Returns:
+        scipy.sparse: The approximation of A^TA
+    """
+    pass
+
+def get_A_tilde_sq(
+        A:scipy.sparse,
+        num_trials:int,
+        rng:np.random.Generator,
+) -> scipy.sparse:
+    """Generate ~A^TA in a (hopefully) more parallelizable way
+
+    Args:
+        A (scipy.sparse): Some matrix to approximate A^TA of
+        num_trials (int): The number of approximations of A^TA to generate
+        rng (np.random.Generator): For repeatable randomization
+
+    Returns:
+        scipy.sparse: The approximation of A^TA
+    """
+    pass
