@@ -4,6 +4,8 @@ import scipy
 import numpy as np
 
 from ...util.power import power, rayleigh_quotient
+from .work import power_work
+
 def rel_error(
         approx: float,
         true: float,
@@ -40,14 +42,14 @@ def online_avg(
     return old_avg + ((new_val - old_avg) / new_total)
 
 def init_test(
-        A:scipy.sparse,
+        A:scipy.sparse.sparray,
         v0:np.ndarray,
         max_iter:int,
 ) -> tuple[np.ndarray, np.ndarray, int]:
     """Initialize this power iteration test
 
     Args:
-        A (scipy.sparse): The matrix in question
+        A (scipy.sparse.sparray): The matrix in question
         v0 (np.ndarray): The initial guess for the eigenvector
         max_iter (int): the maximum number of iterations
 
@@ -110,26 +112,6 @@ def test_A_tilde(
     scores[iter:] = scores[iter - 1]    
     vects[iter:] = vects[iter - 1]    
     return scores, vects, iter
-
-def power_work(
-        matrix: scipy.sparse,
-        num_iter: int,
-) -> np.ndarray:
-    """The amount of cummulative work done at every iteration of Power on the 
-    given matrix
-
-    Args:
-        matrix (scipy.sparse): The matrix that power-iteration was run on
-        num_iter (int): number of iterations run
-
-    Returns:
-        np.ndarray: A linearly increasing one-dimensional array of length 
-        num_iter
-    """
-    nnzs = matrix.nnz
-    iterations = np.arange(0, num_iter)
-    total_work = iterations * nnzs # Doing SpMv multiplication per iteration
-    return total_work
 
 if __name__ == '__main__':
     """Yeahhh

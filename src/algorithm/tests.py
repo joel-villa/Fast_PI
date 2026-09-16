@@ -3,9 +3,10 @@
 import scipy
 import numpy as np
 
-from .util.approx import get_next_A_tilde
-from ..util.power import power
 from .util import comp as comp
+from .util.approx import get_next_A_tilde
+from .util.work import power_work
+from ..util.power import power
 
 
 def baseline(
@@ -47,7 +48,7 @@ def baseline(
         iter += 1
 
     scores = scores[0:iter]
-    work = comp.power_work(matrix=A, num_iter=iter)
+    work = power_work(matrix=A, num_iter=iter)
     lbl = "baseline"
     return work, scores, lbl
 

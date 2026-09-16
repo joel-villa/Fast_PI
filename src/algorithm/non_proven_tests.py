@@ -5,6 +5,7 @@ import scipy
 import numpy as np
 
 from .util.approx import get_next_A_tilde
+from .util.work import power_work
 from .util import comp as comp
 from .tests import baseline
 
@@ -62,7 +63,7 @@ def test_averaging(
             new_total=i + 1,
         )
         work = np.zeros_like(all_work)
-        work[0:num_iter] = comp.power_work(
+        work[0:num_iter] = power_work(
             matrix=A_tilde,
             num_iter=num_iter,
         )
