@@ -24,6 +24,37 @@ def power_work(
     total_work = iterations * nnzs # Doing SpMv multiplication per iteration
     return total_work
 
+def work_baseline(
+        A:scipy.sparse.sparray,
+        is_distributed:bool,
+) -> int:
+    """The number of scalar mults to compute A^TA
+
+    NOTE: A^TA can be rewritten as a sum of the outerproducts of the rows
+
+    Work breakdown: 
+        The i'th row contributes w_i^2, where w_i is the nnz's in the i'th row
+
+    Args:
+        A (scipy.sparse.sparray): The matrix A
+        is_distributed (bool): True -> max thread work, False -> total work
+
+    Returns:
+        int: Number of scalar multsf
+    """
+    if type(A) != scipy.sparse.csr_array and type(A) != scipy.sparse._csr.csr_matrix:
+        warnings.warn(f"A must be CSR, given {type(A)}")
+
+    row_nnzs = np.diff(A.indptr)
+    row_work = row_nnzs * row_nnzs
+
+    assert row_nnzs.shape[0] == A.shape[0] #TODO: delete this after sure it is workign
+
+    if is_distributed:
+        return np.max(row_work)
+
+    return np.sum(row_work)
+
 def work_naive_pessimistic(
     A:scipy.sparse.sparray,
     num_tirals:int,
@@ -61,8 +92,12 @@ def work_binomial(
     """Calculate ammount of work required to do the parallelizable calculation 
     of an averaged approximation of A^TA
 
-    NOTE: the total work is independent of the number of trials, just dependent 
-    upon the number of rows
+    NOTE: 
+        (1) the total work is independent of the number of trials, just 
+        dependent upon the number of rows
+        (2) same amount of work to compute approx A^TA as A^TA, assuming the 
+        cost of calling binom() is insignificant in comparison to the outer 
+        product computations
 
     Work breakdown: doing row_i.transpose() @ row_i at every iteration
         The i'th row contributes w_i^2, where w_i is the nnz's in the i'th row
@@ -75,18 +110,10 @@ def work_binomial(
     Returns:
         int: Ammount of work per thread
     """
-    if type(A) != scipy.sparse.csr_array and type(A) != scipy.sparse._csr.csr_matrix:
-        warnings.warn(f"A must be CSR, given {type(A)}")
-
-    row_nnzs = np.diff(A.indptr)
-    row_work = row_nnzs * row_nnzs
-
-    assert row_nnzs.shape[0] == A.shape[0] #TODO: delete this after sure it is workign
-
-    if is_distributed:
-        return np.max(row_work)
-
-    return np.sum(row_work)
+    return work_baseline( 
+        A=A, 
+        is_distributed=is_distributed,
+    )
 
 if __name__ == '__main__':
     """Yeahhh
@@ -146,6 +173,16 @@ if __name__ == '__main__':
         )
         print(f"Work Binomial (non distributed): {work}")
         work = work_binomial(
+            A=A,
+            is_distributed=True
+        )
+        print(f"Work Binomial (distributed): {work}")
+        work = work_baseline(
+            A=A,
+            is_distributed=False
+        )
+        print(f"Work Binomial (non distributed): {work}")
+        work = work_baseline(
             A=A,
             is_distributed=True
         )
