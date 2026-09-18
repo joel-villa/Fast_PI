@@ -5,6 +5,7 @@ import numpy as np
 
 from ...util.power import power, rayleigh_quotient
 from .work import power_work
+from ...util.constants import THIRTY_TWO_BIT_PRECISION
 
 def rel_score(
         max:float,
@@ -20,8 +21,11 @@ def rel_score(
     Returns:
         np.ndarray: Those adjust values 
     """
-    # TODO: check max of xs error + check xs are positive
-    pass
+    # Error handlign
+    assert np.max(xs) < max + THIRTY_TWO_BIT_PRECISION, f"np.max(xs) = {np.max(xs)} > {max}"
+    assert np.all(xs >= 0), f"Scores must be nonnegative"
+
+    return xs / max
 
 def rel_error(
         approx: float,
