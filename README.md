@@ -24,7 +24,6 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
-- Change 'fast' to 'binomial'
 - Baseline pays for A^TA
 - Score vs. Work Graph
     - Total &/or Max Work
