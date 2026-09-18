@@ -6,6 +6,23 @@ import numpy as np
 from ...util.power import power, rayleigh_quotient
 from .work import power_work
 
+def rel_score(
+        max:float,
+        xs:np.ndarray,
+) -> np.ndarray:
+    """Adjust the x values s.t. they are on a range from 0 to 1, where if x_i 
+    equals max then set that value to one
+
+    Args:
+        max (float): The maximum possible value
+        xs (np.ndarray): The list of values
+
+    Returns:
+        np.ndarray: Those adjust values 
+    """
+    # TODO: check max of xs error + check xs are positive
+    pass
+
 def rel_error(
         approx: float,
         true: float,
