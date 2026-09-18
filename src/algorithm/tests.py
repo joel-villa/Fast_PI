@@ -5,7 +5,7 @@ import numpy as np
 
 from .util import comp as comp
 from .util.approx import get_next_A_tilde, naive_A_tilde_sq, binomial_A_tilde_sq
-from .util.work import power_work, work_naive_pessimistic, work_binomial
+from .util import work as work
 from ..util.power import power, rayleigh_quotient
 
 
@@ -48,9 +48,50 @@ def baseline(
         iter += 1
 
     scores = scores[0:iter]
-    work = power_work(matrix=A, num_iter=iter)
+    power_wrk = work.power_work(matrix=A, num_iter=iter)
     lbl = "baseline"
-    return work, scores, lbl
+    return power_wrk, scores, lbl
+
+def baseline_pays(
+        A: scipy.sparse.sparray,
+        v0: np.ndarray,
+        max_iter: int,
+        tol: float,
+        is_distributed:bool,
+) -> tuple [np.ndarray, np.ndarray, str]:
+    """Run the default power iteration on this matrix, charging it for the 
+    initial cost of computing A^TA
+
+    Args:
+        A: the original matrix
+        v0: initial guess for top eigenvector
+        max_iter: maximum number of iterations to do power iteration
+        tol (float): how much precision before terminating power
+        is_distributed (bool): Changes ammount of work that goes into computing 
+        A^TA
+
+    Returns:
+        tuple [np.ndarray, np.ndarray, str]: 
+        np.ndarray: the x-values (the ammount of work done),
+        np.ndarray: the y-values (the score of the vector),
+        str: the string representation of this test
+    """
+    xs, ys, lbl = baseline(
+        A=A.transpose() @ A,
+        v0=v0,
+        max_iter=max_iter,
+        tol=tol
+    )
+
+    # Add initial work
+    init_work = work.work_baseline(
+        A=A,
+        is_distributed=is_distributed,
+    )
+    xs += init_work
+
+    return xs, ys, f"{lbl} (is_distributed={is_distributed})"
+
 
 def test(
         A_sq: scipy.sparse.sparray,
@@ -99,10 +140,10 @@ def test(
         i += 1
 
     scores = scores[0:i]
-    work = power_work(matrix=tilde_A_sq, num_iter=i)
-    work += init_work
+    pwr_work = work.power_work(matrix=tilde_A_sq, num_iter=i)
+    pwr_work += init_work
     
-    return work, scores #TODO: untested
+    return pwr_work, scores #TODO: untested
     
 
 def naive_test(
@@ -138,7 +179,7 @@ def naive_test(
         num_trials=num_trials,
         rng=rng,
     )
-    init_work = work_naive_pessimistic(
+    init_work = work.work_naive_pessimistic(
         A=A,
         num_tirals=num_trials,
         is_distributed=is_distributed
@@ -191,7 +232,7 @@ def binomial_test(
         num_trials=num_trials,
         rng=rng,
     )
-    init_work = work_binomial(
+    init_work = work.work_binomial(
         A=A,
         is_distributed=is_distributed
     )
@@ -209,8 +250,8 @@ def binomial_test(
 
     return xs, ys, lbl
 
-if __name__ == '__main__':
-    """Yeahhh
+def main(): #TODO: scale things from zero to one
+    """For testing purposes
     """
     from ..bounds.preprocess import preprocess
     import matplotlib.pyplot as plt
@@ -272,13 +313,15 @@ if __name__ == '__main__':
         rng = np.random.default_rng(seed=5334)
         rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
         print(f"ray_quot = {comp.rayleigh_quotient(rand_vect, A)}")
-        xs, ys, lbl = baseline(
-            A=A_sqr,
-            v0=rand_vect,
-            max_iter=max_iter,
-            tol=tol,
-        )
-        plt.plot(xs,ys, label=lbl)
+        for is_dist in dists:
+            xs, ys, lbl = baseline_pays(
+                A=A,
+                v0=rand_vect,
+                max_iter=max_iter,
+                tol=tol,
+                is_distributed=is_dist,
+            )
+            plt.plot(xs,ys, label=lbl)
         for func in funcs:
             for is_dist in dists:
                 for N in Ns:
@@ -298,3 +341,7 @@ if __name__ == '__main__':
         plt.ylabel(r"$|A^TA\tilde v_1|$", rotation=0)
         plt.legend()
         plt.show()
+
+if __name__ == '__main__':
+    """For testing purporses"""
+    main()
