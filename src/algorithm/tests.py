@@ -255,6 +255,7 @@ def main(): #TODO: scale things from zero to one
     """
     from ..bounds.preprocess import preprocess
     import matplotlib.pyplot as plt
+    from .util.comp import rel_score
 
     mats = [
         "1138_bus",
@@ -310,6 +311,10 @@ def main(): #TODO: scale things from zero to one
         print(mat)
         A, _ = preprocess(mat_name=mat)
         A_sqr = A.transpose() @ A
+        two_norm = scipy.sparse.linalg.norm(
+            x=A_sqr,
+            ord=2,
+        )
         rng = np.random.default_rng(seed=5334)
         rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
         print(f"ray_quot = {comp.rayleigh_quotient(rand_vect, A)}")
@@ -321,6 +326,8 @@ def main(): #TODO: scale things from zero to one
                 tol=tol,
                 is_distributed=is_dist,
             )
+            ys = rel_score(max=two_norm, xs=ys)
+            print(f"xs:{xs[:5]}, ys:{ys[:5]}, lbl:{lbl}")
             plt.plot(xs,ys, label=lbl)
         for func in funcs:
             for is_dist in dists:
@@ -334,11 +341,12 @@ def main(): #TODO: scale things from zero to one
                         seed=SEED,
                         is_distributed=is_dist,
                     )
+                    ys = rel_score(max=two_norm, xs=ys)
                     plt.plot(xs, ys, label=lbl)
 
         plt.title(f"Work vs. Accuracy of Top Eigenvector ({mat})")
         plt.xlabel(f"Approximate Number of Scalar Mults")
-        plt.ylabel(r"$|A^TA\tilde v_1|$", rotation=0)
+        plt.ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
         plt.legend()
         plt.show()
 
