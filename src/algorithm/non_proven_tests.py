@@ -9,9 +9,53 @@ from .util.work import power_work
 from .util import comp as comp
 from .tests import baseline
 
+def test_A_tilde(
+        A_tilde: scipy.sparse.sparray,
+        v0: np.ndarray,
+        max_iter: int,
+        tol: float
+) -> tuple[np.ndarray, np.ndarray, int]:
+    """Get the approximate spectral information at every iteration
+
+    Args:
+        A_tilde (scipy.sparse.sparray): The approximation matrix in question
+        v0 (np.ndarray): Some original guess for the top eigenvector
+        max_iter (int): The maximum number of iterations to run power iteration
+        tol (float): The ammount of allowable error
+
+    Returns:
+        tuple[np.ndarray, np.ndarray, int]: 
+        np.ndarray: the score of the top eigenvector approximation at every 
+        iteration (note that this is a 1xmax_iter array)
+        np.ndarray: the top eigenvector approximation at every iteration 
+        (max_iterxn)
+        int: number of iterations
+    """
+    v=v0
+    scores, vects, iter = comp.init_test(
+        A=A_tilde,
+        v0=v0,
+        max_iter=max_iter,
+    )
+    
+    while iter < max_iter:
+        lam, v = comp.power(
+            A = A_tilde,
+            v0=v,
+            num_iter=1,
+        )
+        scores[iter] = lam
+        vects[iter] = v
+        if (comp.rel_error(scores[iter], scores[iter - 1]) < tol):
+            iter += 1
+            break
+        iter += 1
+    scores[iter:] = scores[iter - 1]    
+    vects[iter:] = vects[iter - 1]    
+    return scores, vects, iter
 
 def test_averaging(
-        A:scipy.sparse,
+        A:scipy.sparse.sparray,
         v0:np.ndarray,
         # lam_star:float,
         max_iter:int,
@@ -25,7 +69,7 @@ def test_averaging(
     hopefully getting better results
 
     Args:
-        A (scipy.sparse): the original matrix
+        A (scipy.sparse.sparray): the original matrix
         v0 (np.ndarray): initial guess for top eigenvector
         max_iter (max_iter): maximum number of iterations to do power iteration
         seed (int): for repeatable randomness (scikit does not have repeatable 
@@ -50,7 +94,7 @@ def test_averaging(
 
     for i in range(num_samples):
         A_tilde = get_next_A_tilde(A, rng=rng)
-        _, vects, num_iter = comp.test_A_tilde(
+        _, vects, num_iter = test_A_tilde(
             A_tilde=A_tilde,
             v0=v0,
             max_iter=max_iter,

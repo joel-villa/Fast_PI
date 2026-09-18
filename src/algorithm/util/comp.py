@@ -68,56 +68,14 @@ def init_test(
 
     return scores, vects, iter
 
-def test_A_tilde(
-        A_tilde: scipy.sparse,
-        v0: np.ndarray,
-        max_iter: int,
-        tol: float
-) -> tuple[np.ndarray, np.ndarray, int]:
-    """Get the approximate spectral information at every iteration
 
-    Args:
-        A_tilde (scipy.sparse): The approximation matrix in question
-        v0 (np.ndarray): Some original guess for the top eigenvector
-        max_iter (int): The maximum number of iterations to run power iteration
-        tol (float): The ammount of allowable error
-
-    Returns:
-        tuple[np.ndarray, np.ndarray, int]: 
-        np.ndarray: the score of the top eigenvector approximation at every 
-        iteration (note that this is a 1xmax_iter array)
-        np.ndarray: the top eigenvector approximation at every iteration 
-        (max_iterxn)
-        int: number of iterations
-    """
-    v=v0
-    scores, vects, iter = init_test(
-        A=A_tilde,
-        v0=v0,
-        max_iter=max_iter,
-    )
-    
-    while iter < max_iter:
-        lam, v = power(
-            A = A_tilde,
-            v0=v,
-            num_iter=1,
-        )
-        scores[iter] = lam
-        vects[iter] = v
-        if (rel_error(scores[iter], scores[iter - 1]) < tol):
-            iter += 1
-            break
-        iter += 1
-    scores[iter:] = scores[iter - 1]    
-    vects[iter:] = vects[iter - 1]    
-    return scores, vects, iter
 
 if __name__ == '__main__':
     """Yeahhh
     """
     from ...bounds.preprocess import preprocess
     from .approx import get_next_A_tilde
+    from ..non_proven_tests import test_A_tilde
 
     mats = [
         "1138_bus",
