@@ -58,11 +58,24 @@ def test(
         v0: np.ndarray,
         max_iter: int,
         tol: float,
-        seed: int,
         init_work: int,
 ) -> tuple[np.ndarray, np.ndarray]:
-    rng = np.random.default_rng(seed=seed)    
-    
+    """A generic test of the accuracy of tilde_A_sq, given A_sq and other 
+    informaiton for power iteration
+
+    Args:
+        A_sq (scipy.sparse.sparray): A^TA
+        tilde_A_sq (scipy.sparse.sparray): Approximation of
+        v0 (np.ndarray): initial guess for top eigenvector
+        max_iter (int): max number of iterations
+        tol (float): tolerance of power iteration
+        init_work (int): to be added to the work calculations
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: 
+        np.ndarray: work done per iteration of power
+        np.ndarray: score of top eigenvector approxation per iteration of power
+    """    
     scores, _, i = comp.init_test(
         A=A_sq,
         v0=v0,
@@ -119,6 +132,7 @@ def naive_test(
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
+    rng = np.random.default_rng(seed=seed)
     tilde_A_sq = naive_A_tilde_sq(
         A=A, 
         num_trials=num_trials,
@@ -136,7 +150,6 @@ def naive_test(
         v0=v0,
         max_iter=max_iter,
         tol=tol,
-        seed=seed,
         init_work=init_work,
     )
 
@@ -172,6 +185,7 @@ def binomial_test(
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
+    rng = np.random.default_rng(seed=seed)
     tilde_A_sq = binomial_A_tilde_sq(
         A=A, 
         num_trials=num_trials,
@@ -188,7 +202,6 @@ def binomial_test(
         v0=v0,
         max_iter=max_iter,
         tol=tol,
-        seed=seed,
         init_work=init_work,
     )
 
