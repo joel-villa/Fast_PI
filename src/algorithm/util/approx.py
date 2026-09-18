@@ -164,7 +164,7 @@ def naive_A_tilde_sq(
 
     return approximation
 
-def get_A_tilde_sq(
+def binomial_A_tilde_sq(
         A:scipy.sparse.sparray,
         num_trials:int,
         rng:np.random.Generator,
@@ -248,7 +248,7 @@ if __name__ == '__main__':
                 rng=rng,
             )
             fst_op_norm_avg += norm(fst_A_tilde_sq)
-            snd_A_tilde_sq = get_A_tilde_sq(
+            snd_A_tilde_sq = binomial_A_tilde_sq(
                 A=A,
                 num_trials=N,
                 rng=rng,

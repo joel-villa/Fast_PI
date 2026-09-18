@@ -4,8 +4,8 @@ import scipy
 import numpy as np
 
 from .util import comp as comp
-from .util.approx import get_next_A_tilde, naive_A_tilde_sq, get_A_tilde_sq
-from .util.work import power_work, work_naive_pessimistic, work_fast
+from .util.approx import get_next_A_tilde, naive_A_tilde_sq, binomial_A_tilde_sq
+from .util.work import power_work, work_naive_pessimistic, work_binomial
 from ..util.power import power, rayleigh_quotient
 
 
@@ -52,6 +52,46 @@ def baseline(
     lbl = "baseline"
     return work, scores, lbl
 
+def test(
+        A_sq: scipy.sparse.sparray,
+        tilde_A_sq: scipy.sparse.sparray,
+        v0: np.ndarray,
+        max_iter: int,
+        tol: float,
+        seed: int,
+        init_work: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    rng = np.random.default_rng(seed=seed)    
+    
+    scores, _, i = comp.init_test(
+        A=A_sq,
+        v0=v0,
+        max_iter=max_iter,
+    )
+    v=v0
+
+    while i < max_iter:
+        _, v = power(
+            A=tilde_A_sq,
+            v0=v,
+            num_iter=1,
+        )
+        scores[i] = rayleigh_quotient( # Score of approximation based on actual
+            x=v,
+            A=A_sq,
+        )
+        if (comp.rel_error(scores[i], scores[i - 1]) < tol): #TODO: this was copied and pasted, bad coding practice, maybe add a helper function for rel error check
+            i += 1
+            break
+        i += 1
+
+    scores = scores[0:i]
+    work = power_work(matrix=tilde_A_sq, num_iter=i)
+    work += init_work
+    
+    return work, scores #TODO: untested
+    
+
 def naive_test(
         A: scipy.sparse.sparray,
         v0: np.ndarray,
@@ -79,8 +119,6 @@ def naive_test(
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
-    rng = np.random.default_rng(seed=seed)
-    A_sq = A.transpose() @ A
     tilde_A_sq = naive_A_tilde_sq(
         A=A, 
         num_trials=num_trials,
@@ -91,36 +129,23 @@ def naive_test(
         num_tirals=num_trials,
         is_distributed=is_distributed
     )
-    scores, _, i = comp.init_test(
-        A=A,
+    
+    xs, ys = test(
+        A_sq=A.transpose() @ A,
+        tilde_A_sq=tilde_A_sq,
         v0=v0,
         max_iter=max_iter,
+        tol=tol,
+        seed=seed,
+        init_work=init_work,
     )
-    v=v0
 
-    while i < max_iter:
-        _, v = power(
-            A=tilde_A_sq,
-            v0=v,
-            num_iter=1,
-        )
-        scores[i] = rayleigh_quotient( # Score of approximation based on actual
-            x=v,
-            A=A_sq,
-        )
-        if (comp.rel_error(scores[i], scores[i - 1]) < tol): #TODO: this was copied and pasted, bad coding practice, maybe add a helper function for rel error check
-            i += 1
-            break
-        i += 1
-
-    scores = scores[0:i]
-    work = power_work(matrix=A, num_iter=i)
-    work += init_work
     lbl = f"naive (distributed={is_distributed}), {num_trials} trials" 
-    return work, scores, lbl #TODO: untested
+
+    return xs, ys, lbl
 
 
-def distributable_test(
+def binomial_test(
         A: scipy.sparse.sparray,
         v0: np.ndarray,
         max_iter: int,
@@ -147,5 +172,116 @@ def distributable_test(
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
-    #TODO: implement this + main
-    pass
+    tilde_A_sq = binomial_A_tilde_sq(
+        A=A, 
+        num_trials=num_trials,
+        rng=rng,
+    )
+    init_work = work_binomial(
+        A=A,
+        is_distributed=is_distributed
+    )
+    
+    xs, ys = test(
+        A_sq=A.transpose() @ A,
+        tilde_A_sq=tilde_A_sq,
+        v0=v0,
+        max_iter=max_iter,
+        tol=tol,
+        seed=seed,
+        init_work=init_work,
+    )
+
+    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials" 
+
+    return xs, ys, lbl
+
+if __name__ == '__main__':
+    """Yeahhh
+    """
+    from ..bounds.preprocess import preprocess
+    import matplotlib.pyplot as plt
+
+    mats = [
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
+        "bcspwr06",
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
+    ]
+
+    mats = sorted(mats) #Alphabetical order
+    max_iter = 30
+    tol=1/64
+    SEED = 7
+
+    # HYPER PARAMS:
+    dists = [
+        True,
+        # False,
+    ]
+    Ns = [
+        1,
+        4,
+        8,
+        16,
+        32,
+        64,
+    ]
+    funcs = [
+        # naive_test,
+        binomial_test,
+    ]
+
+    for mat in mats:
+        print(mat)
+        A, _ = preprocess(mat_name=mat)
+        A_sqr = A.transpose() @ A
+        rng = np.random.default_rng(seed=5334)
+        rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
+        print(f"ray_quot = {comp.rayleigh_quotient(rand_vect, A)}")
+        xs, ys, lbl = baseline(
+            A=A_sqr,
+            v0=rand_vect,
+            max_iter=max_iter,
+            tol=tol,
+        )
+        plt.plot(xs,ys, label=lbl)
+        for func in funcs:
+            for is_dist in dists:
+                for N in Ns:
+                    xs, ys, lbl = func(
+                        A=A,
+                        v0=rand_vect,
+                        max_iter=max_iter,
+                        tol=tol,
+                        num_trials=N,
+                        seed=SEED,
+                        is_distributed=is_dist,
+                    )
+                    plt.plot(xs, ys, label=lbl)
+
+        plt.title(f"Work vs. Accuracy of Top Eigenvector ({mat})")
+        plt.xlabel(f"Approximate Number of Scalar Mults")
+        plt.ylabel(r"$|A^TA\tilde v_1|$", rotation=0)
+        plt.legend()
+        plt.show()

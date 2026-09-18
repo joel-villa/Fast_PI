@@ -54,7 +54,7 @@ def work_naive_pessimistic(
         return mults_per_iter
     return num_tirals * mults_per_iter
 
-def work_fast(
+def work_binomial(
         A:scipy.sparse.csr_array,
         is_distributed:bool,
 ) -> int:
@@ -140,13 +140,13 @@ if __name__ == '__main__':
             is_distributed=True,
         )
         print(f"Work Naive (distributed): {work}")
-        work = work_fast(
+        work = work_binomial(
             A=A,
             is_distributed=False
         )
-        print(f"Work Fast (non distributed): {work}")
-        work = work_fast(
+        print(f"Work Binomial (non distributed): {work}")
+        work = work_binomial(
             A=A,
             is_distributed=True
         )
-        print(f"Work Fast (distributed): {work}")
+        print(f"Work Binomial (distributed): {work}")

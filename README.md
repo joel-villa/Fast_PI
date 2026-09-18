@@ -24,6 +24,8 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Empirical
 
+- Change 'fast' to 'binomial'
+- Baseline pays for A^TA
 - Score vs. Work Graph
     - Total &/or Max Work
 - Weighted Averaging of eigenvectors
@@ -38,6 +40,8 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 
 ### Theory
 
+- Binomial expected work: (1 - ||a_j||)^N
+- Stochastic equivalence of binomial approach to 'naive' approach
 - ~A^T~A = ? => ~A = ?
 - min delta for theoretical results to exist
 - Relate $w_i$'s to $v$ in some cool manner
