@@ -8,6 +8,8 @@ import scipy
 from scipy.linalg import norm # 2-norm by default
 from scipy.sparse import issparse
 
+from .constants import THIRTY_TWO_BIT_PRECISION
+
 def nnz(A):
     """ Get the number of nonzeros in the matrix A
 
@@ -193,28 +195,31 @@ def count_mults_lazy(v0, A, P, maxiter=10):
 
 def rayleigh_quotient(
         x:np.ndarray,
-        A:scipy.sparse,
+        A:scipy.sparse.sparray,
 ) -> float:
     """Get the rayleigh quotient (score) of the given array-matrix combo
 
     Args:
         x (np.ndarray): array in question
-        A (scipy.sparse): matrix in question
+        A (scipy.sparse.sparray): matrix in question
 
     Returns:
         float: The Rayleigh quotient
     """
+    assert np.linalg.norm(x, ord=2) < 1 + THIRTY_TWO_BIT_PRECISION, f"vect not normalized: {np.linalg.norm(x, ord=2)}"
+    assert np.linalg.norm(x, ord=2) > 1 - THIRTY_TWO_BIT_PRECISION, f"vect not normalized: {np.linalg.norm(x, ord=2)}"
+
     return (x.T @ (A @ x)).item()
 
 def power(
-        A:scipy.sparse,
+        A:scipy.sparse.sparray,
         v0:np.ndarray,
         num_iter:int,
 ) -> tuple[float, np.ndarray]:
     """Do power iteration
 
     Args:
-        A (scipy.sparse): The matrix
+        A (scipy.sparse.sparray): The matrix
         v0 (np.ndarray): The current guess for the top eigenvector
         num_iter (int): The number of iterations
 
