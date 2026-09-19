@@ -317,11 +317,12 @@ def main(): #TODO: scale things from zero to one
         )
         rng = np.random.default_rng(seed=5334)
         rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
-        print(f"ray_quot = {comp.rayleigh_quotient(rand_vect, A)}")
+        normalized_vect = rand_vect / np.linalg.norm(rand_vect, ord=2)
+        print(f"initial ray_quot = {comp.rayleigh_quotient(normalized_vect, A_sqr)}")
         for is_dist in dists:
             xs, ys, lbl = baseline_pays(
                 A=A,
-                v0=rand_vect,
+                v0=normalized_vect,
                 max_iter=max_iter,
                 tol=tol,
                 is_distributed=is_dist,
@@ -334,7 +335,7 @@ def main(): #TODO: scale things from zero to one
                 for N in Ns:
                     xs, ys, lbl = func(
                         A=A,
-                        v0=rand_vect,
+                        v0=normalized_vect,
                         max_iter=max_iter,
                         tol=tol,
                         num_trials=N,
