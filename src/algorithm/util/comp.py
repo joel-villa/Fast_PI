@@ -11,7 +11,7 @@ def rel_score(
         max:float,
         xs:np.ndarray,
 ) -> np.ndarray:
-    """Adjust the x values s.t. they are on a range from 0 to 1, where if x_i 
+    """Adjust the x values s.t. they are on a range from 0 to 1, where if x_i
     equals max then set that value to one
 
     Args:
@@ -19,7 +19,7 @@ def rel_score(
         xs (np.ndarray): The list of values
 
     Returns:
-        np.ndarray: Those adjust values 
+        np.ndarray: Those adjust values
     """
     # Error handlign
     assert np.max(xs) < max + THIRTY_TWO_BIT_PRECISION, f"np.max(xs) = {np.max(xs)} > {max}"
@@ -75,7 +75,7 @@ def init_test(
         max_iter (int): the maximum number of iterations
 
     Returns:
-        tuple[np.ndarray, np.ndarray, int]: 
+        tuple[np.ndarray, np.ndarray, int]:
         np.ndarray: the array which will hold the top eigenvalues
         np.ndarray: the array which will hold the top eigenvectors
         int: the initial number of iterations
