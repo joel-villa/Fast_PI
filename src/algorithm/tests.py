@@ -24,7 +24,7 @@ def baseline(
         tol (float): how much precision before terminating power
 
     Returns:
-        tuple [np.ndarray, np.ndarray, str]: 
+        tuple [np.ndarray, np.ndarray, str]:
         np.ndarray: the x-values (the ammount of work done),
         np.ndarray: the y-values (the score of the vector),
         str: the string representation of this test
@@ -59,7 +59,7 @@ def baseline_pays(
         tol: float,
         is_distributed:bool,
 ) -> tuple [np.ndarray, np.ndarray, str]:
-    """Run the default power iteration on this matrix, charging it for the 
+    """Run the default power iteration on this matrix, charging it for the
     initial cost of computing A^TA
 
     Args:
@@ -67,11 +67,11 @@ def baseline_pays(
         v0: initial guess for top eigenvector
         max_iter: maximum number of iterations to do power iteration
         tol (float): how much precision before terminating power
-        is_distributed (bool): Changes ammount of work that goes into computing 
+        is_distributed (bool): Changes ammount of work that goes into computing
         A^TA
 
     Returns:
-        tuple [np.ndarray, np.ndarray, str]: 
+        tuple [np.ndarray, np.ndarray, str]:
         np.ndarray: the x-values (the ammount of work done),
         np.ndarray: the y-values (the score of the vector),
         str: the string representation of this test
@@ -101,7 +101,7 @@ def test(
         tol: float,
         init_work: int,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """A generic test of the accuracy of tilde_A_sq, given A_sq and other 
+    """A generic test of the accuracy of tilde_A_sq, given A_sq and other
     informaiton for power iteration
 
     Args:
@@ -113,10 +113,10 @@ def test(
         init_work (int): to be added to the work calculations
 
     Returns:
-        tuple[np.ndarray, np.ndarray]: 
+        tuple[np.ndarray, np.ndarray]:
         np.ndarray: work done per iteration of power
         np.ndarray: score of top eigenvector approxation per iteration of power
-    """    
+    """
     scores, _, i = comp.init_test(
         A=A_sq,
         v0=v0,
@@ -142,9 +142,9 @@ def test(
     scores = scores[0:i]
     pwr_work = work.power_work(matrix=tilde_A_sq, num_iter=i)
     pwr_work += init_work
-    
+
     return pwr_work, scores #TODO: untested
-    
+
 
 def naive_test(
         A: scipy.sparse.sparray,
@@ -164,18 +164,18 @@ def naive_test(
         tol (float): Tolerance of power iteration
         num_trials (int): Number of things to average
         seed (int): For repeatable randomization
-        is_distributed (bool): Changes ammount of work that goes into computing 
+        is_distributed (bool): Changes ammount of work that goes into computing
         an approximation for A^TA
-        
+
     Returns:
-        tuple [np.ndarray, np.ndarray, str]: 
+        tuple [np.ndarray, np.ndarray, str]:
         np.ndarray: work per iteration
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
     rng = np.random.default_rng(seed=seed)
     tilde_A_sq = naive_A_tilde_sq(
-        A=A, 
+        A=A,
         num_trials=num_trials,
         rng=rng,
     )
@@ -184,7 +184,7 @@ def naive_test(
         num_tirals=num_trials,
         is_distributed=is_distributed
     )
-    
+
     xs, ys = test(
         A_sq=A.transpose() @ A,
         tilde_A_sq=tilde_A_sq,
@@ -194,7 +194,7 @@ def naive_test(
         init_work=init_work,
     )
 
-    lbl = f"naive (distributed={is_distributed}), {num_trials} trials" 
+    lbl = f"naive (distributed={is_distributed}), {num_trials} trials"
 
     return xs, ys, lbl
 
@@ -217,18 +217,18 @@ def binomial_test(
         tol (float): Tolerance of power iteration
         num_trials (int): Number of things to average
         seed (int): For repeatable randomization
-        is_distributed (bool): Changes ammount of work that goes into computing 
+        is_distributed (bool): Changes ammount of work that goes into computing
         an approximation for A^TA
 
     Returns:
-        tuple [np.ndarray, np.ndarray, str]: 
+        tuple [np.ndarray, np.ndarray, str]:
         np.ndarray: work per iteration
         np.ndarray: score of approximate eigenvector per iteration
         str: label of this test
     """
     rng = np.random.default_rng(seed=seed)
     tilde_A_sq = binomial_A_tilde_sq(
-        A=A, 
+        A=A,
         num_trials=num_trials,
         rng=rng,
     )
@@ -236,7 +236,7 @@ def binomial_test(
         A=A,
         is_distributed=is_distributed
     )
-    
+
     xs, ys = test(
         A_sq=A.transpose() @ A,
         tilde_A_sq=tilde_A_sq,
@@ -246,16 +246,22 @@ def binomial_test(
         init_work=init_work,
     )
 
-    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials" 
+    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials"
 
     return xs, ys, lbl
 
 def main(): #TODO: scale things from zero to one
     """For testing purposes
     """
+    import matplotlib
+    matplotlib.use("QtAgg")
+
     from ..bounds.preprocess import preprocess
     import matplotlib.pyplot as plt
     from .util.comp import rel_score
+
+
+    print(plt.get_backend())
 
     mats = [
         "1138_bus",
