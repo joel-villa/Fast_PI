@@ -1,4 +1,4 @@
-""" An implementation of an algorithm which is supposed to be faster than 
+""" An implementation of an algorithm which is supposed to be faster than
 typical Power Iteration"""
 
 import time
@@ -22,7 +22,7 @@ def plain_pi(
         A (scipy.sparse): The matrix to get the top eigenvector/value of
 
     Returns:
-        tuple[float, np.ndarray]: 
+        tuple[float, np.ndarray]:
         float: top eigenvalue
         np.ndarray: top eigenvector
     """
@@ -41,9 +41,9 @@ def fast_pi(
         seed (int): Seed of random number genrator
 
     Returns:
-        tuple[float, np.ndarray]: 
+        tuple[float, np.ndarray]:
         float: the top eigenvalue approximation
-        np.ndarray: the top eigenvector approximation 
+        np.ndarray: the top eigenvector approximation
     """
     rng = np.random.default_rng(seed=seed)
 
@@ -81,22 +81,22 @@ def bounded_fast_pi(
         seed: int,
         f_of_n:  Callable[[int], int] | None = None,
 ) -> tuple[float,np.ndarray, int, float]:
-    """Do the fast power-iteration method on the matrix A with some allowable 
+    """Do the fast power-iteration method on the matrix A with some allowable
     ammount of error
 
     Args:
         mat_name (str): The name of the matrix in the Suite Sparse collection
         A (scipy.sparse): The matrix to find the top spectral info about
         epsilon (float): Amount of allowable error in top eigenvalue
-        f_of_n (Callable[[int], int] | None): A function that determines the number of 
+        f_of_n (Callable[[int], int] | None): A function that determines the number of
         samples based on the matrix size
         seed (int): The seed for repeatable randomization
     Returns:
-        tuple[float,np.ndarray, int, float]: 
+        tuple[float,np.ndarray, int, float]:
         float: the top eigenvalue approximation
         np.ndarray: the top eigenvector approximation
         int: number of samples used
-        float: probability of success (falling within those epsilon bounds) 
+        float: probability of success (falling within those epsilon bounds)
     """
     if f_of_n is None:
         f_of_n = default_f
@@ -118,8 +118,8 @@ def bounded_fast_pi(
     )
 
     return (
-        lambda_guess, 
-        v_approx, 
+        lambda_guess,
+        v_approx,
         num_approximations,
         delta,
     )
@@ -132,22 +132,22 @@ def probable_fast_pi(
         seed: int,
         f_of_n:  Callable[[int], int] | None = None,
 ) -> tuple[float,np.ndarray, int, float]:
-    """Do the fast power-iteration method on the matrix A with some allowable 
+    """Do the fast power-iteration method on the matrix A with some allowable
     ammount of error
 
     Args:
         mat_name (str): The name of the matrix in the Suite Sparse collection
         A (scipy.sparse): The matrix to find the top spectral info about
         delta (float): Probability of success
-        f_of_n (Callable[[int], int] | None): A function that determines the number of 
+        f_of_n (Callable[[int], int] | None): A function that determines the number of
         samples based on the matrix size
         seed (int): The seed for repeatable randomization
     Returns:
-        tuple[float,np.ndarray, int, float]: 
+        tuple[float,np.ndarray, int, float]:
         float: the top eigenvalue approximation
         np.ndarray: the top eigenvector approximation
         int: number of samples used
-        float: With probability at least delta, the top eigenvector falls within 
+        float: With probability at least delta, the top eigenvector falls within
         this epsilon ammount
     """
     if f_of_n is None:
@@ -170,8 +170,8 @@ def probable_fast_pi(
     )
 
     return (
-        lambda_guess, 
-        v_approx, 
+        lambda_guess,
+        v_approx,
         num_approximations,
         epsilon,
     )
@@ -212,16 +212,16 @@ if __name__ == '__main__':
                 )
                 fast_pi_end = time.perf_counter()
                 fast_pi_time = fast_pi_end - fast_pi_start
-    
-    
+
+
                 lambda_approx = np.linalg.norm(A @ v_approx)
-    
+
                 rel_err = rel_error(
-                    approx=float(lambda_approx), 
+                    approx=float(lambda_approx),
                     true=lambda_max,
                 )
-    
-                print(f"With probability at least {delta}, using" 
+
+                print(f"With probability at least {delta}, using"
                       f"{num_samples} iid copies of ~A, the top eigenvalue has"
                       fr"$||A\tilde w|| \in [(1 - {epsilon}) ||Aw||, ||Aw||]$")
                 print(fr"||A \tilde w||  = {lambda_approx}"
