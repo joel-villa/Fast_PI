@@ -1,6 +1,7 @@
 # FAST_PI
 
-An approach to speeding up Power Iteration via row sampling based on row-magnitudes. For the theoretical results see the docs/ directory.
+An approach to speeding up Power Iteration via row sampling based on row-
+magnitudes. For the theoretical results see the docs/ directory.
 
 ## To load Sparsification_Research Repository Run
 ```(linux)
@@ -18,7 +19,8 @@ python -m src.main
 
 ## A Note on ssgetpy
 
-The ssgetpy library will download matrices onto your machine, at the root in the .ssgetpy directory
+On UNIX based machines, the ssgetpy library will download matrices onto your 
+machine, at the root in the .ssgetpy directory
 
 ## TODO
 
@@ -38,4 +40,5 @@ The ssgetpy library will download matrices onto your machine, at the root in the
 - min delta for theoretical results to exist
 - Take advantage of eigen-gap? Other routes forward?
 - Change $w$ to $v$, more sensible
-- FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard power-iteration...
+- FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard 
+  power-iteration...
