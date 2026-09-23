@@ -325,7 +325,11 @@ def main(): #TODO: scale things from zero to one
         rand_vect = rng.normal(loc=0.0, scale=0.0625, size=A.shape[0])
         normalized_vect = rand_vect / np.linalg.norm(rand_vect, ord=2)
         print(f"initial ray_quot = {comp.rayleigh_quotient(normalized_vect, A_sqr)}")
-        for is_dist in dists:
+
+        baseline_work = []
+        work_offsets = []
+
+        for i, is_dist in enumerate(dists):
             xs, ys, lbl = baseline_pays(
                 A=A,
                 v0=normalized_vect,
@@ -333,11 +337,27 @@ def main(): #TODO: scale things from zero to one
                 tol=tol,
                 is_distributed=is_dist,
             )
-            ys = rel_score(max=two_norm, xs=ys)
+
+            work_offsets.append(xs[0])
+            baseline_work.append(xs[-1]) # Track final work
+
+            # Start at zero
+            xs = xs - work_offsets[i]
+
+            xs = rel_score(
+                max=baseline_work[i],
+                xs=xs,
+                check_max=True,
+            )
+            ys = rel_score(
+                max=two_norm,
+                xs=ys,
+                check_max=True,
+            )
             print(f"xs:{xs[:5]}, ys:{ys[:5]}, lbl:{lbl}")
             plt.plot(xs,ys, label=lbl)
         for func in funcs:
-            for is_dist in dists:
+            for i, is_dist in enumerate(dists):
                 for N in Ns:
                     xs, ys, lbl = func(
                         A=A,
@@ -348,11 +368,22 @@ def main(): #TODO: scale things from zero to one
                         seed=SEED,
                         is_distributed=is_dist,
                     )
-                    ys = rel_score(max=two_norm, xs=ys)
+                    # Scale to be between zero and one
+                    xs = xs - work_offsets[i]
+                    xs = rel_score(
+                        max=baseline_work[i],
+                        xs=xs,
+                        check_max=False,
+                    )
+                    ys = rel_score(
+                        max=two_norm,
+                        xs=ys,
+                        check_max=True,
+                    )
                     plt.plot(xs, ys, label=lbl)
 
         plt.title(f"Work vs. Accuracy of Top Eigenvector ({mat})")
-        plt.xlabel(f"Approximate Number of Scalar Mults")
+        plt.xlabel(f"Approximate Proportion of Scalar Mults")
         plt.ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
         plt.legend()
         plt.show()
