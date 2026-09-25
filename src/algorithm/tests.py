@@ -291,8 +291,8 @@ def main(): #TODO: scale things from zero to one
     ]
 
     mats = sorted(mats) #Alphabetical order
-    max_iter = 30
-    tol=1/64
+    max_iter = 2048
+    tol=1/256
     SEED = 7
 
     # HYPER PARAMS:
