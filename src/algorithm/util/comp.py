@@ -7,7 +7,26 @@ from ...util.power import power, rayleigh_quotient
 from .work import power_work
 from ...util.constants import THIRTY_TWO_BIT_PRECISION
 
-def rel_score(
+def check_vals(
+    max:float,
+    xs:np.ndarray,
+    check_max:bool,
+):
+    """Adjust the x values s.t. they are on a range from 0 to 1, where if x_i
+    equals max then set that value to one
+
+    Args:
+        max (float): The maximum possible value
+        xs (np.ndarray): The list of values
+        check_max (bool): If True -> throw error if any values in xs are more
+        than max, do no such error handling otherwise
+    """
+    assert np.all(xs >= 0), f"Scores must be nonnegative"
+    if check_max and (np.max(xs) > (max + THIRTY_TWO_BIT_PRECISION)):
+        raise ValueError(f"np.max(xs) = {np.max(xs)} > {max}")
+
+
+def rel_value(
         max:float,
         xs:np.ndarray,
         check_max:bool,
@@ -24,12 +43,33 @@ def rel_score(
     Returns:
         np.ndarray: Those adjust values
     """
-    # Error handlign
-    assert np.all(xs >= 0), f"Scores must be nonnegative"
-    if check_max and (np.max(xs) > (max + THIRTY_TWO_BIT_PRECISION)):
-        raise ValueError(f"np.max(xs) = {np.max(xs)} > {max}")
+    check_vals(
+        max,
+        xs,
+        check_max,
+    )
 
     return xs / max
+
+def rel_residue(
+    max: float,
+    xs:np.ndarray,
+    check_max:bool,
+) -> np.ndarray:
+    """Calculate relative residual
+
+    Args:
+        max (float): The maximum possible value in xs
+
+    Returns:
+         residue (np.ndarray): The relative residue
+    """
+    check_vals(
+        max,
+        xs,
+        check_max,
+    )
+    return np.absolute(max - xs) / max
 
 def rel_error(
         approx: float,
