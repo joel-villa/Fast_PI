@@ -143,7 +143,7 @@ def test(
     pwr_work = work.power_work(matrix=tilde_A_sq, num_iter=i)
     pwr_work += init_work
 
-    return pwr_work, scores #TODO: untested
+    return pwr_work, scores
 
 
 def naive_test(
@@ -250,15 +250,22 @@ def binomial_test(
 
     return xs, ys, lbl
 
-def main(): #TODO: scale things from zero to one
-    """For testing purposes
+def main(
+    log_y:bool,
+    num_avg:int
+):
+    """Generate performance plots for Fast-PI on those matrices
+
+    Args:
+        log_y (bool): Y-axis of plot log scaled?
+        num_avg (int): The number averaged in the result (to reduce noise) # TODO
     """
     import matplotlib
     matplotlib.use("QtAgg")
 
     from ..bounds.preprocess import preprocess
     import matplotlib.pyplot as plt
-    from .util.comp import rel_score
+    from .util.comp import rel_value, rel_residue
 
 
     print(plt.get_backend())
@@ -344,12 +351,12 @@ def main(): #TODO: scale things from zero to one
             # Start at zero
             xs = xs - work_offsets[i]
 
-            xs = rel_score(
+            xs = rel_value(
                 max=baseline_work[i],
                 xs=xs,
                 check_max=True,
             )
-            ys = rel_score(
+            ys = rel_residue(
                 max=two_norm,
                 xs=ys,
                 check_max=True,
@@ -370,12 +377,12 @@ def main(): #TODO: scale things from zero to one
                     )
                     # Scale to be between zero and one
                     xs = xs - work_offsets[i]
-                    xs = rel_score(
+                    xs = rel_value(
                         max=baseline_work[i],
                         xs=xs,
                         check_max=False,
                     )
-                    ys = rel_score(
+                    ys = rel_residue(
                         max=two_norm,
                         xs=ys,
                         check_max=True,
@@ -383,11 +390,19 @@ def main(): #TODO: scale things from zero to one
                     plt.plot(xs, ys, label=lbl)
 
         plt.title(f"Work vs. Accuracy of Top Eigenvector ({mat})")
-        plt.xlabel(f"Approximate Proportion of Scalar Mults")
-        plt.ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
+        plt.xlabel("Approximate Proportion of Scalar Mults")
+        if (log_y):
+            plt.ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
+            plt.yscale('log')
+        else:
+            # In case non-log plots are also useful
+            plt.ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
         plt.legend()
         plt.show()
 
 if __name__ == '__main__':
     """For testing purporses"""
-    main()
+    main(
+        True,
+        32,
+    )
