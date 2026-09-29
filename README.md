@@ -26,7 +26,8 @@ machine, at the root in the .ssgetpy directory
 
 ### Empirical
 
-- [ ] Residual(ish) -> plots approach zero rather than one
+- [x] Residual(ish) -> plots approach zero rather than one
+- [x] logarithm view of accuracy
 - [ ] Do norms impact, performance, why are some not seeing gains?
 - [ ] Implement averaging of at least 20 runs
 - [ ] Longer runs -> Stronger results
