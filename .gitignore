@@ -1,5 +1,12 @@
 __pycache__
 .vscode
 testing_area.py
-.DS_Store
+
+# What is this?
 \misc
+
+# MacOS
+.DS_Store
+
+# Zed
+pyrightconfig.json 
