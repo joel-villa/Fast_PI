@@ -252,12 +252,17 @@ def binomial_test(
 
 def main(
     log_y:bool,
+    avg_min:bool,
     num_avg:int
 ):
     """Generate performance plots for Fast-PI on those matrices
 
     Args:
         log_y (bool): Y-axis of plot log scaled?
+        avg_min (bool): When averaging variable length sequences, must choose
+        to average over all or part of them.
+            True -> average over those that exist for all trials
+            False -> average over all (the outlier longest will be weighted 100%)
         num_avg (int): The number averaged in the result (to reduce noise) # TODO
     """
     import matplotlib
@@ -337,7 +342,7 @@ def main(
         work_offsets = []
 
         for i, is_dist in enumerate(dists):
-            xs, ys, lbl = baseline_pays(
+            xs_temp, ys, lbl = baseline_pays(
                 A=A,
                 v0=normalized_vect,
                 max_iter=max_iter,
@@ -345,15 +350,15 @@ def main(
                 is_distributed=is_dist,
             )
 
-            work_offsets.append(xs[0])
-            baseline_work.append(xs[-1]) # Track final work
+            work_offsets.append(xs_temp[0])
+            baseline_work.append(xs_temp[-1]) # Track final work
 
             # Start at zero
-            xs = xs - work_offsets[i]
+            xs_temp = xs_temp - work_offsets[i]
 
-            xs = rel_value(
+            xs_temp = rel_value(
                 max=baseline_work[i],
-                xs=xs,
+                xs=xs_temp,
                 check_max=True,
             )
             ys = rel_residue(
@@ -361,33 +366,63 @@ def main(
                 xs=ys,
                 check_max=True,
             )
-            print(f"xs:{xs[:5]}, ys:{ys[:5]}, lbl:{lbl}")
-            plt.plot(xs,ys, label=lbl)
+            print(f"xs:{xs_temp[:5]}, ys:{ys[:5]}, lbl:{lbl}")
+            plt.plot(xs_temp,ys, label=lbl)
         for func in funcs:
             for i, is_dist in enumerate(dists):
                 for N in Ns:
-                    xs, ys, lbl = func(
-                        A=A,
-                        v0=normalized_vect,
-                        max_iter=max_iter,
-                        tol=tol,
-                        num_trials=N,
-                        seed=SEED,
-                        is_distributed=is_dist,
-                    )
-                    # Scale to be between zero and one
-                    xs = xs - work_offsets[i]
-                    xs = rel_value(
-                        max=baseline_work[i],
-                        xs=xs,
-                        check_max=False,
-                    )
-                    ys = rel_residue(
-                        max=two_norm,
-                        xs=ys,
-                        check_max=True,
-                    )
-                    plt.plot(xs, ys, label=lbl)
+                    ys = np.zeros(max_iter)
+                    xs = np.zeros(max_iter)
+                    ys_j = np.full((num_avg, max_iter), np.nan) # for averaging
+                    least_iter = np.inf
+                    most_iter = 0
+                    lbl = ""
+                    for j in range(num_avg):
+                        xs_temp, ys_temp, lbl = func(
+                            A=A,
+                            v0=normalized_vect,
+                            max_iter=max_iter,
+                            tol=tol,
+                            num_trials=N,
+                            seed=SEED,
+                            is_distributed=is_dist,
+                        )
+                        # Scale to be between zero and one
+                        xs_temp = xs_temp - work_offsets[i]
+                        xs_temp = rel_value(
+                            max=baseline_work[i],
+                            xs=xs_temp,
+                            check_max=False,
+                        )
+                        ys_temp = rel_residue(
+                            max=two_norm,
+                            xs=ys_temp,
+                            check_max=True,
+                        )
+
+                        # Max & Min iter tracking -> handling averaging over
+                        # variable length sequences
+                        curr_iter = ys_temp.shape[0]
+                        ys_j[j, : curr_iter] = ys_temp
+                        least_iter = min(least_iter, curr_iter)
+                        if (most_iter < curr_iter):
+                            # Track the most number of iterations so far
+                            most_iter = curr_iter
+                            xs = xs_temp
+
+                    ys = np.nanmean(ys_j, axis=0)
+
+                    if (avg_min):
+                        xs = xs[:least_iter]
+                        ys = ys[:least_iter]
+                    else:
+                        xs = xs[:most_iter]
+                        ys = ys[:most_iter]
+
+                    print(f"xs.shape = {xs.shape}")
+                    print(f"ys.shape = {ys.shape}")
+
+                    plt.plot(xs, ys, label=f"{lbl}, avg of {num_avg}")
 
         plt.title(f"Work vs. Accuracy of Top Eigenvector ({mat})")
         plt.xlabel("Approximate Proportion of Scalar Mults")
@@ -403,6 +438,7 @@ def main(
 if __name__ == '__main__':
     """For testing purporses"""
     main(
-        True,
-        32,
+        num_avg=32,
+        avg_min=True,
+        log_y=True,
     )
