@@ -6,7 +6,7 @@ magnitudes. For the theoretical results see the docs/ directory.
 ## Generating Plots
 
 ```(linux)
-python -m src.algorithm.tests
+python -m src.algorithm.main
 ```
 
 ## To load Sparsification_Research Repository Run
