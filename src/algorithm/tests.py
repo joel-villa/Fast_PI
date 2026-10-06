@@ -90,7 +90,8 @@ def baseline_pays(
     )
     xs += init_work
 
-    return xs, ys, f"{lbl} (is_distributed={is_distributed})"
+#    return xs, ys, f"{lbl} (is_distributed={is_distributed})"
+    return xs, ys, lbl
 
 
 def test(
@@ -246,7 +247,8 @@ def binomial_test(
         init_work=init_work,
     )
 
-    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials"
+#    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials"
+    lbl = f"{num_trials} binomial trials"
 
     return xs, ys, lbl
 
@@ -305,7 +307,7 @@ def main(
 
     mats = sorted(mats) #Alphabetical order
     max_iter = 2048
-    tol=1/256
+    tol=1/8192
     SEED = 7
 
     # HYPER PARAMS:
@@ -327,6 +329,11 @@ def main(
     ]
 
     for mat in mats:
+        fig, ax = plt.subplots(
+            figsize=(12.8, 14.4),
+            dpi=256,
+        )
+
         print(mat)
         A, _ = preprocess(mat_name=mat)
         A_sqr = A.transpose() @ A
@@ -368,7 +375,7 @@ def main(
                 check_max=True,
             )
             print(f"xs:{xs_temp[:5]}, ys:{ys[:5]}, lbl:{lbl}")
-            plt.plot(xs_temp,ys, label=lbl)
+            ax.plot(xs_temp,ys, label=lbl)
         for func in funcs:
             for i, is_dist in enumerate(dists):
                 for N in Ns:
@@ -428,18 +435,22 @@ def main(
                     print(f"xs.shape = {xs.shape}")
                     print(f"ys.shape = {ys.shape}")
 
-                    plt.plot(xs, ys, label=f"{lbl}, avg of {num_avg}")
+                    ax.plot(xs, ys, label=f"{lbl}, avg of {num_avg}")
 
-        plt.title(f"Work vs. Accuracy of Top Eigenvector ({mat})")
-        plt.xlabel("Approximate Proportion of Scalar Mults")
+        ax.set_title(f"Work vs. Accuracy of Top Eigenvector ({mat}: {A.shape[0]}x{A.shape[1]}, {A.nnz} nnz)")
+        ax.set_xlabel("Approximate Proportion of Scalar Mults")
         if (log_y):
-            plt.ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
-            plt.yscale('log')
+            ax.set_ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
+            ax.set_yscale('log')
         else:
             # In case non-log plots are also useful
-            plt.ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
-        plt.legend()
-        plt.show()
+            ax.set_ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
+        ax.legend()
+        fig.canvas.draw()
+        fig.savefig(f"plots/{mat}.png", dpi=plt.figure().dpi)
+#        plt.show()
+        plt.close(fig)
+
 
 if __name__ == '__main__':
     """For testing purporses"""
