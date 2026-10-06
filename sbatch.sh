@@ -11,10 +11,12 @@
 module load python
 
 python -m venv .venv
+source .venv/bin/activate
 pip install scipy
 pip install scikit-learn
+pip install matplotlib
 pip install ssgetpy
-pip isntall PyQt6
+pip install PyQt6
 
-python -m src.algorithm.tests
+python -m src.algorithm.main
 
