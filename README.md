@@ -3,19 +3,24 @@
 An approach to speeding up Power Iteration via row sampling based on row-
 magnitudes. For the theoretical results see the docs/ directory.
 
+## Generating Plots
+
+```(linux)
+python -m src.algorithm.tests
+```
+
 ## To load Sparsification_Research Repository Run
+
 ```(linux)
 git submodule update --init --recursive
 ```
 
 ## To update Sparsification_Research Directory
+
 ```(linux)
 cd Sparsification_Research
 git pull origin main
 ```
-
-## To run main:
-python -m src.main
 
 ## A Note on ssgetpy
 
