@@ -9,7 +9,13 @@ from .util import work as work
 def main(
     log_y:bool,
     run_length_type:int,
-    num_avg:int
+    num_avg:int,
+    mats:list[str],
+    on_easley:bool,
+    max_iter:int,
+    tol:float,
+    seed:int,
+    Ns:list[int],
 ):
     """Generate performance plots for Fast-PI on those matrices
 
@@ -21,9 +27,16 @@ def main(
             2 -> average over the median num trials
             3 -> average over all (the outlier longest will be weighted 100%)
         num_avg (int): The number averaged in the result (to reduce noise) # TODO
+        mats (list[str]): The matrices to test
+        on_easley (bool): on_easley ->  don't display, not on_easly -> display!
+        max_iter (int): max # of iterations of power
+        tol (float): Stopping tolerance of power iteration
+        seed (int): for repeated randomness
+        Ns (list[int]): Number of bernoulli trials
     """
     import matplotlib
-    matplotlib.use("QtAgg")
+    if (not on_easley):
+        matplotlib.use("QtAgg")
 
     from ..bounds.preprocess import preprocess
     import matplotlib.pyplot as plt
@@ -32,50 +45,10 @@ def main(
 
     print(plt.get_backend())
 
-    mats = [
-        "1138_bus",
-        "494_bus",
-        "Harvard500",
-        "bcspwr06",
-        "bcsstk07",
-        "bcsstk08",
-        "bcsstk19",
-        "bcsstk34",
-        "bcsstm07",
-        "blckhole",
-        "cage7",
-        "can_229",
-        "dwt_193",
-        "eris1176",
-        "ex2",
-        "fs_541_1",
-        "gre_1107",
-        "gre_343",
-        "hor_131",
-        "lshp1561",
-        "msc00726",
-        "nasa1824",
-        "nos3",
-        "tomography",
-    ]
-
-    mats = sorted(mats) #Alphabetical order
-    max_iter = 2048
-    tol=1/8192
-    SEED = 7
-
     # HYPER PARAMS:
     dists = [
         True,
         # False,
-    ]
-    Ns = [
-        1,
-        4,
-        8,
-        16,
-        32,
-        64,
     ]
     funcs = [
         # naive_test,
@@ -146,7 +119,7 @@ def main(
                             max_iter=max_iter,
                             tol=tol,
                             num_trials=N,
-                            seed=SEED,
+                            seed=seed,
                             is_distributed=is_dist,
                         )
 #                        print(f"xs={xs[:15]}")
@@ -203,14 +176,62 @@ def main(
         ax.legend()
         fig.canvas.draw()
         fig.savefig(f"plots/{mat}.png", dpi=plt.figure().dpi)
-#        plt.show()
+        if (not on_easley):
+            plt.show()
         plt.close(fig)
 
 
 if __name__ == '__main__':
     """For testing purporses"""
+    mats = [
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
+        "bcspwr06",
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
+    ]
+
+    mats = sorted(mats) #Alphabetical order
+    max_iter = 2048
+    tol=1/8192
+    seed = 7
+
+    Ns = [
+        1,
+        4,
+        8,
+        16,
+        32,
+        64,
+    ]
+
     main(
         num_avg=32,
         run_length_type=2,
         log_y=True,
+        mats=mats,
+        on_easley=True,
+        max_iter=max_iter,
+        tol=tol,
+        seed=seed,
+        Ns=Ns,
     )
