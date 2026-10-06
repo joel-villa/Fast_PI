@@ -252,17 +252,18 @@ def binomial_test(
 
 def main(
     log_y:bool,
-    avg_min:bool,
+    run_length_type:int,
     num_avg:int
 ):
     """Generate performance plots for Fast-PI on those matrices
 
     Args:
         log_y (bool): Y-axis of plot log scaled?
-        avg_min (bool): When averaging variable length sequences, must choose
+        run_length_type (int): When averaging variable length sequences, must choose
         to average over all or part of them.
-            True -> average over those that exist for all trials
-            False -> average over all (the outlier longest will be weighted 100%)
+            1 -> average over those that exist for all trials
+            2 -> average over the median num trials
+            3 -> average over all (the outlier longest will be weighted 100%)
         num_avg (int): The number averaged in the result (to reduce noise) # TODO
     """
     import matplotlib
@@ -374,8 +375,7 @@ def main(
                     ys = np.zeros(max_iter)
                     xs = np.zeros(max_iter)
                     ys_j = np.full((num_avg, max_iter), np.nan) # for averaging
-                    least_iter = np.inf
-                    most_iter = 0
+                    run_iters = np.zeros(num_avg)
                     lbl = ""
                     for j in range(num_avg):
                         xs_temp, ys_temp, lbl = func(
@@ -387,6 +387,7 @@ def main(
                             seed=SEED,
                             is_distributed=is_dist,
                         )
+#                        print(f"xs={xs[:15]}")
                         # Scale to be between zero and one
                         xs_temp = xs_temp - work_offsets[i]
                         xs_temp = rel_value(
@@ -400,21 +401,26 @@ def main(
                             check_max=True,
                         )
 
-                        # Max & Min iter tracking -> handling averaging over
-                        # variable length sequences
+                        # Iteration tracking
                         curr_iter = ys_temp.shape[0]
                         ys_j[j, : curr_iter] = ys_temp
-                        least_iter = min(least_iter, curr_iter)
-                        if (most_iter < curr_iter):
-                            # Track the most number of iterations so far
-                            most_iter = curr_iter
+                        run_iters[j] = curr_iter
+                        if (run_iters[j] == np.max(run_iters)):
+                            # Track longest!
                             xs = xs_temp
 
                     ys = np.nanmean(ys_j, axis=0)
 
-                    if (avg_min):
+                    least_iter = np.min(run_iters)
+                    most_iter = np.max(run_iters)
+                    median_iter = round(np.median(run_iters))
+
+                    if (run_length_type == 1):
                         xs = xs[:least_iter]
                         ys = ys[:least_iter]
+                    elif (run_length_type == 2):
+                        xs = xs[:median_iter]
+                        ys = ys[:median_iter]
                     else:
                         xs = xs[:most_iter]
                         ys = ys[:most_iter]
@@ -439,6 +445,6 @@ if __name__ == '__main__':
     """For testing purporses"""
     main(
         num_avg=32,
-        avg_min=True,
+        run_length_type=2,
         log_y=True,
     )
