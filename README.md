@@ -26,13 +26,14 @@ machine, at the root in the .ssgetpy directory
 
 ### Empirical
 
-- [x] Residual(ish) -> plots approach zero rather than one
-- [x] logarithm view of accuracy
 - [ ] Do norms impact, performance, why are some not seeing gains?
-- [ ] Implement averaging of at least 20 runs
+- [ ] Run on CARC:
+  - [ ] Collection test sweep averaging (Ask Saia about this: is it possible if 
+    we have variable number of iteratiosn?)
+  - [ ] Run on large matrices!
 - [ ] Longer runs -> Stronger results
-- [ ] Collection test sweep averaging
 - [ ] N vs. error plot
+  - [ ] Plus line for epsilon bounds
 - [ ] Clean up README runnables
 - [ ] Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
 - [ ] Make code strongly typed and redo doc comments
@@ -40,8 +41,8 @@ machine, at the root in the .ssgetpy directory
 
 ### Theory
 
+- [ ] Expected amount of reduced work per iteration (expected new nnzs)
 - [ ] Binomial expected work: (1 - ||a_j||)^N
-- [ ] Expected Work
 - [ ] Take advantage of eigen-gap? Other routes forward?
 - [ ] FAST-PI requires $O(\dots)$ scalar mults, vs. $O(\dots)$ of the standard 
   power-iteration...
