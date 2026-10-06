@@ -2,27 +2,29 @@
 Utility functions for row_norm tests
 """
 
-from scipy.optimize import linprog
-
-import json 
-
-import numpy as np
+import json
 import math
 
+import numpy as np
+
+from collections.abc import Callable
+
 from Sparsification_Research.src.SSGetter import SSGetter
-from .constants import THIRTY_TWO_BIT_PRECISION
 from ..util.sparse_rows import calc_row_norms
+from .constants import THIRTY_TWO_BIT_PRECISION
+
+
 
 NPZ_PATH = "data/two_norms.npz"
 json_path = "data/pow_law.json"
 
 def save_data(mat_name, ys):
     """ Save the matrix's sorted row-norms to data/two_norms.json
-    
+
     Args:
         mat_name: the name of the suite-sparse matrix
         ys: sorted array of row magnitudes (2-norms)
-    Return: 
+    Return:
         None
     """
     data = load_data()
@@ -33,7 +35,7 @@ def save_data(mat_name, ys):
     np.savez(NPZ_PATH, **data)
 
 def load_data() -> dict:
-    """Read the data 
+    """Read the data
 
     Returns:
         dict: _description_
@@ -44,21 +46,21 @@ def load_data() -> dict:
     except EOFError:
         # Empty file error
         return {}
-    
+
 def get_norms_from_npz(mat_name:str) -> np.ndarray | None:
     """ Read the matrix's two-norm data from data/two_norms.npz
-    
+
     Args:
-        mat_name: 
-    Return: 
-        None: 
-    
+        mat_name:
+    Return:
+        None:
+
 
     Args:
         mat_name (str): the name of the suite-sparse matrix
 
     Returns:
-        np.ndarray | None: 
+        np.ndarray | None:
             np.ndarray: if two norms are tracked in two_norms.npz
             None: if two norms are not tracked
     """
@@ -79,17 +81,17 @@ def calculate_two_norm(mat_name):
 
     ss_getter = SSGetter(in_csr=True)
     A = ss_getter.get(mat_name)
-    
+
     row_norms = calc_row_norms(A=A, ord=2) # The 2-norm of each row
 
     row_norms = np.sort(row_norms) # sorted
-    
+
     row_norms = row_norms[::-1] #descending
 
     return row_norms
 
 def get_sorted_row_norms(mat_name:str, rescale: bool=False) -> np.ndarray:
-    """Get the row norms of the given matrix, either from data/two_norms.npz or 
+    """Get the row norms of the given matrix, either from data/two_norms.npz or
     by calculating them
 
     Args:
@@ -99,7 +101,7 @@ def get_sorted_row_norms(mat_name:str, rescale: bool=False) -> np.ndarray:
         np.ndarray: sorted array of row magnitudes (2-norms)
     """
     ys = get_norms_from_npz(mat_name=mat_name)
-    
+
     if ys is None:
         # Matrix data has not been computed, compute them and save
         ys = calculate_two_norm(mat_name=mat_name)
@@ -114,13 +116,13 @@ def get_sorted_row_norms(mat_name:str, rescale: bool=False) -> np.ndarray:
 """THE WORKING STRATEGY FOR POWER LAW USES BRUTE FORCE SEARCH"""
 
 def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
-    """ Get the power law coefficients of the given row-norm distribution 
+    """ Get the power law coefficients of the given row-norm distribution
 
     Args:
         ys (np.ndarray): the row-magnitudes (sorted)
 
     Returns:
-        tuple[float, float]: 
+        tuple[float, float]:
             float: c or the y-intercept of a log log plot
             float: k or the slope of a log log plot
     """
@@ -137,7 +139,7 @@ def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
     # Power law distribution -> ln y = ln c + k ln x
     ln_xs = np.log(xs)
     ln_ys = np.log(ys)
-    
+
     # Testing 1024 values for k in the range -4 to 0
     ks = np.linspace(-4, 0, 1024)
 
@@ -147,8 +149,8 @@ def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
     k_best = np.inf
 
     for i, k in enumerate(ks):
-        # the y-intercept of a line w/ slope k, that runs above all the data 
-        ln_a = np.max(ln_ys - k * ln_xs) 
+        # the y-intercept of a line w/ slope k, that runs above all the data
+        ln_a = np.max(ln_ys - k * ln_xs)
 
         c = math.exp(ln_a)
         area = 0
@@ -156,7 +158,7 @@ def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
         if abs(k + 1) <= THIRTY_TWO_BIT_PRECISION: #1e-7 ~ 32-bit machine epsilon
             # a ln n, if k == -1
             area = c * math.log(num_rows)
-        else: 
+        else:
             # a / (k+1) (n^(k+1) - 1), if k != -1
             area = c / (k + 1) * (num_rows ** (k + 1) - 1)
 
@@ -169,15 +171,15 @@ def get_power_law_coefficients(ys: np.ndarray) -> tuple[float, float]:
     return c_best, k_best
 
 
-""" 
+"""
 POWER LAW RELATED FUNCTIONS BELOW
 """
 
 def pow_law_y(xs, coefficient, exponent):
-    """ Ge the power law values of x 
+    """ Ge the power law values of x
 
     ys = a * x^k
-    
+
     Args:
         xs: x-values
         coefficient: mutlitipicative constant of power law
@@ -195,7 +197,7 @@ def pow_law_calcs(mat_name, ys):
     # The sum of the two-norm of the top 20% of rows
     top_20 = ys[:twenty_percent_rows]
     print(f"top_20.shape = {top_20.shape}")
-    top_20_sum = np.sum(top_20) 
+    top_20_sum = np.sum(top_20)
 
     # The sum of the two-norm of the bottom 20% of rows
     bottom_80 = ys[twenty_percent_rows:]
@@ -218,10 +220,10 @@ def pow_law_calcs(mat_name, ys):
 
 def get_LP_A(ln_xs):
     """Get the A matrix used in the linear programming problem
-    
-    Args: 
+
+    Args:
         ln_xs: natural log of those x-values
-    Return: 
+    Return:
         A_ub: can be plugged directly into scipy.optimize.linprog
     """
     # The column vectors
@@ -234,8 +236,8 @@ def get_LP_A(ln_xs):
 
 def pow_integral(a, k, n):
     """ The integral of ax^k, from x=1 to n
-    
-    Args: 
+
+    Args:
         a: coefficient
         k: power
         n: number of rows in A
@@ -246,9 +248,9 @@ def pow_integral(a, k, n):
 
     if k == -1:
         return a * np.log(n)
-    else: 
+    else:
         return a / (k + 1) * (n ** (k + 1) - 1)
-    
+
 def remove_zero_values(xs, ys):
     """ Remove zero values from ys, and corresponding values from xs
 
@@ -257,7 +259,7 @@ def remove_zero_values(xs, ys):
         ys: y-values
     Return:
         xs: x-values w/o zero values
-        ys: y-values w/o corresponding values 
+        ys: y-values w/o corresponding values
     """
     # Remove zero values from xs and ys
     nonzero_indices = np.nonzero(ys)[0]
@@ -265,27 +267,26 @@ def remove_zero_values(xs, ys):
     ys = ys[nonzero_indices]
     return xs, ys
 
-def rm_first_funct_vals(xs, ys, function):
-    """ Remove the first z values from both xs and ys, where z is the output 
-    of function(n), where n is the dimension of xs and ys
-    TODO
+def rm_first_funct_vals(
+    xs: np.ndarray,
+    ys: np.ndarray,
+    function: Callable[[np.ndarray], int] | None,
+):
+    """Remove the first z values from both xs and ys, where z is the output of
+    function(n), where n is the dimension of xs and ys
+
     Args:
-        xs: numpy array of floats
-            An array to reduce
-        ys: numpy array of floats
-            An array to reduce
-        function: a function which takes in an array of floats and returns an 
-        integer 
-            if None, return xs and ys unchanged
-    Return: 
-        xs: numpy array 
-            Subset of original xs
-        ys: numpy array
-            Subset of original ys
-    """
+        xs (np.ndarray): An array to reduce
+        ys (np.ndarray): An array to reduce
+        function (Callable[[np.ndarray], int] | None): If None -> returns xs
+        and ys unchanged. Otw, is used to determine subset of xs and ys
+
+    Returns:
+         xs (np.ndarray): subset of oringal xs
+	"""
     if function is None:
         return xs, ys
-    
+
     n_subset = function(xs)
 
     # Only want the last n - n_subset elements
@@ -295,8 +296,8 @@ def rm_first_funct_vals(xs, ys, function):
     return xs, ys
 def log_size(xs):
     """ Returns the ceiling of the log of the size of the xs array
-    
-    Args: 
+
+    Args:
         xs: numpy array
             Dimension of signifigance
     Return: log(len(xs))
