@@ -7,7 +7,7 @@ import numpy as np
 from .util.approx import get_next_A_tilde
 from .util.work import power_work
 from .util import comp as comp
-from .tests import baseline
+from .acc_vs_work import baseline
 
 def test_A_tilde(
         A_tilde: scipy.sparse.sparray,
@@ -24,10 +24,10 @@ def test_A_tilde(
         tol (float): The ammount of allowable error
 
     Returns:
-        tuple[np.ndarray, np.ndarray, int]: 
-        np.ndarray: the score of the top eigenvector approximation at every 
+        tuple[np.ndarray, np.ndarray, int]:
+        np.ndarray: the score of the top eigenvector approximation at every
         iteration (note that this is a 1xmax_iter array)
-        np.ndarray: the top eigenvector approximation at every iteration 
+        np.ndarray: the top eigenvector approximation at every iteration
         (max_iterxn)
         int: number of iterations
     """
@@ -37,7 +37,7 @@ def test_A_tilde(
         v0=v0,
         max_iter=max_iter,
     )
-    
+
     while iter < max_iter:
         lam, v = comp.power(
             A = A_tilde,
@@ -50,8 +50,8 @@ def test_A_tilde(
             iter += 1
             break
         iter += 1
-    scores[iter:] = scores[iter - 1]    
-    vects[iter:] = vects[iter - 1]    
+    scores[iter:] = scores[iter - 1]
+    vects[iter:] = vects[iter - 1]
     return scores, vects, iter
 
 def test_averaging(
@@ -64,23 +64,23 @@ def test_averaging(
         num_samples:int,
         is_max: bool,
 ) -> tuple[np.ndarray, np.ndarray, str]:
-    """Test an averaging approach, generate N, approximations of A, use them 
-    to independently get N seperate approximations for v_star, average them, 
+    """Test an averaging approach, generate N, approximations of A, use them
+    to independently get N seperate approximations for v_star, average them,
     hopefully getting better results
 
     Args:
         A (scipy.sparse.sparray): the original matrix
         v0 (np.ndarray): initial guess for top eigenvector
         max_iter (max_iter): maximum number of iterations to do power iteration
-        seed (int): for repeatable randomness (scikit does not have repeatable 
+        seed (int): for repeatable randomness (scikit does not have repeatable
               randomness)
         tol (float): how much precision before terminating power
         num_samples (int): How many approximations of A?
-        is_max (bool): If True then get the maximum work done by any given 
+        is_max (bool): If True then get the maximum work done by any given
         parallel power iteration, else get the total work across all
 
     Returns:
-        tuple[np.ndarray, np.ndarray, str]: 
+        tuple[np.ndarray, np.ndarray, str]:
         np.ndarray: the x-values (the ammount of work done),
         np.ndarray: the y-values (the score of the vector),
         str: the string representation of this test

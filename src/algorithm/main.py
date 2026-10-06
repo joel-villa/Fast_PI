@@ -2,7 +2,7 @@
 import scipy
 import numpy as np
 
-from . import tests
+from . import acc_vs_work
 from .util import comp as comp
 from .util import work as work
 
@@ -52,7 +52,7 @@ def main(
     ]
     funcs = [
         # naive_test,
-        tests.binomial_test,
+        acc_vs_work.binomial_test,
     ]
     #TODO: clean up this function don't need all of this complexity anymore..
 
@@ -78,7 +78,7 @@ def main(
         work_offsets = []
 
         for i, is_dist in enumerate(dists):
-            xs_temp, ys, lbl = tests.baseline_pays(
+            xs_temp, ys, lbl = acc_vs_work.baseline_pays(
                 A=A,
                 v0=normalized_vect,
                 max_iter=max_iter,
