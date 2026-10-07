@@ -167,12 +167,9 @@ def main(
 
         ax.set_title(f"Work vs. Accuracy of Top Eigenvector ({mat}: {A.shape[0]}x{A.shape[1]}, {A.nnz} nnz)")
         ax.set_xlabel("Approximate Proportion of Scalar Mults")
+        ax.set_ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
         if (log_y):
-            ax.set_ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
             ax.set_yscale('log')
-        else:
-            # In case non-log plots are also useful
-            ax.set_ylabel(r"$\frac{|A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
         ax.legend()
         fig.canvas.draw()
         fig.savefig(f"plots/{mat}.png", dpi=plt.figure().dpi)
@@ -183,31 +180,36 @@ def main(
 
 if __name__ == '__main__':
     """For testing purporses"""
+    # mats = [
+    #     "1138_bus",
+    #     "494_bus",
+    #     "Harvard500",
+    #     "bcspwr06",
+    #     "bcsstk07",
+    #     "bcsstk08",
+    #     "bcsstk19",
+    #     "bcsstk34",
+    #     "bcsstm07",
+    #     "blckhole",
+    #     "cage7",
+    #     "can_229",
+    #     "dwt_193",
+    #     "eris1176",
+    #     "ex2",
+    #     "fs_541_1",
+    #     "gre_1107",
+    #     "gre_343",
+    #     "hor_131",
+    #     "lshp1561",
+    #     "msc00726",
+    #     "nasa1824",
+    #     "nos3",
+    #     "tomography",
+    # ]
     mats = [
-        "1138_bus",
-        "494_bus",
-        "Harvard500",
-        "bcspwr06",
-        "bcsstk07",
-        "bcsstk08",
-        "bcsstk19",
-        "bcsstk34",
-        "bcsstm07",
-        "blckhole",
-        "cage7",
-        "can_229",
-        "dwt_193",
-        "eris1176",
-        "ex2",
-        "fs_541_1",
-        "gre_1107",
-        "gre_343",
-        "hor_131",
-        "lshp1561",
-        "msc00726",
-        "nasa1824",
-        "nos3",
-        "tomography",
+        "ct20stif",
+        "finan512",
+        "nasasrb",
     ]
 
     mats = sorted(mats) #Alphabetical order
