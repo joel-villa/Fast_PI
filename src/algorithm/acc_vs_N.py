@@ -3,7 +3,8 @@ the sampling scheme that generates ~A"""
 import scipy
 import numpy as np
 from scipy.sparse.linalg import eigs
-from scipy.sparse.linalg import norm
+from numpy.linalg import norm
+from tqdm import tqdm
 
 from .util.approx import binomial_A_tilde_sq
 
@@ -31,7 +32,7 @@ def acc_vs_N(
 	"""
     ys = np.zeros_like(Ns)
 
-    for i, N in enumerate(Ns):
+    for i, N in tqdm(enumerate(Ns)):
         tilde_A_snd_moment = binomial_A_tilde_sq(
             A=A,
             num_trials=N,
@@ -89,7 +90,7 @@ def main():
     import matplotlib.pyplot as plt
     from .util.comp import rel_value, rel_residue
 
-    num_avg = 32
+    num_avg = 8
     Ns = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256])
     run_length_type = 2
     log_y = True
@@ -154,7 +155,9 @@ def main():
         ys_i = np.full((num_avg, ys.shape[0]), np.nan) # for averaging
         run_iters = np.zeros(num_avg)
         lbl = ""
+        #TODO: debug this, currently flat lining
         for i in range(num_avg):
+            print(i)
             xs_temp, ys_temp, lbl = acc_vs_N(
                 A=A,
                 rng=rng,
