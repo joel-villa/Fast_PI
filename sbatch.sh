@@ -1,10 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=Work_vs_Accuracy
-#SBATCH --account 2016579
 #SBATCH --partition=debug
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=00:20:00
+#SBATCH --time=01:00:00
 #SBATCH --output=test.out
 #SBATCH --error=test.err
 
