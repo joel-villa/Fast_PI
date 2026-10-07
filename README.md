@@ -39,7 +39,7 @@ machine, at the root in the .ssgetpy directory
 - [ ] Longer runs -> Stronger results
 - [ ] N vs. error plot
   - [ ] Plus line for epsilon bounds
-- [ ] Clean up README runnables
+- [x] Clean up README runnables
 - [ ] Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
 - [ ] Make code strongly typed and redo doc comments
 - [ ] Move two_norm.npz handling into proven/util/npz_wrapper.py
