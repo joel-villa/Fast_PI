@@ -208,8 +208,8 @@ if __name__ == '__main__':
     # ]
     mats = [
         "ct20stif",
-        "finan512",
-        "nasasrb",
+#        "finan512",
+#        "nasasrb",
     ]
 
     mats = sorted(mats) #Alphabetical order
