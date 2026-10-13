@@ -29,8 +29,11 @@ machine, at the root in the .ssgetpy directory
 
 ## TODO
 
+- [ ] FIGURE OUT WHAT MAKES SOME PERFORMANT AND OTHERS NOT
+
 ### Empirical
 
+- [ ] Test on dense matrices (are there power-law drop off dense matrices)
 - [ ] Do norms impact, performance, why are some not seeing gains?
 - [ ] Run on CARC:
   - [ ] Collection test sweep averaging (Ask Saia about this: is it possible if 
@@ -43,6 +46,8 @@ machine, at the root in the .ssgetpy directory
 - [ ] Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
 - [ ] Make code strongly typed and redo doc comments
 - [ ] Move two_norm.npz handling into proven/util/npz_wrapper.py
+- [ ] Implement Machine precision
+- [ ] Max number of iterations on the order of 100,000
 
 ### Theory
 
