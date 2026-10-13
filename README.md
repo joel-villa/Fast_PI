@@ -33,21 +33,20 @@ machine, at the root in the .ssgetpy directory
 
 ### Empirical
 
+- [ ] Implement Machine precision
+- [ ] Max number of iterations on the order of 100,000
 - [ ] Test on dense matrices (are there power-law drop off dense matrices)
 - [ ] Do norms impact, performance, why are some not seeing gains?
 - [ ] Run on CARC:
   - [ ] Collection test sweep averaging (Ask Saia about this: is it possible if 
     we have variable number of iteratiosn?)
   - [ ] Run on large matrices!
-- [ ] Longer runs -> Stronger results
-- [ ] N vs. error plot
-  - [ ] Plus line for epsilon bounds
-- [x] Clean up README runnables
+- [x] Longer runs -> Stronger results
+- [x] N vs. error plot
+  - [x] Plus line for epsilon bounds
 - [ ] Convergence vs. Work graph + line for bounds on $(1 \pm \epsilon)||A||$
 - [ ] Make code strongly typed and redo doc comments
 - [ ] Move two_norm.npz handling into proven/util/npz_wrapper.py
-- [ ] Implement Machine precision
-- [ ] Max number of iterations on the order of 100,000
 
 ### Theory
 
