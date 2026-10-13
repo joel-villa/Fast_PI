@@ -42,7 +42,7 @@ def baseline(
             num_iter=1,
         )
         scores[iter] = lam
-        if (comp.rel_error(scores[iter], scores[iter - 1]) < tol):
+        if (comp.terminate_power(scores[iter - 1], scores[iter], tol)):
             iter += 1
             break
         iter += 1
@@ -135,7 +135,7 @@ def test(
             x=v,
             A=A_sq,
         )
-        if (comp.rel_error(scores[i], scores[i - 1]) < tol): #TODO: this was copied and pasted, bad coding practice, maybe add a helper function for rel error check
+        if (comp.terminate_power(scores[i - 1], scores[i], tol)): #TODO: this was copied and pasted, bad coding practice, maybe add a helper function for rel error check
             i += 1
             break
         i += 1
@@ -248,6 +248,6 @@ def binomial_test(
     )
 
 #    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials"
-    lbl = f"{num_trials} binomial trials"
+    lbl = f"{num_trials} trials"
 
     return xs, ys, lbl
