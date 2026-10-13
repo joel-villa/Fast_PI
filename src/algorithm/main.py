@@ -59,8 +59,8 @@ def main(
     for mat in mats:
         fig, ax = plt.subplots(
             figsize=(12.8, 14.4),
-            dpi=256,
         )
+        fig.set_dpi(512) # Goal: high-resolution
 
         print(mat)
         A, _ = preprocess(mat_name=mat)
@@ -102,7 +102,8 @@ def main(
                 xs=ys,
                 check_max=True,
             )
-            print(f"xs:{xs_temp[:5]}, ys:{ys[:5]}, lbl:{lbl}")
+            print(f"xs_temp.shape: {xs_temp.shape}, ys_temp.shape: {ys.shape}")
+            print(f"xs_temp[-8:]:{xs_temp[-8:]}, ys[-8:]:{ys[-8:]}, lbl:{lbl}")
             ax.plot(xs_temp,ys, label=lbl)
         for func in funcs:
             for i, is_dist in enumerate(dists):
@@ -172,7 +173,7 @@ def main(
             ax.set_yscale('log')
         ax.legend()
         fig.canvas.draw()
-        fig.savefig(f"plots/{mat}.png", dpi=plt.figure().dpi)
+        fig.savefig(f"plots/{mat}.png", dpi=fig.dpi) # Goal: high-resolution
         if (not on_easley):
             plt.show()
         plt.close(fig)
@@ -180,41 +181,41 @@ def main(
 
 if __name__ == '__main__':
     """For testing purporses"""
-    # mats = [
-    #     "1138_bus",
-    #     "494_bus",
-    #     "Harvard500",
-    #     "bcspwr06",
-    #     "bcsstk07",
-    #     "bcsstk08",
-    #     "bcsstk19",
-    #     "bcsstk34",
-    #     "bcsstm07",
-    #     "blckhole",
-    #     "cage7",
-    #     "can_229",
-    #     "dwt_193",
-    #     "eris1176",
-    #     "ex2",
-    #     "fs_541_1",
-    #     "gre_1107",
-    #     "gre_343",
-    #     "hor_131",
-    #     "lshp1561",
-    #     "msc00726",
-    #     "nasa1824",
-    #     "nos3",
-    #     "tomography",
-    # ]
     mats = [
-        "ct20stif",
+        "1138_bus",
+        "494_bus",
+        "Harvard500",
+        "bcspwr06",
+        "bcsstk07",
+        "bcsstk08",
+        "bcsstk19",
+        "bcsstk34",
+        "bcsstm07",
+        "blckhole",
+        "cage7",
+        "can_229",
+        "dwt_193",
+        "eris1176",
+        "ex2",
+        "fs_541_1",
+        "gre_1107",
+        "gre_343",
+        "hor_131",
+        "lshp1561",
+        "msc00726",
+        "nasa1824",
+        "nos3",
+        "tomography",
+    ]
+#    mats = [
+#        "ct20stif",
 #        "finan512",
 #        "nasasrb",
-    ]
+#    ]
 
     mats = sorted(mats) #Alphabetical order
-    max_iter = 2048
-    tol=1/8192
+    max_iter = 2 ** 17 # 131, 072
+    tol=0 # tolerance of zero -> machine percision
     seed = 7
 
     Ns = [
