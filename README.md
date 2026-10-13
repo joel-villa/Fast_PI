@@ -40,6 +40,7 @@ machine, at the root in the .ssgetpy directory
 - [ ] Run on CARC:
   - [ ] Collection test sweep averaging (Ask Saia about this: is it possible if 
     we have variable number of iteratiosn?)
+    - [ ] Solution: do 20 randomly selected mats dense & sparse alike
   - [ ] Run on large matrices!
 - [x] Longer runs -> Stronger results
 - [x] N vs. error plot
