@@ -88,6 +88,27 @@ def rel_error(
     # print(f"approx - true / approx = {abs(approx - true)} / {abs(true)} = {rel_error}")
     return rel_error
 
+def terminate_power(
+    prev_iter:float,
+    curr_iter:float,
+    tolerance:float,
+) -> bool:
+    """Stop power iteration?
+
+    Args:
+        prev_iter (float): The 'score' of the previous vector approximation
+        found via power iteration
+
+    Returns:
+        terminate (bool):
+             True -> stop power iteration (converged)
+             False -> continue power iteration
+	"""
+    if curr_iter < 1e-14:
+        print(f"rel_error(prev_iter, curr_iter)={rel_error(prev_iter, curr_iter)}")
+        print(f"{rel_error(prev_iter, curr_iter)} <= {tolerance} = {rel_error(prev_iter, curr_iter) <= tolerance}")
+    return (rel_error(prev_iter, curr_iter) <= tolerance) or prev_iter > curr_iter
+
 def online_avg(
         old_avg:np.ndarray,
         new_val:np.ndarray,
