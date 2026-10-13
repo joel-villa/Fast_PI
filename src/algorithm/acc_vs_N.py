@@ -30,9 +30,9 @@ def acc_vs_N(
         ys (np.ndarray): The accuracy for each N approximation
         lbl (str): string representation of this test
 	"""
-    ys = np.zeros_like(Ns)
+    ys = np.zeros((Ns.shape[0],))
 
-    for i, N in tqdm(enumerate(Ns)):
+    for i, N in enumerate(Ns):
         tilde_A_snd_moment = binomial_A_tilde_sq(
             A=A,
             num_trials=N,
@@ -40,7 +40,7 @@ def acc_vs_N(
         )
 
         # The approximation for v
-        _, v_tilde = eigs(
+        top_scores, v_tilde = eigs(
             A=tilde_A_snd_moment,
             k=1,
             which="LM",
@@ -48,6 +48,9 @@ def acc_vs_N(
         v_tilde = v_tilde[:,0]
 
         # The approximate score
+        Av = A @ v_tilde.T
+        # print(f"Av.shape = {Av.shape}")
+        # print(f"~v^TMv = {v_tilde.T @ tilde_A_snd_moment @ v_tilde} = {top_scores[0]} = top_score")
         ys[i] = norm(A @ v_tilde)
 
     return Ns, ys, "empirical results"
@@ -93,8 +96,8 @@ def main():
     num_avg = 8
     Ns = np.array([1, 2, 4, 8, 16, 32, 64, 128, 256])
     run_length_type = 2
-    log_y = True
-    log_x = True
+    log_y = False
+    log_x = False
     mats = [
         "1138_bus",
         "494_bus",
@@ -132,37 +135,35 @@ def main():
 
         print(mat)
         A, _ = preprocess(mat_name=mat)
-        tilde_A_snd_moment = A.transpose() @ A
+        A_snd_moment = A.transpose() @ A
         # The approximation for v
-        _, v_tilde = eigs(
-            A=tilde_A_snd_moment,
+        _, v = eigs(
+            A=A_snd_moment,
             k=1,
             which="LM",
         )
-        v_tilde = v_tilde[:,0]
+        v = v[:,0]
         top_score = norm(
-            x=A @ v_tilde,
+            x=A @ v,
             ord=2,
         )
+        print(f"top_score: {top_score}")
 
         rng = np.random.default_rng(seed=5334)
 
-        baseline_work = []
-        work_offsets = []
-
-        ys = np.zeros_like(Ns)
-        xs = np.zeros_like(Ns)
+        ys = np.zeros((Ns.shape[0],))
         ys_i = np.full((num_avg, ys.shape[0]), np.nan) # for averaging
-        run_iters = np.zeros(num_avg)
         lbl = ""
         #TODO: debug this, currently flat lining
         for i in range(num_avg):
             print(i)
-            xs_temp, ys_temp, lbl = acc_vs_N(
+            _, ys_temp, lbl = acc_vs_N(
                 A=A,
                 rng=rng,
                 Ns=Ns,
             )
+
+            print(f"ys: {ys_temp}")
 
             ys_temp = rel_residue(
                 max=top_score,
@@ -170,29 +171,10 @@ def main():
                 check_max=True,
             )
 
-            # Iteration tracking
-            curr_iter = ys_temp.shape[0]
-            ys_i[i, : curr_iter] = ys_temp
-            run_iters[i] = curr_iter
-            if (run_iters[i] == np.max(run_iters)):
-                # Track longest!
-                xs = xs_temp
+            ys_i[i] = ys_temp
 
         ys = np.nanmean(ys_i, axis=0)
-
-        least_iter = np.min(run_iters)
-        most_iter = np.max(run_iters)
-        median_iter = round(np.median(run_iters))
-
-        if (run_length_type == 1):
-            xs = xs[:least_iter]
-            ys = ys[:least_iter]
-        elif (run_length_type == 2):
-            xs = xs[:median_iter]
-            ys = ys[:median_iter]
-        else:
-            xs = xs[:most_iter]
-            ys = ys[:most_iter]
+        xs = Ns
 
         print(f"xs.shape = {xs.shape}")
         print(f"ys.shape = {ys.shape}")
