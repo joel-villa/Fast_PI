@@ -248,6 +248,9 @@ def binomial_test(
     )
 
 #    lbl = f"binomial (distributed={is_distributed}), {num_trials} trials"
-    lbl = f"{num_trials} trials"
+    if num_trials == 1:
+        lbl = f"{num_trials} trial"
+    else:
+        lbl = f"{num_trials} trials"
 
     return xs, ys, lbl
