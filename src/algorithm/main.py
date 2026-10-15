@@ -104,17 +104,18 @@ def main(
             )
             print(f"xs_temp.shape: {xs_temp.shape}, ys_temp.shape: {ys.shape}")
             print(f"xs_temp[-8:]:{xs_temp[-8:]}, ys[-8:]:{ys[-8:]}, lbl:{lbl}")
-            ax.plot(xs_temp,ys, label=lbl)
+            ax.plot(xs_temp,ys, label=f"{lbl}, nnz = {A_sqr.nnz}")
         for func in funcs:
             for i, is_dist in enumerate(dists):
                 for N in Ns:
                     ys = np.zeros(max_iter)
                     xs = np.zeros(max_iter)
+                    nnzs = np.zeros(num_avg)
                     ys_j = np.full((num_avg, max_iter), np.nan) # for averaging
                     run_iters = np.zeros(num_avg)
                     lbl = ""
                     for j in range(num_avg):
-                        xs_temp, ys_temp, lbl = func(
+                        xs_temp, ys_temp, nnzs[j], lbl = func(
                             A=A,
                             v0=normalized_vect,
                             max_iter=max_iter,
@@ -146,6 +147,7 @@ def main(
                             xs = xs_temp
 
                     ys = np.nanmean(ys_j, axis=0)
+                    nnz = round(np.mean(nnzs))
 
                     least_iter = np.min(run_iters)
                     most_iter = np.max(run_iters)
@@ -164,9 +166,9 @@ def main(
                     print(f"xs.shape = {xs.shape}")
                     print(f"ys.shape = {ys.shape}")
 
-                    ax.plot(xs, ys, label=f"{lbl}, avg of {num_avg}")
+                    ax.plot(xs, ys, label=f"{lbl}, nnz = {nnz}")
 
-        ax.set_title(f"Work vs. Accuracy of Top Eigenvector ({mat}: {A.shape[0]}x{A.shape[1]}, {A.nnz} nnz)")
+        ax.set_title(f"Work vs. Accuracy of Top Eigenvector ({mat}: {A.shape[0]}x{A.shape[1]}, avg of {num_avg})")
         ax.set_xlabel("Approximate Proportion of Scalar Mults")
         ax.set_ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
         if (log_y):
