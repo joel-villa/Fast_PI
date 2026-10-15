@@ -208,7 +208,7 @@ def binomial_test(
         num_trials:int,
         seed:int,
         is_distributed:bool
-) -> tuple [np.ndarray, np.ndarray, str]:
+) -> tuple [np.ndarray, np.ndarray, int, str]:
     """Run the parallelizable approach, return results
 
     Args:
@@ -222,10 +222,10 @@ def binomial_test(
         an approximation for A^TA
 
     Returns:
-        tuple [np.ndarray, np.ndarray, str]:
-        np.ndarray: work per iteration
-        np.ndarray: score of approximate eigenvector per iteration
-        str: label of this test
+        xs (np.ndarray): work per iteration
+        ys (np.ndarray): score of approximate eigenvector per iteration
+        nnz (int): Number of nonzeroes in the approximation of the 2nd moment
+        lbl (str): label of this test
     """
     rng = np.random.default_rng(seed=seed)
     tilde_A_sq = binomial_A_tilde_sq(
@@ -253,4 +253,4 @@ def binomial_test(
     else:
         lbl = f"{num_trials} trials"
 
-    return xs, ys, lbl
+    return xs, ys, tilde_A_sq.nnz, lbl
