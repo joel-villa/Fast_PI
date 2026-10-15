@@ -33,8 +33,6 @@ machine, at the root in the .ssgetpy directory
 
 ### Empirical
 
-- [x] Implement Machine precision
-- [x] Max number of iterations on the order of 100,000
 - [ ] Test on dense matrices (are there power-law drop off dense matrices)
 - [ ] Do norms impact performance? Why are some not seeing gains?
 - [ ] Run on CARC:
