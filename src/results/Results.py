@@ -135,6 +135,7 @@ class Results:
         Args:
             file_id (int | None): The id of the given results
             mat_name (str | None): The matrix being tested
+            mat_shape (tuple[int, int] | None): The shape of the matrix
             is_sparse (bool | None): Is this matrix sparse? If not assumed dense
             snd_moment_norm (float | None): 2 norm of the second moment of A
             snd_moment_nnz (int | None): Number of nonzeroes in A^TA
@@ -169,6 +170,7 @@ class Results:
         else:
             if (
                 mat_name is None or
+                mat_shape is None or
                 is_sparse is None or
                 snd_moment_norm is None or
                 snd_moment_nnz is None or
@@ -190,6 +192,7 @@ class Results:
                     "if file_name is None, most other fields cannot be None"
                 )
             self.mat_name = mat_name
+            self.mat_shape = mat_shape
             self.is_sparse = is_sparse
             self.snd_moment_norm = snd_moment_norm
             self.snd_moment_nnz = snd_moment_nnz
@@ -208,10 +211,17 @@ class Results:
             self.work = work
             self.accuracies = accuracies
 
-        if (
-            False # TODO any dimension checks?
-        ):
-            warn("Metadata and measured data do not coincide")
+        # Ensuring correct usage
+        n_trials = len(self.n_binom_trials)
+        assert n_trials == len(self.lbls), "Incorrect dimensions"
+        assert n_trials == self.test_run_iters.shape[0], "Incorrect dimensions"
+        assert n_trials == self.nnzs.shape[0], "Incorrect dimensions"
+        assert n_trials == self.baseline_work.shape[0], "Incorrect dimensions"
+        assert n_trials == self.baseline_accuracies.shape[0], "Incorrect dimensions"
+        assert n_trials == self.work.shape[0], "Incorrect dimensions"
+        assert n_trials == self.accuracies.shape[0], "Incorrect dimensions"
+        assert self.num_avg == self.accuracies.shape[1], "Incorrect dimensions"
+        assert self.num_avg == self.test_run_iters.shape[1], "Incorrect dimensions"
 
     def get_paths(self, file_id: int) -> tuple[Path,Path]:
         """Get the paths to the file name in test_results directory
@@ -286,6 +296,7 @@ class Results:
         with open(path_json) as json_file:
             metadata = json.load(json_file)
             self.mat_name = metadata['mat_name']
+            self.mat_shape = metadata['mat_shape']
             self.is_sparse = metadata['is_sparse']
             self.snd_moment_norm = metadata['snd_moment_norm']
             self.snd_moment_nnz = metadata['snd_moment_nnz']
@@ -326,6 +337,7 @@ class Results:
 
         metadata = {
             'mat_name': self.mat_name,
+            'mat_shape': self.mat_shape,
             'is_sparse': self.is_sparse,
             'snd_moment_norm': self.snd_moment_norm,
             'snd_moment_nnz': self.snd_moment_nnz,
@@ -354,14 +366,15 @@ class Results:
         return file_id
 
     def disp_results(
-        self
+        self,
+        log_y: bool,
     ) -> None:
-        """Display the test results
+        """Display the results
+
+        Args:
+            log_y (bool): take logarithm of y-axis when plotting?
         """
-        fig, ax = plt.subplots(
-            figsize=(12.8, 14.4),
-        )
-        fig.set_dpi(512) # Goal: high-resolution
+        fig, ax = plt.subplots()
 
         base_xs = self.baseline_work
         base_ys = self.baseline_accuracies
@@ -384,11 +397,15 @@ class Results:
         )
         ax.plot(base_xs,base_ys, label=f"baseline, nnz = {self.snd_moment_nnz}")
 
-        for i in range(self.work.shape[0]):
+        num_trials = self.work.shape[0]
+        num_avg = self.num_avg
+
+        for i in range(num_trials):
+            # Looping through Ns
             lbl = self.lbls[i]
             xs = self.work[i]
             ys_i = np.full( # for averaging
-                (self.accuracies.shape[1], self.accuracies.shape[2]),
+                (num_avg, self.accuracies.shape[2]),
                 np.nan,
             )
             # Scale to be between zero and one
@@ -399,7 +416,8 @@ class Results:
                 check_max=False,
             )
 
-            for j in range(self.work.shape[1]):
+            for j in range(num_avg):
+                # Looping through the runs (for averaging purposes)
                 ys_temp = self.accuracies[i, j]
                 ys_i[j] = rel_residue(
                     max=self.snd_moment_norm,
@@ -430,7 +448,8 @@ class Results:
             ax.plot(xs, ys, label=f"{lbl}, nnz = {nnz}")
 
         ax.set_title(
-            f"Work vs. Accuracy of Top Eigenvector ({self.mat_name}: {A.shape[0]}x{A.shape[1]}, avg of {num_avg})"
+            f"Work vs. Accuracy of Top Eigenvector ({self.mat_name}:"
+            f"{self.mat_shape[0]}x{self.mat_shape[1]}, avg of {num_avg})"
         )
         ax.set_xlabel("Approximate Proportion of Scalar Mults")
         ax.set_ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
@@ -438,7 +457,5 @@ class Results:
             ax.set_yscale('log')
         ax.legend()
         fig.canvas.draw()
-        fig.savefig(f"plots/{mat}.png", dpi=fig.dpi) # Goal: high-resolution
-        if (not on_easley):
-            plt.show()
+        plt.show()
         plt.close(fig)
