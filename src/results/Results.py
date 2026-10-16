@@ -215,12 +215,11 @@ class Results:
             self.accuracies = accuracies
 
         # Ensuring correct usage
+        assert self.baseline_accuracies.shape == self.baseline_work.shape, f"Incorrect dimensions {self.baseline_accuracies.shape} != {self.baseline_work.shape}"
         n_trials = len(self.n_binom_trials)
         assert n_trials == len(self.lbls), f"Incorrect dimensions {n_trials} != {len(self.lbls)}"
         assert n_trials == self.test_run_iters.shape[0], f"Incorrect dimensions {n_trials} != {self.test_run_iters.shape[0]}"
         assert n_trials == self.nnzs.shape[0], f"Incorrect dimensions {n_trials} != {self.nnzs.shape[0]}"
-        assert n_trials == self.baseline_work.shape[0], f"Incorrect dimensions {n_trials} != {self.baseline_work.shape[0]}"
-        assert n_trials == self.baseline_accuracies.shape[0], f"Incorrect dimensions {n_trials} != {self.baseline_accuracies.shape[0]}"
         assert n_trials == self.work.shape[0], f"Incorrect dimensions {n_trials} != {self.work.shape[0]}"
         assert n_trials == self.accuracies.shape[0], f"Incorrect dimensions {n_trials} != {self.accuracies.shape[0]}"
         assert self.num_avg == self.test_run_iters.shape[1], f"Incorrect dimensions {self.num_avg} != {self.accuracies.shape[1]}"
@@ -261,7 +260,7 @@ class Results:
             break
         if file_name is None:
             # DNE -> initialize the filename
-            file_name = f"{str(file_id).zfill(self.FILE_ID_LEN)}{self.mat_name}"
+            file_name = f"{str(file_id).zfill(self.FILE_ID_LEN)}_{self.mat_name}"
 
         path_json = self.TEST_RESULTS_PATH / f"{file_name}.json"
         path_npz = self.TEST_RESULTS_PATH / f"{file_name}.npz"
