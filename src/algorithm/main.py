@@ -2,6 +2,8 @@
 import scipy
 import numpy as np
 
+from tqdm import tqdm
+
 from . import acc_vs_work
 from .util import comp as comp
 from .util import work as work
@@ -101,18 +103,18 @@ def main(
 
         lbls = []
         num_Ns_tested = len(Ns)
-        test_run_iters = np.zeros((num_Ns_tested, num_avg))
+        test_run_iters = np.zeros((num_Ns_tested, num_avg), int)
         nnzs = np.zeros((num_Ns_tested, num_avg))
         work = np.zeros((num_Ns_tested, max_iter))
         accuracies = np.full((num_Ns_tested, num_avg, max_iter), np.nan) # NaNs for that good averaging
 
-        for k, N in enumerate(Ns):
+        for i, N in tqdm(enumerate(Ns)):
 #            ys = np.zeros(max_iter)
 #            xs = np.zeros(max_iter)
 #            ys_j = np.full((num_avg, max_iter), np.nan) # for averaging
-#            lbl = ""
+            lbl = ""
             for j in range(num_avg):
-                xs_temp, ys_temp, nnzs[k, j], lbl = acc_vs_work.binomial_test(
+                xs_temp, ys_temp, nnzs[i, j], lbl = acc_vs_work.binomial_test(
                     A=A,
                     v0=normalized_vect,
                     max_iter=max_iter,
@@ -124,14 +126,14 @@ def main(
                 # Iteration tracking
                 curr_iter = ys_temp.shape[0]
 #                ys_j[j, : curr_iter] = ys_temp
-                accuracies[k, j, : curr_iter] = ys_temp
-                test_run_iters[k, j] = curr_iter
-                if (test_run_iters[k, j] == np.max(test_run_iters[k])):
+                accuracies[i, j, : curr_iter] = ys_temp
+                test_run_iters[i, j] = curr_iter
+                if (test_run_iters[i, j] == np.max(test_run_iters[i])):
                     # Track longest!
-                    xs = xs_temp
-                    work[k] = xs_temp
+#                    xs = xs_temp
+                    work[i, :test_run_iters[i,j]] = xs_temp
 
-                lbls.append(lbl)
+            lbls.append(lbl)
 
 #            ys = np.nanmean(ys_j, axis=0)
 #            nnz = round(np.mean(nnzs[k]))
