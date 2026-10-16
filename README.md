@@ -33,6 +33,7 @@ machine, at the root in the .ssgetpy directory
 
 ### Empirical
 
+- [ ] Results Object
 - [ ] Test on dense matrices (are there power-law drop off dense matrices)
 - [ ] Do norms impact performance? Why are some not seeing gains?
 - [ ] Run on CARC:
@@ -46,6 +47,7 @@ machine, at the root in the .ssgetpy directory
 
 ### Theory
 
+- [ ] Proof that $A$ cannot be used
 - [ ] Expected amount of reduced work per iteration (expected new nnzs)
 - [ ] Binomial expected work: (1 - ||a_j||)^N
 - [ ] Take advantage of eigen-gap? Other routes forward?
