@@ -216,15 +216,16 @@ class Results:
 
         # Ensuring correct usage
         n_trials = len(self.n_binom_trials)
-        assert n_trials == len(self.lbls), "Incorrect dimensions"
-        assert n_trials == self.test_run_iters.shape[0], "Incorrect dimensions"
-        assert n_trials == self.nnzs.shape[0], "Incorrect dimensions"
-        assert n_trials == self.baseline_work.shape[0], "Incorrect dimensions"
-        assert n_trials == self.baseline_accuracies.shape[0], "Incorrect dimensions"
-        assert n_trials == self.work.shape[0], "Incorrect dimensions"
-        assert n_trials == self.accuracies.shape[0], "Incorrect dimensions"
-        assert self.num_avg == self.accuracies.shape[1], "Incorrect dimensions"
-        assert self.num_avg == self.test_run_iters.shape[1], "Incorrect dimensions"
+        assert n_trials == len(self.lbls), f"Incorrect dimensions {n_trials} != {len(self.lbls)}"
+        assert n_trials == self.test_run_iters.shape[0], f"Incorrect dimensions {n_trials} != {self.test_run_iters.shape[0]}"
+        assert n_trials == self.nnzs.shape[0], f"Incorrect dimensions {n_trials} != {self.nnzs.shape[0]}"
+        assert n_trials == self.baseline_work.shape[0], f"Incorrect dimensions {n_trials} != {self.baseline_work.shape[0]}"
+        assert n_trials == self.baseline_accuracies.shape[0], f"Incorrect dimensions {n_trials} != {self.baseline_accuracies.shape[0]}"
+        assert n_trials == self.work.shape[0], f"Incorrect dimensions {n_trials} != {self.work.shape[0]}"
+        assert n_trials == self.accuracies.shape[0], f"Incorrect dimensions {n_trials} != {self.accuracies.shape[0]}"
+        assert self.num_avg == self.test_run_iters.shape[1], f"Incorrect dimensions {self.num_avg} != {self.accuracies.shape[1]}"
+        assert self.num_avg == self.nnzs.shape[1], f"Incorrect dimensions {self.num_avg} != {self.nnzs.shape[1]}"
+        assert self.num_avg == self.accuracies.shape[1], f"Incorrect dimensions {self.num_avg} != {self.accuracies.shape[1]}"
 
     def get_paths(self, file_id: int) -> tuple[Path,Path]:
         """Get the paths to the file name in test_results directory
