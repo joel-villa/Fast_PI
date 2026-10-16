@@ -10,3 +10,8 @@ testing_area.py
 
 # Zed
 pyrightconfig.json 
+
+# Data too big, have to zip to store on github
+data/acc_vs_work/*.json
+data/acc_vs_work/*.npz
+
