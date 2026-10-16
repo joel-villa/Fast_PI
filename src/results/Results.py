@@ -7,6 +7,9 @@ Resources:
 import os
 import json
 import numpy as np
+
+import matplotlib
+matplotlib.use("QtAgg")
 import matplotlib.pyplot as plt
 from pathlib import Path
 from warnings import warn
@@ -426,7 +429,7 @@ class Results:
                 )
 
             ys = np.nanmean(ys_i, axis=0)
-            nnz = round(np.mean(self.nnzs))
+            nnz = round(np.mean(self.nnzs[i]))
 
             least_iter = np.min(self.test_run_iters[i])
             most_iter = np.max(self.test_run_iters[i])
@@ -441,9 +444,6 @@ class Results:
             else:
                 xs = xs[:most_iter]
                 ys = ys[:most_iter]
-
-            print(f"xs.shape = {xs.shape}")
-            print(f"ys.shape = {ys.shape}")
 
             ax.plot(xs, ys, label=f"{lbl}, nnz = {nnz}")
 
