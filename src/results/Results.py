@@ -98,7 +98,6 @@ class Results:
     tol: float
     seed: int
     num_avg: int
-    run_length_type: int
     n_binom_trials: list[int]
     lbls: list[str]
     notes: str | None
@@ -122,7 +121,6 @@ class Results:
         tol: float | None = None,
         seed: int | None = None,
         num_avg: int | None = None,
-        run_length_type: int | None = None,
         n_binom_trials: list[int] | None = None,
         lbls: list[str] | None = None,
         notes: str | None = None,
@@ -148,7 +146,6 @@ class Results:
             machine precision)
             seed (int | None): The seed of random events
             num_avg (int | None): Number of runs to average over
-            run_length_type (int | None): When averaging variable length
             sequences, must choose to average over all or part of them.
                 1 -> average over those that exist for all trials
                 2 -> average over the median num trials
@@ -181,7 +178,6 @@ class Results:
                 tol is None or
                 seed is None or
                 num_avg is None or
-                run_length_type is None or
                 n_binom_trials is None or
                 lbls is None or
                 test_run_iters is None or
@@ -203,7 +199,6 @@ class Results:
             self.tol = tol
             self.seed = seed
             self.num_avg = num_avg
-            self.run_length_type = run_length_type
             self.n_binom_trials = n_binom_trials
             self.lbls = lbls
             self.notes = notes
@@ -307,7 +302,6 @@ class Results:
             self.tol = metadata['tol']
             self.seed = metadata['seed']
             self.num_avg = metadata['num_avg']
-            self.run_length_type = metadata['run_length_type']
             self.n_binom_trials = metadata['n_binom_trials']
             self.lbls = metadata['lbls']
             self.notes = metadata['notes']
@@ -348,7 +342,6 @@ class Results:
             'tol': self.tol,
             'seed': self.seed,
             'num_avg': self.num_avg,
-            'run_length_type': self.run_length_type,
             'n_binom_trials': self.n_binom_trials,
             'lbls': self.lbls,
             'notes': self.notes,
@@ -370,6 +363,7 @@ class Results:
 
     def disp_results(
         self,
+        run_length_type: int,
         log_y: bool,
     ) -> None:
         """Display the results
@@ -383,7 +377,6 @@ class Results:
         base_ys = self.baseline_accuracies
 
         work_offset = base_xs[0]
-        print(f"work_offset: {work_offset}")
         total_base_work = base_xs[-1]
 
         # Start at zero
@@ -406,15 +399,18 @@ class Results:
 
         for i in range(num_trials):
             # Looping through Ns
+            least_iter = np.min(self.test_run_iters[i])
+            most_iter = np.max(self.test_run_iters[i])
+            median_iter = round(np.median(self.test_run_iters[i]))
+
             lbl = self.lbls[i]
-            xs = self.work[i]
+            xs = self.work[i, :most_iter]
             ys_i = np.full( # for averaging
                 (num_avg, self.accuracies.shape[2]),
                 np.nan,
             )
             # Scale to be between zero and one
             xs = xs - work_offset
-            print(f"xs[:5]: {xs[:5]}")
             xs = rel_value(
                 max=total_base_work,
                 xs=xs,
@@ -423,8 +419,8 @@ class Results:
 
             for j in range(num_avg):
                 # Looping through the runs (for averaging purposes)
-                ys_temp = self.accuracies[i, j]
-                ys_i[j] = rel_residue(
+                ys_temp = self.accuracies[i, j, :self.test_run_iters[i, j]]
+                ys_i[j, :self.test_run_iters[i, j]] = rel_residue(
                     max=self.snd_moment_norm,
                     xs=ys_temp,
                     check_max=True,
@@ -433,14 +429,10 @@ class Results:
             ys = np.nanmean(ys_i, axis=0)
             nnz = round(np.mean(self.nnzs[i]))
 
-            least_iter = np.min(self.test_run_iters[i])
-            most_iter = np.max(self.test_run_iters[i])
-            median_iter = round(np.median(self.test_run_iters[i]))
-
-            if (self.run_length_type == 1):
+            if (run_length_type == 1):
                 xs = xs[:least_iter]
                 ys = ys[:least_iter]
-            elif (self.run_length_type == 2):
+            elif (run_length_type == 2):
                 xs = xs[:median_iter]
                 ys = ys[:median_iter]
             else:
@@ -451,7 +443,7 @@ class Results:
 
         ax.set_title(
             f"Work vs. Accuracy of Top Eigenvector ({self.mat_name}:"
-            f"{self.mat_shape[0]}x{self.mat_shape[1]}, avg of {num_avg})"
+            f"{self.mat_shape[0]}x{self.mat_shape[1]}, avg of {num_avg}) runs"
         )
         ax.set_xlabel("Approximate Proportion of Scalar Mults")
         ax.set_ylabel(r"$\frac{|A^TA| - |A^TA\tilde v_1|}{|A^TA|}$", rotation=0)
