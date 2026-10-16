@@ -249,7 +249,7 @@ class Results:
                         curr_file_id = int(file[:self.FILE_ID_LEN])
                         if (curr_file_id == file_id):
                             # file name without ".json"
-                            file_name = file[-5:]
+                            file_name = file[:-5]
                             break
                     except:
                         pass
@@ -383,6 +383,7 @@ class Results:
         base_ys = self.baseline_accuracies
 
         work_offset = base_xs[0]
+        print(f"work_offset: {work_offset}")
         total_base_work = base_xs[-1]
 
         # Start at zero
@@ -413,6 +414,7 @@ class Results:
             )
             # Scale to be between zero and one
             xs = xs - work_offset
+            print(f"xs[:5]: {xs[:5]}")
             xs = rel_value(
                 max=total_base_work,
                 xs=xs,
