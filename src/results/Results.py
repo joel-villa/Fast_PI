@@ -166,7 +166,6 @@ class Results:
         """
         if file_id:
             self.load_results(file_id)
-
         else:
             if (
                 mat_name is None or
@@ -453,3 +452,20 @@ class Results:
         fig.canvas.draw()
         plt.show()
         plt.close(fig)
+
+
+def main():
+    """Nothing but a thang
+	"""
+    result_ids = range(1, 25)
+
+    for id in result_ids:
+        results = Results(file_id=id)
+        results.disp_results(
+            log_y=True,
+            run_length_type=2
+        )
+
+if __name__ == '__main__':
+    """For testing purporses"""
+    main()
