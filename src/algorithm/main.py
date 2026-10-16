@@ -98,7 +98,6 @@ def main(
             tol = tol,
             seed = seed,
             num_avg = num_avg,
-            run_length_type = run_length_type,
             n_binom_trials = Ns,
             lbls = lbls,
             notes = None,
@@ -112,7 +111,7 @@ def main(
         file_id = results.save_results()
         if not on_easley:
             results = Results(file_id=file_id)
-            results.disp_results(log_y=True)
+            results.disp_results(log_y=True, run_length_type=run_length_type)
 
 
 if __name__ == '__main__':
@@ -169,7 +168,7 @@ if __name__ == '__main__':
         run_length_type=2,
         log_y=True,
         mats=mats,
-        on_easley=False,
+        on_easley=True,
         max_iter=max_iter,
         tol=tol,
         seed=seed,
@@ -177,4 +176,4 @@ if __name__ == '__main__':
     )
 
 #    results = Results(file_id = 1)
-#    results.disp_results(log_y=True)
+#    results.disp_results(log_y=True, run_length_type=2)
