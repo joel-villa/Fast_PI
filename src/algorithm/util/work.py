@@ -1,4 +1,4 @@
-"""For generating ammount of work to compute an average of approximations of 
+"""For generating ammount of work to compute an average of approximations of
 A^TA"""
 import scipy
 import numpy as np
@@ -8,7 +8,7 @@ def power_work(
         matrix: scipy.sparse.sparray,
         num_iter: int,
 ) -> np.ndarray:
-    """The amount of cummulative work done at every iteration of Power on the 
+    """The amount of cummulative work done at every iteration of Power on the
     given matrix
 
     Args:
@@ -16,7 +16,7 @@ def power_work(
         num_iter (int): number of iterations run
 
     Returns:
-        np.ndarray: A linearly increasing one-dimensional array of length 
+        np.ndarray: A linearly increasing one-dimensional array of length
         num_iter
     """
     nnzs = matrix.nnz
@@ -32,7 +32,7 @@ def work_baseline(
 
     NOTE: A^TA can be rewritten as a sum of the outerproducts of the rows
 
-    Work breakdown: 
+    Work breakdown:
         The i'th row contributes w_i^2, where w_i is the nnz's in the i'th row
 
     Args:
@@ -50,7 +50,7 @@ def work_baseline(
 
     assert row_nnzs.shape[0] == A.shape[0] #TODO: delete this after sure it is workign
 
-    if is_distributed:
+    if is_distributed: #TODO: have return both, get rid of is_distributed
         return np.max(row_work)
 
     return np.sum(row_work)
@@ -60,10 +60,10 @@ def work_naive_pessimistic(
     num_tirals:int,
     is_distributed:bool,
 ) -> int:
-    """Calculate ammount of work (scalar mults) involved in computing this 
+    """Calculate ammount of work (scalar mults) involved in computing this
     average in a naive way
 
-    NOTE: actually computing this work involves expectation, and sparsity 
+    NOTE: actually computing this work involves expectation, and sparsity
     rate, this is a simple overestimate
 
     Work breakdown: Doing A.transpose() @ diag_i @ diag_i @ A at every iteration
@@ -79,7 +79,7 @@ def work_naive_pessimistic(
     Returns:
         int: amount of scalar mults
     """
-    # 
+    #
     mults_per_iter = A.nnz + A.shape[0] + A.nnz * A.shape[0]
     if is_distributed:
         return mults_per_iter
@@ -89,14 +89,14 @@ def work_binomial(
         A:scipy.sparse.csr_array,
         is_distributed:bool,
 ) -> int:
-    """Calculate ammount of work required to do the parallelizable calculation 
+    """Calculate ammount of work required to do the parallelizable calculation
     of an averaged approximation of A^TA
 
-    NOTE: 
-        (1) the total work is independent of the number of trials, just 
+    NOTE:
+        (1) the total work is independent of the number of trials, just
         dependent upon the number of rows
-        (2) same amount of work to compute approx A^TA as A^TA, assuming the 
-        cost of calling binom() is insignificant in comparison to the outer 
+        (2) same amount of work to compute approx A^TA as A^TA, assuming the
+        cost of calling binom() is insignificant in comparison to the outer
         product computations
 
     Work breakdown: doing row_i.transpose() @ row_i at every iteration
@@ -104,14 +104,14 @@ def work_binomial(
 
     Args:
         A (scipy.sparse.csr_array): The matrix in question
-        is_distributed (bool): True -> taking maxium, False -> summing up work 
+        is_distributed (bool): True -> taking maxium, False -> summing up work
         per row
 
     Returns:
         int: Ammount of work per thread
     """
-    return work_baseline( 
-        A=A, 
+    return work_baseline(
+        A=A,
         is_distributed=is_distributed,
     )
 
@@ -156,13 +156,13 @@ if __name__ == '__main__':
         A, _ = preprocess(mat_name=mat)
 
         work = work_naive_pessimistic(
-            A=A, 
+            A=A,
             num_tirals=N,
             is_distributed=False,
         )
         print(f"Work Naive (non distributed): {work}")
         work = work_naive_pessimistic(
-            A=A, 
+            A=A,
             num_tirals=N,
             is_distributed=True,
         )
