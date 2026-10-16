@@ -33,7 +33,8 @@ machine, at the root in the .ssgetpy directory
 
 ### Empirical
 
-- [ ] Results Object
+- [ ] Run Carc to fill out acc_vs_work folder
+- [x] Results Object
 - [ ] Test on dense matrices (are there power-law drop off dense matrices)
 - [ ] Do norms impact performance? Why are some not seeing gains?
 - [ ] Run on CARC:
