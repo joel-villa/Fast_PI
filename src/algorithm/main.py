@@ -63,7 +63,7 @@ def main(
         num_Ns_tested = len(Ns)
         test_run_iters = np.zeros((num_Ns_tested, num_avg), int)
         nnzs = np.zeros((num_Ns_tested, num_avg))
-        work = np.zeros((num_Ns_tested, max_iter))
+        work = np.full((num_Ns_tested, max_iter), np.nan)
         accuracies = np.full((num_Ns_tested, num_avg, max_iter), np.nan) # NaNs for that good averaging
 
         for i, N in tqdm(enumerate(Ns)):
@@ -169,9 +169,12 @@ if __name__ == '__main__':
         run_length_type=2,
         log_y=True,
         mats=mats,
-        on_easley=True,
+        on_easley=False,
         max_iter=max_iter,
         tol=tol,
         seed=seed,
         Ns=Ns,
     )
+
+#    results = Results(file_id = 1)
+#    results.disp_results(log_y=True)
