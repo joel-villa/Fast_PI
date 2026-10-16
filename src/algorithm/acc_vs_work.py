@@ -253,4 +253,6 @@ def binomial_test(
     else:
         lbl = f"{num_trials} trials"
 
+#    print(f"xs[:8]: {xs[:8]}")
+
     return xs, ys, tilde_A_sq.nnz, lbl
